@@ -4,10 +4,11 @@ import requests
 import time
 import json
 import sys
+import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 API_URL = "https://api.enlyai.com/v1/chat/completions"
-API_KEY = "sk-scz5ymhelfKbuckZK04znfZmtrjKrOtIMDT6j8NLcL3rq1qM"
+API_KEY = os.environ.get("ENLYAI_API_KEY", "YOUR_API_KEY_HERE")
 TOTAL_REQUESTS = int(sys.argv[1]) if len(sys.argv) > 1 else 50
 CONCURRENT = int(sys.argv[2]) if len(sys.argv) > 2 else 10
 

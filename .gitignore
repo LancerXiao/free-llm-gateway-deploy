@@ -1,0 +1,28 @@
+# Environment / secrets
+.env
+.env.*
+*.secret
+
+# API keys (prevent accidental commit)
+# Use environment variables instead of hardcoding keys
+
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+
+# Node (new-api frontend)
+node_modules/
+
+# Build artifacts
+dist/
+build/
