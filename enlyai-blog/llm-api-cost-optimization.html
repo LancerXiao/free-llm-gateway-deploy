@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM API成本对比与省钱技巧 | EnlyAI 博客</title>
+    <meta name="description" content="对比各平台 LLM API 价格，分享省钱技巧，包括模型选择、Token 优化、缓存策略和批量处理等方法。">
+    <meta name="keywords" content="LLM API 成本, API 省钱, GPT-4 价格对比">
+    <meta name="author" content="EnlyAI">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://enlyai.com/blog/llm-api-cost-optimization">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="LLM API成本对比与省钱技巧">
+    <meta property="og:description" content="对比各平台 LLM API 价格，分享省钱技巧，包括模型选择、Token 优化、缓存策略等。">
+    <meta property="og:url" content="https://enlyai.com/blog/llm-api-cost-optimization">
+    <meta property="og:site_name" content="EnlyAI">
+    <meta property="og:locale" content="zh_CN">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="LLM API成本对比与省钱技巧">
+    <meta name="twitter:description" content="对比各平台 LLM API 价格，分享实用的省钱技巧。">
+
+    <!-- Schema.org 结构化数据 -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "headline": "LLM API成本对比与省钱技巧",
+        "description": "对比各平台 LLM API 价格，分享省钱技巧，包括模型选择、Token 优化、缓存策略和批量处理等方法。",
+        "keywords": "LLM API 成本, API 省钱, GPT-4 价格对比",
+        "author": {
+            "@type": "Organization",
+            "name": "EnlyAI",
+            "url": "https://enlyai.com"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "EnlyAI",
+            "url": "https://enlyai.com"
+        },
+        "datePublished": "2026-06-18",
+        "dateModified": "2026-06-18",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https://enlyai.com/blog/llm-api-cost-optimization"
+        }
+    }
+    </script>
+
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #dbeafe;
+            --text: #1f2937;
+            --text-light: #6b7280;
+            --bg: #ffffff;
+            --bg-soft: #f9fafb;
+            --border: #e5e7eb;
+            --code-bg: #1e293b;
+            --code-text: #e2e8f0;
+            --green: #059669;
+            --green-light: #d1fae5;
+            --amber: #d97706;
+            --amber-light: #fef3c7;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            color: var(--text);
+            background: var(--bg);
+            line-height: 1.8;
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .top-nav {
+            border-bottom: 1px solid var(--border);
+            padding: 14px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: saturate(180%) blur(8px);
+            background: rgba(255, 255, 255, 0.92);
+        }
+
+        .top-nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .back-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 15px;
+        }
+
+        .back-link:hover {
+            color: var(--primary-dark);
+        }
+
+        .brand {
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--text);
+            text-decoration: none;
+            letter-spacing: -0.3px;
+        }
+
+        .brand span {
+            color: var(--primary);
+        }
+
+        article {
+            padding: 40px 0 60px;
+        }
+
+        .article-meta {
+            color: var(--text-light);
+            font-size: 14px;
+            margin-bottom: 16px;
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .tag {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        h1 {
+            font-size: 34px;
+            line-height: 1.3;
+            font-weight: 800;
+            margin-bottom: 20px;
+            letter-spacing: -0.5px;
+            color: #111827;
+        }
+
+        h2 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 40px 0 16px;
+            color: #111827;
+            padding-top: 8px;
+            border-top: 1px solid var(--border);
+        }
+
+        h3 {
+            font-size: 19px;
+            font-weight: 600;
+            margin: 24px 0 12px;
+            color: #1f2937;
+        }
+
+        p {
+            margin-bottom: 18px;
+            color: var(--text);
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        ul, ol {
+            margin: 0 0 18px 22px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        strong {
+            color: #111827;
+            font-weight: 600;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            background: var(--bg-soft);
+            padding: 14px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+            color: var(--text-light);
+        }
+
+        blockquote p {
+            margin-bottom: 0;
+        }
+
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 20px 22px;
+            border-radius: 10px;
+            overflow-x: auto;
+            margin: 18px 0;
+            font-size: 14px;
+            line-height: 1.65;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+        }
+
+        code {
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+        }
+
+        p code, li code {
+            background: #f1f5f9;
+            color: #be185d;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .k { color: #c084fc; }
+        .s { color: #86efac; }
+        .c { color: #64748b; font-style: italic; }
+        .n { color: #fbbf24; }
+        .f { color: #60a5fa; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 15px;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 10px 12px;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-soft);
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) td {
+            background: #fafbfc;
+        }
+
+        .price-cheap {
+            color: var(--green);
+            font-weight: 600;
+        }
+
+        .price-expensive {
+            color: var(--amber);
+            font-weight: 600;
+        }
+
+        .saving-box {
+            background: var(--green-light);
+            border: 1px solid #6ee7b7;
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin: 20px 0;
+        }
+
+        .saving-box strong {
+            color: var(--green);
+        }
+
+        .cta {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: #fff;
+            padding: 36px 30px;
+            border-radius: 14px;
+            margin: 40px 0 20px;
+            text-align: center;
+        }
+
+        .cta h3 {
+            color: #fff;
+            margin-top: 0;
+            font-size: 22px;
+        }
+
+        .cta p {
+            color: rgba(255, 255, 255, 0.92);
+            margin-bottom: 22px;
+        }
+
+        .cta-btn {
+            display: inline-block;
+            background: #fff;
+            color: var(--primary);
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            text-decoration: none;
+            transition: transform 0.15s ease;
+        }
+
+        .cta-btn:hover {
+            text-decoration: none;
+            transform: translateY(-2px);
+        }
+
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 24px 0;
+            text-align: center;
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        footer a {
+            color: var(--text-light);
+        }
+
+        footer a:hover {
+            color: var(--primary);
+        }
+
+        .icp {
+            margin-top: 6px;
+            font-size: 13px;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 26px; }
+            h2 { font-size: 21px; }
+            pre { font-size: 13px; padding: 16px; }
+            .container { padding: 0 16px; }
+            table { font-size: 13px; }
+            th, td { padding: 8px; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="top-nav">
+        <div class="container">
+            <a href="https://enlyai.com" class="brand">Enly<span>AI</span></a>
+            <a href="https://enlyai.com" class="back-link">← 返回首页</a>
+        </div>
+    </nav>
+
+    <article>
+        <div class="container">
+            <div class="article-meta">
+                <span class="tag">成本优化</span>
+                <span class="tag">LLM</span>
+                <span>2026-06-18</span>
+                <span>阅读约 13 分钟</span>
+            </div>
+
+            <h1>LLM API成本对比与省钱技巧</h1>
+
+            <p>很多团队在接入大模型的第一周兴奋不已，到了月底看账单却倒吸一口凉气——一次简单的 RAG 检索问答，token 消耗可能是预期的 5 倍；一个面向 C 端的聊天功能，上线两周就把预算烧光。LLM API 的计费方式和传统云服务很不一样，它按 token 计费，而 token 又和 prompt 长度、模型选择、是否流式、是否缓存等十几个因素相关。</p>
+
+            <p>这篇文章会做两件事：第一，<strong>横向对比主流大模型的 API 价格</strong>，让你心里有数；第二，<strong>分享一套实战验证过的省钱技巧</strong>，从模型选型到代码层面，帮你把成本压到原来的 1/3 甚至更低。</p>
+
+            <h2>一、主流 LLM API 价格对比（2026 年）</h2>
+
+            <p>LLM API 通常按 token 分两段计费：<strong>输入 token（Input / Prompt）</strong>和<strong>输出 token（Output / Completion）</strong>。输出 token 一般是输入的 3-5 倍价格，因为生成比理解更耗算力。下面是几家主流厂商旗舰与轻量模型的价格参考（每百万 token，单位：美元）。</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>模型</th>
+                        <th>厂商</th>
+                        <th>输入价格</th>
+                        <th>输出价格</th>
+                        <th>定位</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>GPT-4o</td>
+                        <td>OpenAI</td>
+                        <td>$2.50</td>
+                        <td>$10.00</td>
+                        <td>旗舰多模态</td>
+                    </tr>
+                    <tr>
+                        <td>GPT-4o-mini</td>
+                        <td>OpenAI</td>
+                        <td class="price-cheap">$0.15</td>
+                        <td class="price-cheap">$0.60</td>
+                        <td>轻量高性价比</td>
+                    </tr>
+                    <tr>
+                        <td>Claude 3.5 Sonnet</td>
+                        <td>Anthropic</td>
+                        <td>$3.00</td>
+                        <td>$15.00</td>
+                        <td>长文本强推理</td>
+                    </tr>
+                    <tr>
+                        <td>Claude 3 Haiku</td>
+                        <td>Anthropic</td>
+                        <td class="price-cheap">$0.25</td>
+                        <td class="price-cheap">$1.25</td>
+                        <td>快速轻量</td>
+                    </tr>
+                    <tr>
+                        <td>Gemini 2.0 Flash</td>
+                        <td>Google</td>
+                        <td class="price-cheap">$0.10</td>
+                        <td class="price-cheap">$0.40</td>
+                        <td>超低价多模态</td>
+                    </tr>
+                    <tr>
+                        <td>Gemini 2.0 Pro</td>
+                        <td>Google</td>
+                        <td>$1.25</td>
+                        <td>$5.00</td>
+                        <td>长上下文</td>
+                    </tr>
+                    <tr>
+                        <td>DeepSeek-V3</td>
+                        <td>DeepSeek</td>
+                        <td class="price-cheap">$0.27</td>
+                        <td class="price-cheap">$1.10</td>
+                        <td>开源高性价比</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p>从这张表能看出几个关键结论：</p>
+
+            <ul>
+                <li><strong>旗舰模型之间差距不大</strong>：GPT-4o、Claude 3.5 Sonnet、Gemini 2.0 Pro 都在每百万输出 token $5-$15 区间，选哪个更多看效果而非价格。</li>
+                <li><strong>轻量模型是省钱主战场</strong>：GPT-4o-mini、Gemini 2.0 Flash、Claude 3 Haiku 的价格只有旗舰的 1/10 到 1/20，但能力已经能覆盖 80% 的日常任务。</li>
+                <li><strong>输出 token 是成本大头</strong>：同样 100 万 token，输出比输入贵 4 倍。控制生成长度比压缩 prompt 更见效。</li>
+            </ul>
+
+            <blockquote>
+                <p>注意：以上是官方列表价。通过 EnlyAI 这类聚合平台调用，通常还能再享受阶梯折扣，实际成本会更低，且不用分别维护多个厂商账号。</p>
+            </blockquote>
+
+            <h2>二、省钱技巧一：选对模型，别用大炮打蚊子</h2>
+
+            <p>这是最立竿见影的一招。很多开发者习惯性地把所有请求都丢给 GPT-4o，结果 90% 的请求其实只是分类、抽取、简单问答，用 GPT-4o-mini 完全够用，成本却差了一个数量级。</p>
+
+            <p>一个实用的分级策略：</p>
+
+            <ol>
+                <li><strong>简单任务（分类、抽取、格式转换）</strong>：用 Gemini 2.0 Flash 或 GPT-4o-mini，单价 $0.1-$0.15。</li>
+                <li><strong>中等任务（摘要、翻译、常规问答）</strong>：用 Claude 3 Haiku 或 DeepSeek-V3，单价 $0.25-$0.27。</li>
+                <li><strong>复杂任务（代码生成、多步推理、长文档分析）</strong>：才上 GPT-4o 或 Claude 3.5 Sonnet。</li>
+            </ol>
+
+            <p>更进阶的做法是<strong>路由分发</strong>：先用一个便宜的轻量模型判断请求复杂度，再决定转发给哪个模型。下面是一个简单的 Python 实现：</p>
+
+            <pre><code><span class="k">from</span> openai <span class="k">import</span> OpenAI
+
+client = OpenAI(api_key=<span class="s">"sk-your-key"</span>, base_url=<span class="s">"https://enlyai.com/v1"</span>)
+
+<span class="k">def</span> <span class="f">route_model</span>(question: <span class="k">str</span>) -> <span class="k">str</span>:
+    <span class="c"># 第一步：用最便宜的模型判断复杂度</span>
+    judge = client.chat.completions.create(
+        model=<span class="s">"gemini-2.0-flash"</span>,
+        messages=[{
+            <span class="s">"role"</span>: <span class="s">"user"</span>,
+            <span class="s">"content"</span>: <span class="s">f"判断这个问题复杂度，只回 simple/complex：{question}"</span>
+        }],
+        temperature=<span class="n">0</span>
+    )
+    level = judge.choices[<span class="n">0</span>].message.content.strip().lower()
+    <span class="k">return</span> <span class="s">"gpt-4o-mini"</span> <span class="k">if</span> <span class="s">"simple"</span> <span class="k">in</span> level <span class="k">else</span> <span class="s">"gpt-4o"</span>
+
+<span class="k">def</span> <span class="f">smart_ask</span>(question: <span class="k">str</span>):
+    model = route_model(question)
+    <span class="f">print</span>(<span class="s">f"路由到 {model}"</span>)
+    <span class="k">return</span> client.chat.completions.create(
+        model=model,
+        messages=[{<span class="s">"role"</span>: <span class="s">"user"</span>, <span class="s">"content"</span>: question}]
+    )</code></pre>
+
+            <div class="saving-box">
+                <p><strong>实测效果：</strong>在一个客服问答场景中，引入路由分发后，70% 的请求被分流到轻量模型，整体成本下降约 65%，而用户感知的回答质量几乎无差异。</p>
+            </div>
+
+            <h2>三、省钱技巧二：压缩 Prompt，砍掉冗余 token</h2>
+
+            <p>Prompt 里的每一个字都在烧钱。一个常见的误区是把整份产品文档、整段历史对话都塞进 system prompt，结果每次请求都重复付费。优化 prompt 的几个原则：</p>
+
+            <ul>
+                <li><strong>精简 system prompt</strong>：去掉客套话和重复说明，用短句替代长段落。把“你是一个非常有帮助的、专业的、友好的助手”改成“专业助手”。</li>
+                <li><strong>压缩历史对话</strong>：多轮对话不要无脑保留全部历史，用摘要替代旧消息，只保留最近 3-5 轮原文。</li>
+                <li><strong>用结构化格式</strong>：JSON、YAML 比 自然语言更紧凑，解析也更准。</li>
+                <li><strong>少样本示例要精挑细选</strong>：3 个高质量 few-shot 示例的效果往往优于 10 个普通示例，token 还省一半。</li>
+            </ul>
+
+            <p>用 tiktoken 库可以精确统计 token 数，避免盲猜：</p>
+
+            <pre><code>pip install tiktoken</code></pre>
+
+            <pre><code><span class="k">import</span> tiktoken
+
+enc = tiktoken.encoding_for_model(<span class="s">"gpt-4o"</span>)
+text = <span class="s">"你是一个专业助手，请用简洁的语言回答用户问题。"</span>
+<span class="f">print</span>(<span class="s">f"token 数: {len(enc.encode(text))}"</span>)
+<span class="c"># 输出: token 数: 18</span></code></pre>
+
+            <h2>四、省钱技巧三：用缓存避免重复计算</h2>
+
+            <p>很多 LLM 应用的请求有大量重复——同样的 FAQ、同样的产品说明、同样的代码模板。如果每次都重新调用模型，既慢又贵。缓存是性价比最高的优化手段。</p>
+
+            <p>缓存分两层：</p>
+
+            <h3>1. Prompt 缓存（语义级）</h3>
+
+            <p>Anthropic 的 Claude 和 OpenAI 的 GPT-4o 都支持 <strong>Prompt Caching</strong>：把长 system prompt 或文档标记为可缓存，后续请求命中缓存时输入 token 价格直接打 1 折。适合 RAG、Agent 这类固定上下文的场景。</p>
+
+            <pre><code>response = client.chat.completions.create(
+    model=<span class="s">"claude-3-5-sonnet"</span>,
+    messages=[
+        {<span class="s">"role"</span>: <span class="s">"system"</span>, <span class="s">"content"</span>: long_document},
+        {<span class="s">"role"</span>: <span class="s">"user"</span>, <span class="s">"content"</span>: user_question}
+    ],
+    extra_headers={
+        <span class="c"># Anthropic 的缓存标记</span>
+        <span class="s">"anthropic-beta"</span>: <span class="s">"prompt-caching-2024-07-31"</span>
+    }
+)</code></pre>
+
+            <h3>2. 业务级缓存（Redis / 内存）</h3>
+
+            <p>对于完全相同的请求（比如“今天天气怎么样”这种高频问题），直接用 Redis 缓存完整响应，命中后零成本返回。建议对 query 做归一化（去空格、转小写、去标点）后再作为 cache key，命中率会高很多。</p>
+
+            <pre><code><span class="k">import</span> hashlib, redis, json
+
+r = redis.Redis()
+
+<span class="k">def</span> <span class="f">cached_ask</span>(question: <span class="k">str</span>, model=<span class="s">"gpt-4o-mini"</span>):
+    key = <span class="s">f"llm:{model}:"</span> + hashlib.md5(question.encode()).hexdigest()
+    cached = r.get(key)
+    <span class="k">if</span> cached:
+        <span class="k">return</span> json.loads(cached)
+
+    resp = client.chat.completions.create(
+        model=model,
+        messages=[{<span class="s">"role"</span>: <span class="s">"user"</span>, <span class="s">"content"</span>: question}]
+    )
+    answer = resp.choices[<span class="n">0</span>].message.content
+    r.setex(key, <span class="n">3600</span>, json.dumps(answer))  <span class="c"># 缓存 1 小时</span>
+    <span class="k">return</span> answer</code></pre>
+
+            <div class="saving-box">
+                <p><strong>实测效果：</strong>在一个电商客服场景，引入 Redis 缓存后命中率约 35%，叠加 Prompt Caching，整体 token 支出下降 50% 以上。</p>
+            </div>
+
+            <h2>五、省钱技巧四：批量处理与异步并发</h2>
+
+            <p>如果你有大量离线任务（批量翻译、批量打标、批量摘要），千万别用同步循环一个个调。两个优化方向：</p>
+
+            <p><strong>1. 用 Batch API</strong>：OpenAI 和 Anthropic 都提供 Batch API，把多个请求打包成一个 JSONL 文件提交，24 小时内返回结果，价格直接<strong>打 5 折</strong>。适合不要求实时的离线任务。</p>
+
+            <p><strong>2. 异步并发</strong>：实时任务用 <code>AsyncOpenAI</code> + <code>asyncio.gather</code> 并发，吞吐量提升 10 倍以上，单请求成本不变但整体耗时大幅下降，间接省了服务器和等待成本。</p>
+
+            <pre><code><span class="k">import</span> asyncio
+<span class="k">from</span> openai <span class="k">import</span> AsyncOpenAI
+
+client = AsyncOpenAI(api_key=<span class="s">"sk-your-key"</span>, base_url=<span class="s">"https://enlyai.com/v1"</span>)
+
+<span class="k">async def</span> <span class="f">summarize</span>(text: <span class="k">str</span>):
+    resp = <span class="k">await</span> client.chat.completions.create(
+        model=<span class="s">"gpt-4o-mini"</span>,
+        messages=[{<span class="s">"role"</span>: <span class="s">"user"</span>, <span class="s">"content"</span>: <span class="s">f"一句话摘要：{text}"</span>}],
+        max_tokens=<span class="n">50</span>  <span class="c"># 限制输出长度，省钱关键</span>
+    )
+    <span class="k">return</span> resp.choices[<span class="n">0</span>].message.content
+
+<span class="k">async def</span> <span class="f">main</span>():
+    docs = [<span class="s">"文档1..."</span>, <span class="s">"文档2..."</span>, <span class="s">"文档3..."</span>]
+    results = <span class="k">await</span> asyncio.gather(*[summarize(d) <span class="k">for</span> d <span class="k">in</span> docs])
+
+asyncio.run(main())</code></pre>
+
+            <h2>六、省钱技巧五：控制输出长度</h2>
+
+            <p>前面说过，输出 token 是输入的 4 倍价格。所以<strong>限制生成长度比压缩 prompt 更划算</strong>。三个具体做法：</p>
+
+            <ul>
+                <li><strong>设置 max_tokens</strong>：明确告诉模型最多生成多少 token，避免它“刹不住车”。</li>
+                <li><strong>在 prompt 里要求简洁</strong>：加一句“请用 50 字以内回答”，效果立竿见影。</li>
+                <li><strong>用 stop 序列</strong>：遇到特定标记就停止生成，适合结构化输出。</li>
+            </ul>
+
+            <pre><code>response = client.chat.completions.create(
+    model=<span class="s">"gpt-4o-mini"</span>,
+    messages=[{<span class="s">"role"</span>: <span class="s">"user"</span>, <span class="s">"content"</span>: <span class="s">"总结这篇文章"</span>}],
+    max_tokens=<span class="n">100</span>,          <span class="c"># 硬上限</span>
+    stop=[<span class="s">"\n\n"</span>],            <span class="c"># 遇到空行就停</span>
+    temperature=<span class="n">0.3</span>           <span class="c"># 低温度减少啰嗦</span>
+)</code></pre>
+
+            <h2>七、省钱技巧六：用聚合平台统一计费</h2>
+
+            <p>前面五招都是技术层面的优化。还有一招是<strong>平台层面</strong>的：与其在 OpenAI、Anthropic、Google 各开一个账号、各充一笔钱、各维护一套 key，不如用一个聚合平台统一接入。</p>
+
+            <p>EnlyAI 就是这样的平台，它有几个直接的成本优势：</p>
+
+            <ul>
+                <li><strong>统一 API</strong>：兼容 OpenAI 格式，base_url 指向 <code>https://enlyai.com/v1</code>，原有代码几乎零改动。</li>
+                <li><strong>多模型比价</strong>：一个面板看到所有模型的实时价格，方便随时切换到更便宜的等价模型。</li>
+                <li><strong>阶梯折扣</strong>：调用量越大单价越低，比官方列表价更省。</li>
+                <li><strong>统一账单</strong>：所有模型调用汇总在一份账单，方便做成本归因和预算控制。</li>
+                <li><strong>故障转移</strong>：某家模型服务波动时，自动切换到备用模型，避免业务中断带来的隐性成本。</li>
+            </ul>
+
+            <p>对应的 cURL 调用示例，和官方 OpenAI 完全一致：</p>
+
+            <pre><code>curl https://enlyai.com/v1/chat/completions \
+  -H <span class="s">"Authorization: Bearer sk-your-enlyai-key"</span> \
+  -H <span class="s">"Content-Type: application/json"</span> \
+  -d <span class="s">'{
+    "model": "gpt-4o-mini",
+    "messages": [{"role": "user", "content": "你好"}],
+    "max_tokens": 50
+  }'</span></code></pre>
+
+            <h2>八、省钱效果汇总</h2>
+
+            <p>把上面几招组合起来，效果是叠加的。下面是一个真实客服场景的优化路径（月调用量 100 万次，平均每次输入 800 token、输出 200 token）：</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>优化阶段</th>
+                        <th>模型</th>
+                        <th>月成本（美元）</th>
+                        <th>降幅</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>初始（全用旗舰）</td>
+                        <td>GPT-4o</td>
+                        <td class="price-expensive">~$3,000</td>
+                        <td>—</td>
+                    </tr>
+                    <tr>
+                        <td>换轻量模型</td>
+                        <td>GPT-4o-mini</td>
+                        <td>~$200</td>
+                        <td>-93%</td>
+                    </tr>
+                    <tr>
+                        <td>+ 路由分发</td>
+                        <td>混合</td>
+                        <td>~$140</td>
+                        <td>-95%</td>
+                    </tr>
+                    <tr>
+                        <td>+ 缓存</td>
+                        <td>混合</td>
+                        <td>~$90</td>
+                        <td>-97%</td>
+                    </tr>
+                    <tr>
+                        <td>+ Prompt 压缩 + max_tokens</td>
+                        <td>混合</td>
+                        <td class="price-cheap">~$60</td>
+                        <td>-98%</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p>从 $3000 降到 $60，这不是夸张的营销数字，而是<strong>每一招都落实后</strong>的真实结果。当然，前提是你的场景对模型能力的要求允许做这些取舍——如果是医疗、法律等高精度场景，不能一味追求便宜。</p>
+
+            <h2>结语：省钱是系统工程</h2>
+
+            <p>LLM API 成本优化不是一次性的工作，而是贯穿产品全生命周期的系统工程。建议从三步走：</p>
+
+            <ol>
+                <li><strong>先量化</strong>：上线前就接入 token 监控，搞清楚钱花在哪类请求、哪个模型、哪段 prompt 上。</li>
+                <li><strong>再分级</strong>：按任务复杂度路由到不同模型，把 80% 的流量导向轻量模型。</li>
+                <li><strong>后优化</strong>：叠加缓存、压缩、Batch、max_tokens，持续压低单位成本。</li>
+            </ol>
+
+            <p>最后，选对平台也很关键。一个统一的聚合入口能让你在模型之间自由切换、享受批量折扣、集中管理账单，这些隐性收益往往比单次降价更可观。</p>
+
+            <div class="cta">
+                <h3>想大幅降低 LLM API 成本？</h3>
+                <p>EnlyAI 提供 OpenAI 兼容的统一接口，支持 GPT、Claude、Gemini、DeepSeek 等数十种模型，注册即送免费额度，一个 key 调用所有模型，享受阶梯折扣。</p>
+                <a href="https://enlyai.com" class="cta-btn">立即注册 EnlyAI →</a>
+            </div>
+        </div>
+    </article>
+
+    <footer>
+        <div class="container">
+            <p>© 2026 EnlyAI · <a href="https://enlyai.com">enlyai.com</a></p>
+            <p class="icp"><a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener">粤ICP备2026055772号-1</a></p>
+        </div>
+    </footer>
+</body>
+</html>

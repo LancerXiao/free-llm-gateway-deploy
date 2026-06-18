@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用Python调用LLM API的5种方式 | EnlyAI 博客</title>
+    <meta name="description" content="介绍使用 Python 调用各种 LLM API 的方法，包括 OpenAI SDK、requests、LangChain、统一 API 和流式输出，附带完整代码示例。">
+    <meta name="keywords" content="Python LLM API, Python 调用 GPT, Python OpenAI SDK">
+    <meta name="author" content="EnlyAI">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://enlyai.com/blog/python-llm-api-tutorial">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="用Python调用LLM API的5种方式">
+    <meta property="og:description" content="介绍使用 Python 调用各种 LLM API 的方法，包括 OpenAI SDK、requests、LangChain、统一 API 和流式输出。">
+    <meta property="og:url" content="https://enlyai.com/blog/python-llm-api-tutorial">
+    <meta property="og:site_name" content="EnlyAI">
+    <meta property="og:locale" content="zh_CN">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="用Python调用LLM API的5种方式">
+    <meta name="twitter:description" content="介绍使用 Python 调用各种 LLM API 的方法，附带完整代码示例。">
+
+    <!-- Schema.org 结构化数据 -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "headline": "用Python调用LLM API的5种方式",
+        "description": "介绍使用 Python 调用各种 LLM API 的方法，包括 OpenAI SDK、requests、LangChain、统一 API 和流式输出，附带完整代码示例。",
+        "keywords": "Python LLM API, Python 调用 GPT, Python OpenAI SDK",
+        "author": {
+            "@type": "Organization",
+            "name": "EnlyAI",
+            "url": "https://enlyai.com"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "EnlyAI",
+            "url": "https://enlyai.com"
+        },
+        "datePublished": "2026-06-18",
+        "dateModified": "2026-06-18",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https://enlyai.com/blog/python-llm-api-tutorial"
+        }
+    }
+    </script>
+
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #dbeafe;
+            --text: #1f2937;
+            --text-light: #6b7280;
+            --bg: #ffffff;
+            --bg-soft: #f9fafb;
+            --border: #e5e7eb;
+            --code-bg: #1e293b;
+            --code-text: #e2e8f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            color: var(--text);
+            background: var(--bg);
+            line-height: 1.8;
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .top-nav {
+            background: #fff;
+            border-bottom: 1px solid var(--border);
+            padding: 14px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: saturate(180%) blur(8px);
+            background: rgba(255, 255, 255, 0.92);
+        }
+
+        .top-nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .back-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 15px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .back-link:hover {
+            color: var(--primary-dark);
+        }
+
+        .brand {
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--text);
+            text-decoration: none;
+            letter-spacing: -0.3px;
+        }
+
+        .brand span {
+            color: var(--primary);
+        }
+
+        article {
+            padding: 40px 0 60px;
+        }
+
+        .article-meta {
+            color: var(--text-light);
+            font-size: 14px;
+            margin-bottom: 16px;
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .tag {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        h1 {
+            font-size: 34px;
+            line-height: 1.3;
+            font-weight: 800;
+            margin-bottom: 20px;
+            letter-spacing: -0.5px;
+            color: #111827;
+        }
+
+        h2 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 40px 0 16px;
+            color: #111827;
+            padding-top: 8px;
+            border-top: 1px solid var(--border);
+        }
+
+        h3 {
+            font-size: 19px;
+            font-weight: 600;
+            margin: 24px 0 12px;
+            color: #1f2937;
+        }
+
+        p {
+            margin-bottom: 18px;
+            color: var(--text);
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        ul, ol {
+            margin: 0 0 18px 22px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        strong {
+            color: #111827;
+            font-weight: 600;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            background: var(--bg-soft);
+            padding: 14px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+            color: var(--text-light);
+        }
+
+        blockquote p {
+            margin-bottom: 0;
+        }
+
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 20px 22px;
+            border-radius: 10px;
+            overflow-x: auto;
+            margin: 18px 0;
+            font-size: 14px;
+            line-height: 1.65;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+        }
+
+        code {
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+        }
+
+        p code, li code {
+            background: #f1f5f9;
+            color: #be185d;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        /* 语法高亮 */
+        .k { color: #c084fc; }   /* keyword */
+        .s { color: #86efac; }   /* string */
+        .c { color: #64748b; font-style: italic; }  /* comment */
+        .n { color: #fbbf24; }   /* number */
+        .f { color: #60a5fa; }   /* function */
+        .o { color: #f472b6; }   /* operator */
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 15px;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 10px 14px;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-soft);
+            font-weight: 600;
+        }
+
+        .cta {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: #fff;
+            padding: 36px 30px;
+            border-radius: 14px;
+            margin: 40px 0 20px;
+            text-align: center;
+        }
+
+        .cta h3 {
+            color: #fff;
+            margin-top: 0;
+            font-size: 22px;
+        }
+
+        .cta p {
+            color: rgba(255, 255, 255, 0.92);
+            margin-bottom: 22px;
+        }
+
+        .cta-btn {
+            display: inline-block;
+            background: #fff;
+            color: var(--primary);
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            text-decoration: none;
+            transition: transform 0.15s ease;
+        }
+
+        .cta-btn:hover {
+            text-decoration: none;
+            transform: translateY(-2px);
+        }
+
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 24px 0;
+            text-align: center;
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        footer a {
+            color: var(--text-light);
+        }
+
+        footer a:hover {
+            color: var(--primary);
+        }
+
+        .icp {
+            margin-top: 6px;
+            font-size: 13px;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 26px; }
+            h2 { font-size: 21px; }
+            pre { font-size: 13px; padding: 16px; }
+            .container { padding: 0 16px; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="top-nav">
+        <div class="container">
+            <a href="https://enlyai.com" class="brand">Enly<span>AI</span></a>
+            <a href="https://enlyai.com" class="back-link">← 返回首页</a>
+        </div>
+    </nav>
+
+    <article>
+        <div class="container">
+            <div class="article-meta">
+                <span class="tag">Python</span>
+                <span class="tag">LLM</span>
+                <span>2026-06-18</span>
+                <span>阅读约 12 分钟</span>
+            </div>
+
+            <h1>用Python调用LLM API的5种方式</h1>
+
+            <p>大语言模型（LLM）已经从研究实验室走进了日常开发流程。无论你在做智能客服、内容生成、代码辅助还是数据分析，几乎都绕不开“用 Python 调一个 LLM API”这件事。然而市面上的调用方式五花八门：官方 SDK、原生 HTTP、第三方框架、统一聚合接口、流式输出……新手很容易被绕晕。</p>
+
+            <p>本文整理了 <strong>5 种最常用的 Python 调用 LLM API 的方式</strong>，从最基础的 OpenAI SDK 讲到统一聚合 API，每种都附带可直接运行的代码示例。读完之后，你可以根据项目规模、团队习惯和成本预算，选择最适合自己的一种。</p>
+
+            <h2>方式一：使用 OpenAI 官方 SDK</h2>
+
+            <p>这是最经典也是最广泛使用的方式。OpenAI 官方提供了 <code>openai</code> 这个 Python 包，封装好了鉴权、请求、重试、流式等逻辑，开箱即用。绝大多数兼容 OpenAI API 格式的服务（包括 EnlyAI）都可以直接用这套 SDK 接入。</p>
+
+            <p>首先安装：</p>
+
+            <pre><code><span class="c"># 安装 OpenAI 官方 SDK</span>
+pip install openai</code></pre>
+
+            <p>然后写一个最简单的调用：</p>
+
+            <pre><code><span class="k">from</span> openai <span class="k">import</span> OpenAI
+
+client = OpenAI(
+    api_key=<span class="s">"sk-your-api-key"</span>,
+    <span class="c"># 如果使用 EnlyAI，只需把 base_url 改成聚合地址</span>
+    <span class="c"># base_url="https://enlyai.com/v1"</span>
+)
+
+response = client.chat.completions.create(
+    model=<span class="s">"gpt-4o-mini"</span>,
+    messages=[
+        {<span class="s">"role"</span>: <span class="s">"system"</span>, <span class="s">"content"</span>: <span class="s">"你是一个简洁的助手"</span>},
+        {<span class="s">"role"</span>: <span class="s">"user"</span>, <span class="s">"content"</span>: <span class="s">"用一句话解释什么是向量数据库"</span>}
+    ]
+)
+
+<span class="f">print</span>(response.choices[<span class="n">0</span>].message.content)</code></pre>
+
+            <p>这种方式的优势是<strong>生态最成熟</strong>，几乎所有教程、示例、工具链都基于它。缺点是默认只能调用 OpenAI 自家的模型，如果想用 Claude 或 Gemini，需要换 SDK 或换 base_url。</p>
+
+            <blockquote>
+                <p>提示：把 <code>base_url</code> 改成 <code>https://enlyai.com/v1</code>，同一套代码就能在 GPT、Claude、Gemini 等几十种模型之间无缝切换，无需修改任何业务代码。</p>
+            </blockquote>
+
+            <h2>方式二：使用 requests 库直接调用 HTTP API</h2>
+
+            <p>如果你不想引入额外依赖，或者需要对请求做更细粒度的控制（自定义 header、代理、超时），可以直接用 Python 标准库的 <code>urllib</code> 或第三方 <code>requests</code> 调用 REST 接口。LLM API 本质上就是一个 HTTP POST 请求。</p>
+
+            <pre><code><span class="k">import</span> requests
+<span class="k">import</span> json
+
+url = <span class="s">"https://enlyai.com/v1/chat/completions"</span>
+headers = {
+    <span class="s">"Authorization"</span>: <span class="s">"Bearer sk-your-api-key"</span>,
+    <span class="s">"Content-Type"</span>: <span class="s">"application/json"</span>
+}
+payload = {
+    <span class="s">"model"</span>: <span class="s">"gpt-4o-mini"</span>,
+    <span class="s">"messages"</span>: [
+        {<span class="s">"role"</span>: <span class="s">"user"</span>, <span class="s">"content"</span>: <span class="s">"写一首关于秋天的五言绝句"</span>}
+    ],
+    <span class="s">"temperature"</span>: <span class="n">0.7</span>
+}
+
+resp = requests.post(url, headers=headers, json=payload, timeout=<span class="n">60</span>)
+data = resp.json()
+<span class="f">print</span>(data[<span class="s">"choices"</span>][<span class="n">0</span>][<span class="s">"message"</span>][<span class="s">"content"</span>])</code></pre>
+
+            <p>对应的 cURL 命令如下，方便你在终端快速测试：</p>
+
+            <pre><code>curl https://enlyai.com/v1/chat/completions \
+  -H <span class="s">"Authorization: Bearer sk-your-api-key"</span> \
+  -H <span class="s">"Content-Type: application/json"</span> \
+  -d <span class="s">'{
+    "model": "gpt-4o-mini",
+    "messages": [{"role": "user", "content": "写一首关于秋天的五言绝句"}]
+  }'</span></code></pre>
+
+            <p>原生 HTTP 方式的好处是<strong>零依赖、最透明</strong>，出问题时排查方便。缺点是需要自己处理错误重试、流式解析、类型转换等细节，代码量会偏多。</p>
+
+            <h2>方式三：使用 LangChain 框架</h2>
+
+            <p>当你的应用涉及多步推理、工具调用、文档检索（RAG）时，手写 prompt 链会非常痛苦。LangChain 是目前最流行的 LLM 应用框架，它把“模型调用 + 提示词模板 + 记忆 + 工具”抽象成可组合的组件。</p>
+
+            <pre><code>pip install langchain langchain-openai</code></pre>
+
+            <pre><code><span class="k">from</span> langchain_openai <span class="k">import</span> ChatOpenAI
+<span class="k">from</span> langchain_core.prompts <span class="k">import</span> ChatPromptTemplate
+
+<span class="c"># 通过 EnlyAI 统一接入，可随时切换底层模型</span>
+llm = ChatOpenAI(
+    model=<span class="s">"gpt-4o-mini"</span>,
+    api_key=<span class="s">"sk-your-api-key"</span>,
+    base_url=<span class="s">"https://enlyai.com/v1"</span>,
+    temperature=<span class="n">0.3</span>
+)
+
+prompt = ChatPromptTemplate.from_messages([
+    (<span class="s">"system"</span>, <span class="s">"你是一位资深 {role}，请用专业但易懂的语言回答。"</span>),
+    (<span class="s">"user"</span>, <span class="s">"{question}"</span>)
+])
+
+chain = prompt | llm
+result = chain.invoke({
+    <span class="s">"role"</span>: <span class="s">"数据库工程师"</span>,
+    <span class="s">"question"</span>: <span class="s">"为什么 PostgreSQL 比 MySQL 更适合复杂查询？"</span>
+})
+<span class="f">print</span>(result.content)</code></pre>
+
+            <p>LangChain 适合<strong>中大型 LLM 应用</strong>，尤其是需要 Agent、RAG、多轮对话的场景。它的学习曲线相对陡峭，但一旦熟悉后，开发效率会大幅提升。需要注意的是，LangChain 默认对接 OpenAI，但通过 <code>base_url</code> 参数同样可以接入 EnlyAI 这类聚合平台。</p>
+
+            <h2>方式四：使用 EnlyAI 统一 API（一行代码切换模型）</h2>
+
+            <p>前面三种方式都有一个共同痛点：<strong>换模型就要改代码</strong>。比如你今天用 GPT-4o，明天想试 Claude 3.5 Sonnet，后天又想用 Gemini 2.0 Flash，每个模型都有自己的 SDK 和鉴权方式，维护起来很麻烦。</p>
+
+            <p>EnlyAI 提供了一个统一 API 接口，<strong>完全兼容 OpenAI API 格式</strong>，你只需要改 <code>model</code> 字段就能在几十种模型之间切换，API base URL 统一是 <code>https://enlyai.com/v1</code>。</p>
+
+            <pre><code><span class="k">from</span> openai <span class="k">import</span> OpenAI
+
+client = OpenAI(
+    api_key=<span class="s">"sk-your-enlyai-key"</span>,
+    base_url=<span class="s">"https://enlyai.com/v1"</span>
+)
+
+<span class="c"># 同一套代码，只需改 model 名称</span>
+models = [<span class="s">"gpt-4o-mini"</span>, <span class="s">"claude-3-5-sonnet"</span>, <span class="s">"gemini-2.0-flash"</span>]
+
+<span class="k">for</span> model <span class="k">in</span> models:
+    resp = client.chat.completions.create(
+        model=model,
+        messages=[{<span class="s">"role"</span>: <span class="s">"user"</span>, <span class="s">"content"</span>: <span class="s">"1+1等于几？"</span>}]
+    )
+    <span class="f">print</span>(<span class="s">f"[{model}] -> {resp.choices[0].message.content}"</span>)</code></pre>
+
+            <p>统一 API 的核心价值在于：</p>
+            <ul>
+                <li><strong>一套密钥</strong>：不用在每个平台分别注册、充值、管理 key。</li>
+                <li><strong>统一计费</strong>：所有模型调用汇总在一个账单，方便成本分析。</li>
+                <li><strong>故障转移</strong>：某个模型服务波动时，可快速切换到备用模型。</li>
+                <li><strong>零迁移成本</strong>：原本基于 OpenAI SDK 的代码几乎不用改。</li>
+            </ul>
+
+            <h2>方式五：流式输出与异步调用</h2>
+
+            <p>在生产环境中，用户体验往往取决于“首字延迟”。如果让用户等 10 秒才看到完整回复，体验会很差；但如果能像 ChatGPT 那样一个字一个字地“吐”出来，感知速度会快很多。这就需要用到<strong>流式输出（Streaming）</strong>。</p>
+
+            <h3>同步流式</h3>
+
+            <pre><code><span class="k">from</span> openai <span class="k">import</span> OpenAI
+
+client = OpenAI(api_key=<span class="s">"sk-your-key"</span>, base_url=<span class="s">"https://enlyai.com/v1"</span>)
+
+stream = client.chat.completions.create(
+    model=<span class="s">"gpt-4o-mini"</span>,
+    messages=[{<span class="s">"role"</span>: <span class="s">"user"</span>, <span class="s">"content"</span>: <span class="s">"讲一个 300 字的科幻小故事"</span>}],
+    stream=<span class="k">True</span>
+)
+
+<span class="k">for</span> chunk <span class="k">in</span> stream:
+    delta = chunk.choices[<span class="n">0</span>].delta.content
+    <span class="k">if</span> delta:
+        <span class="f">print</span>(delta, end=<span class="s">""</span>, flush=<span class="k">True</span>)</code></pre>
+
+            <h3>异步批量调用</h3>
+
+            <p>当你需要同时处理大量请求（比如批量翻译、批量摘要）时，同步调用会非常慢。使用 <code>AsyncOpenAI</code> 可以并发发起多个请求，大幅提升吞吐量。</p>
+
+            <pre><code><span class="k">import</span> asyncio
+<span class="k">from</span> openai <span class="k">import</span> AsyncOpenAI
+
+client = AsyncOpenAI(api_key=<span class="s">"sk-your-key"</span>, base_url=<span class="s">"https://enlyai.com/v1"</span>)
+
+<span class="k">async def</span> <span class="f">ask</span>(question: <span class="k">str</span>):
+    resp = <span class="k">await</span> client.chat.completions.create(
+        model=<span class="s">"gpt-4o-mini"</span>,
+        messages=[{<span class="s">"role"</span>: <span class="s">"user"</span>, <span class="s">"content"</span>: question}]
+    )
+    <span class="k">return</span> resp.choices[<span class="n">0</span>].message.content
+
+<span class="k">async def</span> <span class="f">main</span>():
+    questions = [<span class="s">"什么是 RAG？"</span>, <span class="s">"什么是 Agent？"</span>, <span class="s">"什么是 MoE？"</span>]
+    results = <span class="k">await</span> asyncio.gather(*[ask(q) <span class="k">for</span> q <span class="k">in</span> questions])
+    <span class="k">for</span> q, a <span class="k">in</span> zip(questions, results):
+        <span class="f">print</span>(<span class="s">f"Q: {q}\nA: {a}\n"</span>)
+
+asyncio.run(main())</code></pre>
+
+            <p>异步 + 流式是高并发 LLM 服务的标配组合。配合 FastAPI 等 Web 框架，可以轻松搭建一个支持 SSE（Server-Sent Events）的聊天后端。</p>
+
+            <h2>五种方式对比总结</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>方式</th>
+                        <th>适用场景</th>
+                        <th>学习成本</th>
+                        <th>灵活性</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>OpenAI SDK</td>
+                        <td>快速原型、通用业务</td>
+                        <td>低</td>
+                        <td>中</td>
+                    </tr>
+                    <tr>
+                        <td>requests / HTTP</td>
+                        <td>轻量依赖、定制化</td>
+                        <td>低</td>
+                        <td>高</td>
+                    </tr>
+                    <tr>
+                        <td>LangChain</td>
+                        <td>RAG、Agent、复杂链路</td>
+                        <td>高</td>
+                        <td>高</td>
+                    </tr>
+                    <tr>
+                        <td>EnlyAI 统一 API</td>
+                        <td>多模型切换、成本优化</td>
+                        <td>低</td>
+                        <td>高</td>
+                    </tr>
+                    <tr>
+                        <td>流式 / 异步</td>
+                        <td>实时聊天、高并发</td>
+                        <td>中</td>
+                        <td>高</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>实战建议</h2>
+
+            <p>根据我自己的踩坑经验，给几条实用建议：</p>
+
+            <ol>
+                <li><strong>从 OpenAI SDK 起步</strong>：新手不要一上来就上 LangChain，先把基础调用、流式、函数调用跑通，理解 token、temperature、system prompt 的作用。</li>
+                <li><strong>尽早接入统一 API</strong>：哪怕你只用 GPT，也建议从一开始就用 EnlyAI 这类聚合接口。未来想换模型时，改一个字符串就行，而不是重构整个项目。</li>
+                <li><strong>生产环境务必加超时和重试</strong>：LLM API 偶尔会超时或返回 5xx，用 <code>tenacity</code> 库做指数退避重试是标配。</li>
+                <li><strong>监控 token 消耗</strong>：每次请求都记录 prompt_tokens 和 completion_tokens，否则账单会悄悄失控。</li>
+                <li><strong>把密钥放环境变量</strong>：永远不要把 API key 写死在代码里，用 <code>os.getenv("OPENAI_API_KEY")</code> 读取。</li>
+            </ol>
+
+            <p>掌握这五种方式，基本能覆盖 99% 的 LLM 开发场景。剩下的 1%，往往就是把这些方式组合起来——比如用 LangChain 编排逻辑、用 EnlyAI 统一接入多模型、用异步流式提升体验。</p>
+
+            <div class="cta">
+                <h3>想用一套 API 调用所有主流大模型？</h3>
+                <p>EnlyAI 提供 OpenAI 兼容的统一接口，支持 GPT、Claude、Gemini 等数十种模型，注册即送免费额度，无需分别申请多个平台账号。</p>
+                <a href="https://enlyai.com" class="cta-btn">立即注册 EnlyAI →</a>
+            </div>
+        </div>
+    </article>
+
+    <footer>
+        <div class="container">
+            <p>© 2026 EnlyAI · <a href="https://enlyai.com">enlyai.com</a></p>
+            <p class="icp"><a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener">粤ICP备2026055772号-1</a></p>
+        </div>
+    </footer>
+</body>
+</html>
