@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>如何搭建自己的AI聊天机器人：从零到上线 | EnlyAI 博客</title>
+  <meta name="description" content="手把手教你用 LLM API 搭建 AI 聊天机器人，涵盖技术选型、Python 与 cURL 代码示例、对话上下文管理、Web 界面与部署上线全流程。" />
+  <meta name="keywords" content="AI 聊天机器人, 搭建 chatbot, LLM 聊天机器人" />
+  <meta name="author" content="EnlyAI" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://enlyai.com/blog/build-ai-chatbot-guide" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="如何搭建自己的AI聊天机器人：从零到上线" />
+  <meta property="og:description" content="手把手教你用 LLM API 搭建 AI 聊天机器人，涵盖技术选型、代码示例、对话上下文管理与部署上线。" />
+  <meta property="og:url" content="https://enlyai.com/blog/build-ai-chatbot-guide" />
+  <meta property="og:site_name" content="EnlyAI" />
+  <meta property="og:locale" content="zh_CN" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="如何搭建自己的AI聊天机器人：从零到上线" />
+  <meta name="twitter:description" content="手把手教你用 LLM API 搭建 AI 聊天机器人，涵盖技术选型、代码示例、对话上下文管理与部署上线。" />
+
+  <!-- Schema.org 结构化数据 -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "如何搭建自己的AI聊天机器人：从零到上线",
+    "description": "手把手教你用 LLM API 搭建 AI 聊天机器人，涵盖技术选型、Python 与 cURL 代码示例、对话上下文管理、Web 界面与部署上线全流程。",
+    "keywords": "AI 聊天机器人, 搭建 chatbot, LLM 聊天机器人",
+    "author": {
+      "@type": "Organization",
+      "name": "EnlyAI",
+      "url": "https://enlyai.com"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "EnlyAI",
+      "url": "https://enlyai.com"
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https://enlyai.com/blog/build-ai-chatbot-guide"
+    },
+    "datePublished": "2026-06-18",
+    "dateModified": "2026-06-18",
+    "inLanguage": "zh-CN"
+  }
+  </script>
+
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --primary-light: #dbeafe;
+      --text: #1f2937;
+      --text-light: #6b7280;
+      --bg: #ffffff;
+      --bg-soft: #f9fafb;
+      --border: #e5e7eb;
+      --code-bg: #1e1e2e;
+      --code-text: #e4e4e7;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { -webkit-text-size-adjust: 100%; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+        "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.8;
+      font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: saturate(180%) blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .topbar-inner {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand {
+      font-weight: 700;
+      font-size: 18px;
+      color: var(--primary);
+      text-decoration: none;
+      letter-spacing: 0.3px;
+    }
+    .back-home {
+      color: var(--text-light);
+      text-decoration: none;
+      font-size: 14px;
+      transition: color 0.2s;
+    }
+    .back-home:hover { color: var(--primary); }
+
+    article {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 20px 60px;
+    }
+
+    .post-meta {
+      color: var(--text-light);
+      font-size: 14px;
+      margin-bottom: 14px;
+    }
+    .tag {
+      display: inline-block;
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 999px;
+      margin-right: 8px;
+    }
+
+    h1 {
+      font-size: 32px;
+      line-height: 1.35;
+      font-weight: 800;
+      margin-bottom: 18px;
+      letter-spacing: -0.5px;
+      color: #111827;
+    }
+
+    h2 {
+      font-size: 24px;
+      font-weight: 700;
+      margin: 40px 0 16px;
+      color: #111827;
+      padding-top: 8px;
+      border-top: 1px solid var(--border);
+    }
+
+    h3 {
+      font-size: 19px;
+      font-weight: 700;
+      margin: 28px 0 12px;
+      color: #1f2937;
+    }
+
+    p { margin: 16px 0; }
+
+    a { color: var(--primary); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    ul, ol { margin: 16px 0; padding-left: 24px; }
+    li { margin: 8px 0; }
+
+    strong { color: #111827; font-weight: 700; }
+
+    blockquote {
+      margin: 20px 0;
+      padding: 12px 18px;
+      background: var(--bg-soft);
+      border-left: 4px solid var(--primary);
+      color: var(--text-light);
+      border-radius: 0 6px 6px 0;
+    }
+
+    code {
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      font-size: 0.9em;
+    }
+    p code, li code {
+      background: #f1f5f9;
+      color: #be185d;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    pre {
+      background: var(--code-bg);
+      color: var(--code-text);
+      padding: 18px 20px;
+      border-radius: 10px;
+      overflow-x: auto;
+      margin: 20px 0;
+      font-size: 14px;
+      line-height: 1.65;
+      border: 1px solid #313244;
+    }
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+    .tok-c { color: #7f849c; font-style: italic; }
+    .tok-k { color: #cba6f7; }
+    .tok-s { color: #a6e3a1; }
+    .tok-n { color: #fab387; }
+    .tok-f { color: #89b4fa; }
+
+    .cta {
+      margin: 44px 0 8px;
+      padding: 28px;
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+      border: 1px solid #bfdbfe;
+      border-radius: 14px;
+      text-align: center;
+    }
+    .cta h3 { margin-top: 0; color: var(--primary-dark); }
+    .cta p { color: var(--text); margin-bottom: 18px; }
+    .cta-btn {
+      display: inline-block;
+      background: var(--primary);
+      color: #fff;
+      padding: 12px 28px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 15px;
+      transition: background 0.2s;
+    }
+    .cta-btn:hover { background: var(--primary-dark); text-decoration: none; }
+
+    footer {
+      border-top: 1px solid var(--border);
+      background: var(--bg-soft);
+      padding: 24px 20px;
+      text-align: center;
+      color: var(--text-light);
+      font-size: 13px;
+    }
+    footer a { color: var(--text-light); }
+    footer .icp { margin-top: 6px; }
+
+    @media (max-width: 600px) {
+      h1 { font-size: 26px; }
+      h2 { font-size: 21px; }
+      article { padding: 28px 16px 48px; }
+      pre { font-size: 13px; padding: 14px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="https://enlyai.com">EnlyAI</a>
+      <a class="back-home" href="https://enlyai.com">← 返回首页</a>
+    </div>
+  </header>
+
+  <article>
+    <div class="post-meta">
+      <span class="tag">教程</span>
+      <span class="tag">LLM</span>
+      2026 年 6 月 18 日 · 阅读约 12 分钟
+    </div>
+
+    <h1>如何搭建自己的AI聊天机器人：从零到上线</h1>
+
+    <p>2026 年，大语言模型（LLM）已经从实验室走进生产环境。无论是做客服助手、知识问答，还是个人效率工具，搭建一个 AI 聊天机器人都不再是大型团队的专利。只要有一个可用的 LLM API，几小时就能跑通一个可对话的原型，再花一两天完善上下文管理和界面，就能上线服务真实用户。</p>
+
+    <p>这篇文章会带你完整走一遍流程：从技术选型、调用 LLM API，到管理多轮对话上下文、搭建 Web 界面，最后部署到公网。所有代码示例都可以直接复制运行，我们使用 OpenAI 兼容的接口格式，这样无论你最终用 GPT、Claude 还是 Gemini，代码几乎不用改。</p>
+
+    <h2>一、为什么自己搭建，而不是用现成产品</h2>
+
+    <p>市面上确实有不少开箱即用的 AI 对话产品，但自己搭建有几个明显优势：</p>
+
+    <ul>
+      <li><strong>数据可控</strong>：对话内容、用户日志都在自己服务器上，便于做合规审计和隐私保护。</li>
+      <li><strong>可深度定制</strong>：可以注入业务知识库、接 RAG 检索、定制系统提示词，让机器人真正懂你的业务。</li>
+      <li><strong>成本透明</strong>：按 token 计费，用量大了可以切换更便宜的模型，不用为 SaaS 的溢价买单。</li>
+      <li><strong>多模型灵活切换</strong>：不同场景用不同模型——简单问答用小模型省钱，复杂推理用大模型保质量。</li>
+    </ul>
+
+    <h2>二、技术选型：选一个统一的 LLM API</h2>
+
+    <p>搭建聊天机器人的第一步，是拿到一个能用的 LLM API。这里有个现实问题：OpenAI、Anthropic、Google 三家的接口格式各不相同，如果你直接对接各家原生 API，代码会非常分散，后续切换模型成本很高。</p>
+
+    <p>更聪明的做法是使用一个<strong>兼容 OpenAI 格式</strong>的聚合接口。这样你只需要写一套对接 OpenAI 格式的代码，就能在 GPT、Claude、Gemini、DeepSeek 等模型之间自由切换。EnlyAI（https://enlyai.com）就是这样一个 LLM API 聚合平台，它的接口完全兼容 OpenAI 格式，base URL 是 <code>https://enlyai.com/v1</code>，你只需要一个 API Key 就能调用几十种模型。</p>
+
+    <p>本文所有示例都基于 OpenAI 兼容格式，你可以用 EnlyAI 的 Key 直接跑通，也可以替换成任何兼容此格式的服务。</p>
+
+    <h2>三、环境准备</h2>
+
+    <p>我们用 Python 来搭建后端，因为它有最成熟的 LLM 生态。先确认本地环境：</p>
+
+    <pre><code><span class="tok-c"># 需要 Python 3.9+，推荐用虚拟环境</span>
+python3 -m venv venv
+source venv/bin/activate
+
+<span class="tok-c"># 安装依赖</span>
+pip install openai flask python-dotenv</code></pre>
+
+    <p>把你的 API Key 存到环境变量里，避免硬编码到代码中：</p>
+
+    <pre><code><span class="tok-c"># .env 文件</span>
+OPENAI_API_KEY=sk-你的key
+OPENAI_BASE_URL=https://enlyai.com/v1</code></pre>
+
+    <p>注意 <code>OPENAI_BASE_URL</code> 指向 EnlyAI 的网关地址。如果你用的是官方 OpenAI，这个值可以不设（默认就是官方地址）。这就是聚合平台的好处——一行配置就能换源。</p>
+
+    <h2>四、第一次调用：用 cURL 验证连通性</h2>
+
+    <p>在写复杂代码前，先用最原始的 cURL 确认 API 能通。这是排错的第一步，能帮你区分"是网络/Key 的问题"还是"代码的问题"。</p>
+
+    <pre><code>curl https://enlyai.com/v1/chat/completions \
+  -H <span class="tok-s">"Content-Type: application/json"</span> \
+  -H <span class="tok-s">"Authorization: Bearer $OPENAI_API_KEY"</span> \
+  -d <span class="tok-s">'{
+    "model": "gpt-4o-mini",
+    "messages": [
+      {"role": "user", "content": "你好，请用一句话介绍你自己"}
+    ]
+  }'</code></pre>
+
+    <p>如果一切正常，你会收到类似这样的响应：</p>
+
+    <pre><code>{
+  <span class="tok-s">"id"</span>: <span class="tok-s">"chatcmpl-xxx"</span>,
+  <span class="tok-s">"choices"</span>: [
+    {
+      <span class="tok-s">"message"</span>: {
+        <span class="tok-s">"role"</span>: <span class="tok-s">"assistant"</span>,
+        <span class="tok-s">"content"</span>: <span class="tok-s">"你好！我是一个AI助手，可以帮你回答问题、写作和编程。"</span>
+      },
+      <span class="tok-s">"finish_reason"</span>: <span class="tok-s">"stop"</span>
+    }
+  ],
+  <span class="tok-s">"usage"</span>: { <span class="tok-s">"prompt_tokens"</span>: 12, <span class="tok-s">"completion_tokens"</span>: 20, <span class="tok-s">"total_tokens"</span>: 32 }
+}</code></pre>
+
+    <p>看到 <code>usage</code> 字段了吗？它记录了本次调用的 token 消耗，这是计费和成本监控的关键数据，后面我们会用到。</p>
+
+    <h2>五、用 Python 实现核心对话</h2>
+
+    <p>cURL 验证通过后，我们来写真正的后端代码。先实现一个最简单的单轮对话函数：</p>
+
+    <pre><code><span class="tok-k">import</span> os
+<span class="tok-k">from</span> openai <span class="tok-k">import</span> OpenAI
+<span class="tok-k">from</span> dotenv <span class="tok-k">import</span> load_dotenv
+
+load_dotenv()
+
+client = OpenAI(
+    api_key=os.getenv(<span class="tok-s">"OPENAI_API_KEY"</span>),
+    base_url=os.getenv(<span class="tok-s">"OPENAI_BASE_URL"</span>, <span class="tok-s">"https://enlyai.com/v1"</span>),
+)
+
+<span class="tok-k">def</span> <span class="tok-f">chat</span>(user_message: str, model: str = <span class="tok-s">"gpt-4o-mini"</span>) -> str:
+    response = client.chat.completions.create(
+        model=model,
+        messages=[{<span class="tok-s">"role"</span>: <span class="tok-s">"user"</span>, <span class="tok-s">"content"</span>: user_message}],
+    )
+    <span class="tok-k">return</span> response.choices[<span class="tok-n">0</span>].message.content
+
+<span class="tok-k">if</span> __name__ == <span class="tok-s">"__main__"</span>:
+    print(chat(<span class="tok-s">"用三句话解释什么是向量数据库"</span>))</code></pre>
+
+    <p>运行这段代码，你就拥有了一个能对话的命令行机器人。但真实场景下，用户不会每次都从零开始问——他们需要<strong>多轮对话</strong>，机器人得记住前面说过的话。</p>
+
+    <h2>六、管理多轮对话上下文</h2>
+
+    <p>多轮对话的关键，是把历史消息一起发给模型。OpenAI 兼容接口的 <code>messages</code> 是一个数组，按 <code>system</code>、<code>user</code>、<code>assistant</code> 顺序排列。我们来实现一个带上下文管理的对话类：</p>
+
+    <pre><code><span class="tok-k">from</span> typing <span class="tok-k">import</span> List, Dict
+
+<span class="tok-k">class</span> <span class="tok-f">ChatSession</span>:
+    <span class="tok-k">def</span> __init__(self, system_prompt: str = <span class="tok-s">"你是一个友好的AI助手。"</span>):
+        self.history: List[Dict] = [
+            {<span class="tok-s">"role"</span>: <span class="tok-s">"system"</span>, <span class="tok-s">"content"</span>: system_prompt}
+        ]
+
+    <span class="tok-k">def</span> <span class="tok-f">ask</span>(self, user_input: str, model: str = <span class="tok-s">"gpt-4o-mini"</span>) -> str:
+        self.history.append({<span class="tok-s">"role"</span>: <span class="tok-s">"user"</span>, <span class="tok-s">"content"</span>: user_input})
+        response = client.chat.completions.create(
+            model=model,
+            messages=self.history,
+        )
+        reply = response.choices[<span class="tok-n">0</span>].message.content
+        self.history.append({<span class="tok-s">"role"</span>: <span class="tok-s">"assistant"</span>, <span class="tok-s">"content"</span>: reply})
+        <span class="tok-k">return</span> reply
+
+<span class="tok-c"># 使用示例</span>
+session = ChatSession(<span class="tok-s">"你是一个Python编程专家，回答简洁。"</span>)
+print(session.ask(<span class="tok-s">"列表和元组有什么区别？"</span>))
+print(session.ask(<span class="tok-s">"那它们各自适合什么场景？"</span>))  <span class="tok-c"># 模型能记住上文</span></code></pre>
+
+    <p>这里有几个工程上必须注意的点：</p>
+
+    <ol>
+      <li><strong>上下文会越来越长</strong>：每轮对话都把全部历史发出去，token 消耗会线性增长，成本也会上升。生产环境要做<strong>窗口截断</strong>，只保留最近 N 轮，或者用摘要压缩历史。</li>
+      <li><strong>system prompt 很重要</strong>：它决定了机器人的"人设"和行为边界。比如客服机器人要明确"只回答本公司产品问题，不讨论政治话题"。</li>
+      <li><strong>会话隔离</strong>：每个用户一个 <code>ChatSession</code> 实例，用 session_id 区分。线上服务要把会话历史存到 Redis 或数据库，而不是内存里——否则进程重启就丢了。</li>
+    </ol>
+
+    <h2>七、流式输出：让响应更"像人"</h2>
+
+    <p>用户等待 AI 回复时，逐字流式输出比等十几秒一次性返回体验好得多。OpenAI 兼容接口支持 <code>stream=True</code>，返回的是一个迭代器：</p>
+
+    <pre><code><span class="tok-k">def</span> <span class="tok-f">chat_stream</span>(user_input: str, model: str = <span class="tok-s">"gpt-4o-mini"</span>):
+    response = client.chat.completions.create(
+        model=model,
+        messages=[{<span class="tok-s">"role"</span>: <span class="tok-s">"user"</span>, <span class="tok-s">"content"</span>: user_input}],
+        stream=<span class="tok-k">True</span>,
+    )
+    <span class="tok-k">for</span> chunk <span class="tok-k">in</span> response:
+        delta = chunk.choices[<span class="tok-n">0</span>].delta.content
+        <span class="tok-k">if</span> delta:
+            print(delta, end=<span class="tok-s">""</span>, flush=<span class="tok-k">True</span>)
+
+chat_stream(<span class="tok-s">"写一首关于春天的现代诗"</span>)</code></pre>
+
+    <p>在 Web 端，流式输出通常配合 Server-Sent Events（SSE）实现，前端边收边渲染，用户几乎感觉不到等待。</p>
+
+    <h2>八、搭建一个最小的 Web 界面</h2>
+
+    <p>用 Flask 暴露一个 HTTP 接口，前端就能调用了。这里给出一个支持流式的最小后端：</p>
+
+    <pre><code><span class="tok-k">from</span> flask <span class="tok-k">import</span> Flask, request, Response, jsonify
+<span class="tok-k">import</span> json
+
+app = Flask(__name__)
+sessions: Dict[str, ChatSession] = {}
+
+<span class="tok-k">@app.post</span>(<span class="tok-s">"/chat"</span>)
+<span class="tok-k">def</span> <span class="tok-f">chat_endpoint</span>():
+    data = request.json
+    session_id = data[<span class="tok-s">"session_id"</span>]
+    user_input = data[<span class="tok-s">"message"</span>]
+
+    <span class="tok-k">if</span> session_id <span class="tok-k">not in</span> sessions:
+        sessions[session_id] = ChatSession(data.get(<span class="tok-s">"system_prompt"</span>, <span class="tok-s">"你是AI助手。"</span>))
+
+    session = sessions[session_id]
+
+    <span class="tok-k">def</span> <span class="tok-f">generate</span>():
+        session.history.append({<span class="tok-s">"role"</span>: <span class="tok-s">"user"</span>, <span class="tok-s">"content"</span>: user_input})
+        stream = client.chat.completions.create(
+            model=<span class="tok-s">"gpt-4o-mini"</span>,
+            messages=session.history,
+            stream=<span class="tok-k">True</span>,
+        )
+        full_reply = <span class="tok-s">""</span>
+        <span class="tok-k">for</span> chunk <span class="tok-k">in</span> stream:
+            delta = chunk.choices[<span class="tok-n">0</span>].delta.content <span class="tok-k">or</span> <span class="tok-s">""</span>
+            full_reply += delta
+            <span class="tok-k">yield</span> <span class="tok-s">f"data: {json.dumps({'delta': delta})}</span><span class="tok-s">\n\n"</span>
+        session.history.append({<span class="tok-s">"role"</span>: <span class="tok-s">"assistant"</span>, <span class="tok-s">"content"</span>: full_reply})
+
+    <span class="tok-k">return</span> Response(generate(), mimetype=<span class="tok-s">"text/event-stream"</span>)
+
+<span class="tok-k">if</span> __name__ == <span class="tok-s">"__main__"</span>:
+    app.run(host=<span class="tok-s">"0.0.0.0"</span>, port=<span class="tok-n">5000</span>)</code></pre>
+
+    <p>前端用几行 JavaScript 就能消费这个 SSE 流，实现打字机效果。前端 UI 不是本文重点，你可以用任何喜欢的方式——原生 JS、React、Vue 都行。</p>
+
+    <h2>九、部署上线</h2>
+
+    <p>本地跑通后，部署到公网通常分三步：</p>
+
+    <ol>
+      <li><strong>用 Gunicorn 跑生产级 WSGI</strong>：Flask 自带的开发服务器不能用于生产。<code>pip install gunicorn</code> 后用 <code>gunicorn -w 4 -b 0.0.0.0:5000 app:app</code> 启动。</li>
+      <li><strong>用 Nginx 做反向代理和 HTTPS</strong>：Nginx 接收 443 端口的 HTTPS 请求，转发到 Gunicorn 的 5000 端口。用 Let's Encrypt 免费申请 SSL 证书。</li>
+      <li><strong>用 systemd 或 Docker 守护进程</strong>：保证服务崩溃后自动重启。Docker 化部署更推荐，方便迁移和扩容。</li>
+    </ol>
+
+    <p>一个典型的 Nginx 配置片段：</p>
+
+    <pre><code>server {
+    listen 443 ssl http2;
+    server_name chat.example.com;
+
+    ssl_certificate     /etc/letsencrypt/live/chat.example.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/chat.example.com/privkey.pem;
+
+    location / {
+        proxy_pass http://127.0.0.1:5000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        <span class="tok-c"># SSE 流式需要关闭缓冲</span>
+        proxy_buffering off;
+        proxy_read_timeout 300s;
+    }
+}</code></pre>
+
+    <p>注意 <code>proxy_buffering off</code> 这一行——它是流式输出能正常工作的关键，否则 Nginx 会把整个响应攒齐才发给客户端，打字机效果就失效了。</p>
+
+    <h2>十、上线后的优化建议</h2>
+
+    <p>跑起来只是开始，真正稳定服务用户还需要做这些事：</p>
+
+    <ul>
+      <li><strong>成本监控</strong>：记录每次调用的 <code>usage.total_tokens</code>，按用户/模型聚合统计。发现某个用户 token 暴涨，可能是 prompt 注入攻击或 bug。</li>
+      <li><strong>限流防滥用</strong>：按用户 ID 或 IP 做速率限制，比如每分钟最多 20 次请求。Flask 可以用 <code>flask-limiter</code>。</li>
+      <li><strong>失败重试与降级</strong>：大模型偶尔会超时或返回 5xx。建议做自动重试，并在主模型不可用时降级到更便宜的小模型。</li>
+      <li><strong>内容安全</strong>：对用户输入和模型输出做敏感词过滤，国内服务还要符合《生成式人工智能服务管理暂行办法》的合规要求。</li>
+      <li><strong>接入 RAG</strong>：如果机器人要回答业务知识，把文档向量化存进向量库，每次对话前检索相关片段塞进上下文，效果远好于纯靠模型自身知识。</li>
+    </ul>
+
+    <blockquote>提示：上下文窗口管理是成本控制的核心。一个简单有效的策略是——保留 system prompt + 最近 6 轮对话，超过的部分用便宜的小模型生成摘要替换。这样既保住了长程记忆，又控制了 token 增长。</blockquote>
+
+    <h2>十一、模型选择与成本权衡</h2>
+
+    <p>不是所有问题都需要最贵的模型。一个实用的分层策略：</p>
+
+    <ul>
+      <li><strong>闲聊/简单问答</strong>：用 <code>gpt-4o-mini</code> 这类小模型，响应快、成本低，单次对话几分钱。</li>
+      <li><strong>代码生成/复杂推理</strong>：用 <code>gpt-4o</code>、<code>claude-sonnet</code> 这类中端模型，质量与成本平衡。</li>
+      <li><strong>高难度分析</strong>：用 <code>o3</code>、<code>claude-opus</code> 这类旗舰模型，只在必要时调用。</li>
+    </ul>
+
+    <p>这也是用聚合平台的价值所在——你可以在同一个接口下，按场景动态切换模型，而不需要维护多套 SDK 和多份 Key。EnlyAI 这类平台还提供统一的用量看板，让你一眼看清每个模型花了多少钱。</p>
+
+    <h2>总结</h2>
+
+    <p>搭建一个 AI 聊天机器人，核心其实就三件事：调用 LLM API、管理对话上下文、做好流式输出与部署。技术门槛比大多数人想象的低得多——一个能跑的 MVP，一个下午就能完成。真正的难点在于把它做成稳定、可控、成本合理的产品，这需要在上文提到的限流、监控、降级、RAG 等工程环节持续打磨。</p>
+
+    <p>选对 API 入口能让你事半功倍。一个兼容 OpenAI 格式的聚合接口，意味着你的代码不会被某一家厂商锁定，未来模型迭代时也能平滑迁移。希望这篇文章能帮你少走弯路，尽快把想法变成能服务真实用户的产品。</p>
+
+    <div class="cta">
+      <h3>想立刻动手试试？</h3>
+      <p>EnlyAI 提供 OpenAI 兼容的统一 API，一个 Key 即可调用 GPT、Claude、Gemini 等数十种模型。本文所有代码示例只需替换 base URL 为 <code>https://enlyai.com/v1</code> 即可直接运行。</p>
+      <a class="cta-btn" href="https://enlyai.com">立即注册 EnlyAI，开始搭建 →</a>
+    </div>
+  </article>
+
+  <footer>
+    <div>© 2026 EnlyAI · 统一的 LLM API 聚合平台</div>
+    <div class="icp"><a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener">粤ICP备2026055772号-1</a></div>
+  </footer>
+</body>
+</html>
