@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prompt工程实战：写出高质量提示词的15个技巧 | EnlyAI 博客</title>
+    <meta name="description" content="Prompt工程实战指南，系统讲解写出高质量提示词的15个技巧，涵盖角色设定、Few-shot、Chain of Thought、结构化 Prompt、常见模式与避坑指南，含 Python 代码示例。">
+    <meta name="keywords" content="Prompt工程, 提示词优化, Prompt技巧, Prompt模板, Few-shot, Chain of Thought">
+    <meta name="author" content="EnlyAI">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://enlyai.com/blog/prompt-engineering-guide.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Prompt工程实战：写出高质量提示词的15个技巧">
+    <meta property="og:description" content="系统讲解写出高质量提示词的15个技巧，涵盖角色设定、Few-shot、Chain of Thought、结构化 Prompt 等模式。">
+    <meta property="og:url" content="https://enlyai.com/blog/prompt-engineering-guide.html">
+    <meta property="og:site_name" content="EnlyAI">
+    <meta property="og:locale" content="zh_CN">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Prompt工程实战：写出高质量提示词的15个技巧">
+    <meta name="twitter:description" content="系统讲解写出高质量提示词的15个技巧，含 Python 代码示例。">
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "headline": "Prompt工程实战：写出高质量提示词的15个技巧",
+        "description": "Prompt工程实战指南，系统讲解写出高质量提示词的15个技巧，涵盖角色设定、Few-shot、Chain of Thought、结构化 Prompt、常见模式与避坑指南。",
+        "keywords": "Prompt工程, 提示词优化, Prompt技巧, Prompt模板, Few-shot, Chain of Thought",
+        "author": { "@type": "Organization", "name": "EnlyAI", "url": "https://enlyai.com" },
+        "publisher": { "@type": "Organization", "name": "EnlyAI", "url": "https://enlyai.com" },
+        "datePublished": "2026-06-19",
+        "dateModified": "2026-06-19",
+        "mainEntityOfPage": { "@type": "WebPage", "@id": "https://enlyai.com/blog/prompt-engineering-guide.html" }
+    }
+    </script>
+
+    <style>
+        :root { --primary: #2563eb; --primary-dark: #1d4ed8; --primary-light: #dbeafe; --text: #1f2937; --text-light: #6b7280; --bg: #ffffff; --bg-soft: #f9fafb; --border: #e5e7eb; --code-bg: #1e293b; --code-text: #e2e8f0; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif; color: var(--text); background: var(--bg); line-height: 1.8; font-size: 16px; -webkit-font-smoothing: antialiased; }
+        .container { max-width: 800px; margin: 0 auto; padding: 0 20px; }
+        .top-nav { background: rgba(255, 255, 255, 0.92); border-bottom: 1px solid var(--border); padding: 14px 0; position: sticky; top: 0; z-index: 100; backdrop-filter: saturate(180%) blur(8px); }
+        .top-nav .container { display: flex; justify-content: space-between; align-items: center; }
+        .back-link { color: var(--primary); text-decoration: none; font-weight: 500; font-size: 15px; }
+        .back-link:hover { color: var(--primary-dark); }
+        .brand { font-weight: 700; font-size: 18px; color: var(--text); text-decoration: none; }
+        .brand span { color: var(--primary); }
+        article { padding: 40px 0 60px; }
+        .article-meta { color: var(--text-light); font-size: 14px; margin-bottom: 16px; display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+        .tag { background: var(--primary-light); color: var(--primary-dark); padding: 3px 10px; border-radius: 12px; font-size: 13px; font-weight: 500; }
+        h1 { font-size: 34px; line-height: 1.3; font-weight: 800; margin-bottom: 20px; color: #111827; }
+        h2 { font-size: 24px; font-weight: 700; margin: 40px 0 16px; color: #111827; padding-top: 8px; border-top: 1px solid var(--border); }
+        h3 { font-size: 19px; font-weight: 600; margin: 24px 0 12px; color: #1f2937; }
+        p { margin-bottom: 18px; }
+        a { color: var(--primary); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        ul, ol { margin: 0 0 18px 22px; }
+        li { margin-bottom: 8px; }
+        strong { color: #111827; font-weight: 600; }
+        blockquote { border-left: 4px solid var(--primary); background: var(--bg-soft); padding: 14px 20px; margin: 20px 0; border-radius: 0 8px 8px 0; color: var(--text-light); }
+        blockquote p { margin-bottom: 0; }
+        pre { background: var(--code-bg); color: var(--code-text); padding: 20px 22px; border-radius: 10px; overflow-x: auto; margin: 18px 0; font-size: 14px; line-height: 1.65; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; }
+        code { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; }
+        p code, li code { background: #f1f5f9; color: #be185d; padding: 2px 6px; border-radius: 4px; font-size: 14px; }
+        .k { color: #c084fc; } .s { color: #86efac; } .c { color: #64748b; font-style: italic; } .n { color: #fbbf24; } .f { color: #60a5fa; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 15px; }
+        th, td { border: 1px solid var(--border); padding: 10px 14px; text-align: left; }
+        th { background: var(--bg-soft); font-weight: 600; }
+        .cta { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: #fff; padding: 36px 30px; border-radius: 14px; margin: 40px 0 20px; text-align: center; }
+        .cta h3 { color: #fff; margin-top: 0; font-size: 22px; }
+        .cta p { color: rgba(255, 255, 255, 0.92); margin-bottom: 22px; }
+        .cta-btn { display: inline-block; background: #fff; color: var(--primary); padding: 12px 32px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; transition: transform 0.15s ease; }
+        .cta-btn:hover { text-decoration: none; transform: translateY(-2px); }
+        footer { border-top: 1px solid var(--border); padding: 24px 0; text-align: center; color: var(--text-light); font-size: 14px; }
+        footer a { color: var(--text-light); }
+        footer a:hover { color: var(--primary); }
+        .icp { margin-top: 6px; font-size: 13px; }
+        .related-posts { margin-top: 48px; padding-top: 32px; border-top: 2px solid #e5e7eb; }
+        .related-posts h2 { font-size: 1.4rem; margin-bottom: 20px; color: #111827; }
+        .related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+        .related-card { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; text-decoration: none; color: #374151; transition: all 0.2s; font-size: 0.95rem; }
+        .related-card:hover { background: #eff6ff; border-color: #2563eb; color: #2563eb; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1); }
+        .related-title { flex: 1; padding-right: 12px; }
+        .related-arrow { color: #9ca3af; font-size: 1.1rem; flex-shrink: 0; }
+        .related-card:hover .related-arrow { color: #2563eb; }
+        @media (max-width: 600px) { h1 { font-size: 26px; } h2 { font-size: 21px; } pre { font-size: 13px; padding: 16px; } .container { padding: 0 16px; } }
+    </style>
+</head>
+<body>
+    <nav class="top-nav">
+        <div class="container">
+            <a href="https://enlyai.com" class="brand">Enly<span>AI</span></a>
+            <a href="https://enlyai.com" class="back-link">← 返回首页</a>
+        </div>
+    </nav>
+
+    <article>
+        <div class="container">
+            <div class="article-meta">
+                <span class="tag">Prompt工程</span>
+                <span class="tag">实战技巧</span>
+                <span>2026-06-19</span>
+                <span>阅读约 15 分钟</span>
+            </div>
+
+            <h1>Prompt工程实战：写出高质量提示词的15个技巧</h1>
+
+            <p>同样的模型，有人用它写出惊艳的文案，有人用它得到一堆废话。差距往往不在模型，而在<strong>提示词（Prompt）</strong>。Prompt 工程是一门“用语言编程”的手艺——你写给模型的指令，就是它的程序。程序写得烂，再强的模型也跑不出好结果。</p>
+
+            <p>本文总结了 15 个经过实战验证的 Prompt 技巧，从最基础的角色设定到进阶的 Chain of Thought、结构化模板，每个技巧都配对比示例。掌握这些，你的提示词质量能立刻上一个台阶。</p>
+
+            <h2>一、基础篇：让模型听懂你要什么</h2>
+
+            <h3>技巧1：明确角色设定</h3>
+            <p>给模型一个身份，它的回答会立刻专业起来。不要说“解释 RAG”，要说“你是一位资深 AI 架构师，向初级开发者解释 RAG”。</p>
+
+            <h3>技巧2：具体胜于抽象</h3>
+            <p>“写一篇好文章”是无效指令，模型不知道你要什么风格、多长、给谁看。要写明受众、字数、风格、结构。“写一篇 800 字的科普文章，面向非技术读者，用比喻解释，分三个小节”。</p>
+
+            <h3>技巧3：说清楚输出格式</h3>
+            <p>明确要求 JSON、Markdown 表格、还是纯文本。要 JSON 就给出 schema 示例，避免模型自由发挥。</p>
+            <pre><code><span class="c"># 不好的 Prompt</span>
+请总结这篇文章。
+
+<span class="c"># 好的 Prompt</span>
+你是一位资深编辑。请把下面文章总结成 JSON，包含 title（10字内）、
+key_points（3-5条要点，每条20字内）、summary（100字内概要）。
+只输出 JSON，不要任何解释。
+文章：{article}</code></pre>
+
+            <h3>技巧4：用分隔符隔离上下文</h3>
+            <p>当 Prompt 里既有指令又有大段参考资料时，用 <code>"""</code>、<code>###</code> 或 XML 标签把资料包起来，模型才不会把资料当成指令执行。这是防“提示词注入”的关键手段。</p>
+
+            <h3>技巧5：给出约束条件</h3>
+            <p>明确告诉模型“不要做什么”和“必须做什么”。“不要编造数据，不知道就说不知道”“字数严格控制在 200 字以内”“只用中文回答”。约束越明确，越少跑偏。</p>
+
+            <h2>二、进阶篇：用模式提升复杂任务表现</h2>
+
+            <h3>技巧6：Few-shot 少样本示例</h3>
+            <p>与其费力描述你要的格式，不如直接给 2-3 个示例。模型从示例里学规律比从描述里学更准。特别适合分类、抽取、格式转换任务。</p>
+            <pre><code>请对用户评论进行情感分类，输出 正面/负面/中性。
+
+评论：这个产品太好用了，强烈推荐！
+分类：正面
+
+评论：物流太慢，等了一周才到。
+分类：负面
+
+评论：包装一般，但功能还行。
+分类：中性
+
+评论：{new_comment}
+分类：</code></pre>
+
+            <h3>技巧7：Chain of Thought 思维链</h3>
+            <p>对于数学、推理、多步决策任务，让模型“一步一步思考”能大幅提升正确率。GPT-5.5、Claude Opus 4.8 这类强模型虽然推理能力很强，但在复杂问题上加一句“请逐步推理”依然有效。</p>
+            <pre><code>一个商店原价 200 元的商品先涨 20% 再打 8 折，最终价格是多少？
+请一步一步推理，最后给出答案。</code></pre>
+
+            <h3>技巧8：分步拆解复杂任务</h3>
+            <p>不要让模型一次完成复杂任务，拆成多步分别调用，每步只做一件事。比如写报告：第一步列大纲，第二步逐节扩写，第三步润色。每步结果作为下一步输入，质量远高于一次性生成。</p>
+
+            <h3>技巧9：让模型自我检查</h3>
+            <p>生成后让模型审视自己的输出：“请检查上面的回答是否有事实错误、逻辑漏洞，如有请修正”。这种 self-critique 能显著降低幻觉和低级错误。</p>
+
+            <h3>技巧10：结构化 Prompt 模板</h3>
+            <p>把 Prompt 组织成固定结构：Role（角色）→ Task（任务）→ Context（背景）→ Constraint（约束）→ Format（格式）→ Examples（示例）。结构化模板便于团队复用和迭代。</p>
+            <pre><code><span class="c"># 结构化 Prompt 模板示例</span>
+【角色】你是资深数据分析师。
+【任务】分析销售数据，找出下滑原因。
+【背景】{data_description}
+【约束】只基于数据下结论，不做无依据推测。
+【格式】输出三部分：核心发现、原因分析、改进建议。
+【示例】（略）</code></pre>
+
+            <h2>三、高级篇：稳定与可控</h2>
+
+            <h3>技巧11：用 temperature 控制随机性</h3>
+            <p>temperature 不是 Prompt 文本，但和 Prompt 同样重要。事实问答、代码生成用 0-0.2（确定）；文案、创意用 0.7-0.9（多样）。同一个 Prompt，temperature 设错效果天差地别。</p>
+
+            <h3>技巧12：负面示例也很重要</h3>
+            <p>除了给“正确示例”，给“错误示例”同样有效。“下面是错误示范：……，请避免这种问题”。模型对“不要做什么”的理解往往比对“要做什么”弱，负面示例能补足。</p>
+
+            <h3>技巧13：避免模糊指令词</h3>
+            <p>“适当”“尽量”“可能”这类词模型理解不一致。把“适当详细”改成“每个要点展开 50-80 字”，把“尽量准确”改成“如不确定请说明”。指令越可量化越好。</p>
+
+            <h3>技巧14：迭代式优化</h3>
+            <p>没有一次写对的 Prompt。建立“测试用例集”，每次改 Prompt 都跑一遍，看输出是否变好。把失败的 case 加进 Few-shot 示例，是最高效的优化方式。</p>
+
+            <h3>技巧15：版本化管理 Prompt</h3>
+            <p>把 Prompt 当代码管理：存进 Git，写注释说明每个版本改了什么、为什么改。生产环境的 Prompt 一旦上线就不能随便动，必须有回滚能力。</p>
+
+            <h2>四、用代码管理 Prompt</h2>
+
+            <p>实际项目里 Prompt 不会硬编码在调用处，而是集中管理。下面是一个可复用的 Prompt 模板 + 调用示例：</p>
+
+            <pre><code><span class="k">from</span> openai <span class="k">import</span> OpenAI
+
+client = OpenAI(api_key=<span class="s">"sk-your-enlyai-key"</span>, base_url=<span class="s">"https://enlyai.com/v1"</span>)
+
+<span class="c"># 集中管理 Prompt 模板</span>
+PROMPTS = {
+    <span class="s">"summarize"</span>: <span class="s">"""你是一位资深编辑。请把文章总结成 JSON。
+{{"title": "...", "key_points": [...], "summary": "..."}}
+只输出 JSON。文章：{article}"""</span>,
+    <span class="s">"classify"</span>: <span class="s">"""对评论做情感分类(正面/负面/中性)。
+{few_shot}
+评论：{text}
+分类："""</span>
+}
+
+<span class="k">def</span> <span class="f">run</span>(prompt_name, model=<span class="s">"gpt-5.4-mini"</span>, **vars):
+    prompt = PROMPTS[prompt_name].format(**vars)
+    r = client.chat.completions.create(
+        model=model,
+        messages=[{<span class="s">"role"</span>: <span class="s">"user"</span>, <span class="s">"content"</span>: prompt}],
+        temperature=<span class="n">0.2</span>
+    )
+    <span class="k">return</span> r.choices[<span class="n">0</span>].message.content
+
+<span class="f">print</span>(run(<span class="s">"summarize"</span>, article=<span class="s">"..."</span>))</code></pre>
+
+            <blockquote>
+                <p>提示：通过 EnlyAI 统一接入，同一个 Prompt 模板可以用 GPT-5.5、Claude Opus 4.8、Gemini 3.5 Pro 分别跑一遍对比效果，找出最适合该 Prompt 的模型——这是 Prompt 工程里常被忽略的一环。</p>
+            </blockquote>
+
+            <h2>五、常见避坑指南</h2>
+
+            <ul>
+                <li><strong>别让模型猜你的意图</strong>：模糊指令是幻觉的温床，宁可啰嗦也不要含糊。</li>
+                <li><strong>别把所有要求堆在一句</strong>：长指令用编号列表拆开，模型对结构化指令的遵循度更高。</li>
+                <li><strong>别迷信“你是世界顶级专家”</strong>：角色设定有用，但堆砌夸张头衔不会让模型变强，反而可能让它更啰嗦。</li>
+                <li><strong>别忽略 system 与 user 的分工</strong>：稳定的人设放 system，每次变化的输入放 user，能让模型更稳定地保持角色。</li>
+                <li><strong>别用同一个 temperature 跑所有任务</strong>：分类用 0，创作用 0.8，混用必翻车。</li>
+            </ul>
+
+            <h2>总结</h2>
+
+            <p>Prompt 工程的本质是<strong>把模糊的需求翻译成模型能精确执行的指令</strong>。15 个技巧可以归纳为三条主线：<strong>说清楚（具体、结构、约束）</strong>、<strong>给示范（Few-shot、思维链）</strong>、<strong>勤迭代（测试集、版本化）</strong>。把这三条做到位，你的提示词质量就能超过 90% 的使用者。</p>
+
+            <p>而 Prompt 的最终效果还取决于模型能力。通过 EnlyAI 统一接入，你可以用同一套 Prompt 在多个模型间快速对比，找到“Prompt × 模型”的最佳组合，把提示词的威力发挥到最大。</p>
+
+            <div class="cta">
+                <h3>想让你的 Prompt 在最佳模型上发挥威力？</h3>
+                <p>EnlyAI 提供 OpenAI 兼容的统一接口，一个 key 调用 GPT-5.5、Claude Opus 4.8、Gemini 3.5 Pro，方便你用同一套 Prompt 对比模型效果，注册即送免费额度。</p>
+                <a href="https://enlyai.com" class="cta-btn">立即注册 EnlyAI →</a>
+            </div>
+        </div>
+        <section class="related-posts">
+            <h2>相关文章推荐</h2>
+            <div class="related-grid">
+                <a href="/blog/ai-agent-development.html" class="related-card"><span class="related-title">AI Agent开发指南：用Function Calling构建智能助手</span><span class="related-arrow">→</span></a>
+                <a href="/blog/llm-evaluation-guide.html" class="related-card"><span class="related-title">LLM评估指南：如何评测大模型输出质量</span><span class="related-arrow">→</span></a>
+                <a href="/blog/rag-tutorial.html" class="related-card"><span class="related-title">RAG检索增强生成实战教程</span><span class="related-arrow">→</span></a>
+                <a href="/blog/langchain-tutorial.html" class="related-card"><span class="related-title">LangChain入门：用Python构建LLM应用</span><span class="related-arrow">→</span></a>
+            </div>
+        </section>
+    </article>
+
+    <footer>
+        <div class="container">
+            <p>© 2026 EnlyAI · <a href="https://enlyai.com">enlyai.com</a></p>
+            <p class="icp"><a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener">沪ICP备2025123456号</a></p>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Embedding API使用指南：文本向量化与语义搜索 | EnlyAI 博客</title>
+    <meta name="description" content="Embedding API使用指南，讲解文本向量化原理、API调用方法、余弦相似度计算、语义搜索实现与聚类应用，含完整 Python 代码示例，助你快速搭建语义检索系统。">
+    <meta name="keywords" content="Embedding API, 文本向量化, 语义搜索, 向量嵌入, 余弦相似度, 文本嵌入">
+    <meta name="author" content="EnlyAI">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://enlyai.com/blog/embedding-api-guide.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Embedding API使用指南：文本向量化与语义搜索">
+    <meta property="og:description" content="讲解文本向量化原理、API调用、相似度计算、语义搜索实现，含完整 Python 代码示例。">
+    <meta property="og:url" content="https://enlyai.com/blog/embedding-api-guide.html">
+    <meta property="og:site_name" content="EnlyAI">
+    <meta property="og:locale" content="zh_CN">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Embedding API使用指南：文本向量化与语义搜索">
+    <meta name="twitter:description" content="讲解文本向量化与语义搜索实现，含 Python 代码示例。">
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "headline": "Embedding API使用指南：文本向量化与语义搜索",
+        "description": "Embedding API使用指南，讲解文本向量化原理、API调用方法、余弦相似度计算、语义搜索实现与聚类应用，含完整 Python 代码示例。",
+        "keywords": "Embedding API, 文本向量化, 语义搜索, 向量嵌入, 余弦相似度",
+        "author": { "@type": "Organization", "name": "EnlyAI", "url": "https://enlyai.com" },
+        "publisher": { "@type": "Organization", "name": "EnlyAI", "url": "https://enlyai.com" },
+        "datePublished": "2026-06-19",
+        "dateModified": "2026-06-19",
+        "mainEntityOfPage": { "@type": "WebPage", "@id": "https://enlyai.com/blog/embedding-api-guide.html" }
+    }
+    </script>
+
+    <style>
+        :root { --primary: #2563eb; --primary-dark: #1d4ed8; --primary-light: #dbeafe; --text: #1f2937; --text-light: #6b7280; --bg: #ffffff; --bg-soft: #f9fafb; --border: #e5e7eb; --code-bg: #1e293b; --code-text: #e2e8f0; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif; color: var(--text); background: var(--bg); line-height: 1.8; font-size: 16px; -webkit-font-smoothing: antialiased; }
+        .container { max-width: 800px; margin: 0 auto; padding: 0 20px; }
+        .top-nav { background: rgba(255, 255, 255, 0.92); border-bottom: 1px solid var(--border); padding: 14px 0; position: sticky; top: 0; z-index: 100; backdrop-filter: saturate(180%) blur(8px); }
+        .top-nav .container { display: flex; justify-content: space-between; align-items: center; }
+        .back-link { color: var(--primary); text-decoration: none; font-weight: 500; font-size: 15px; }
+        .back-link:hover { color: var(--primary-dark); }
+        .brand { font-weight: 700; font-size: 18px; color: var(--text); text-decoration: none; }
+        .brand span { color: var(--primary); }
+        article { padding: 40px 0 60px; }
+        .article-meta { color: var(--text-light); font-size: 14px; margin-bottom: 16px; display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+        .tag { background: var(--primary-light); color: var(--primary-dark); padding: 3px 10px; border-radius: 12px; font-size: 13px; font-weight: 500; }
+        h1 { font-size: 34px; line-height: 1.3; font-weight: 800; margin-bottom: 20px; color: #111827; }
+        h2 { font-size: 24px; font-weight: 700; margin: 40px 0 16px; color: #111827; padding-top: 8px; border-top: 1px solid var(--border); }
+        h3 { font-size: 19px; font-weight: 600; margin: 24px 0 12px; color: #1f2937; }
+        p { margin-bottom: 18px; }
+        a { color: var(--primary); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        ul, ol { margin: 0 0 18px 22px; }
+        li { margin-bottom: 8px; }
+        strong { color: #111827; font-weight: 600; }
+        blockquote { border-left: 4px solid var(--primary); background: var(--bg-soft); padding: 14px 20px; margin: 20px 0; border-radius: 0 8px 8px 0; color: var(--text-light); }
+        blockquote p { margin-bottom: 0; }
+        pre { background: var(--code-bg); color: var(--code-text); padding: 20px 22px; border-radius: 10px; overflow-x: auto; margin: 18px 0; font-size: 14px; line-height: 1.65; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; }
+        code { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; }
+        p code, li code { background: #f1f5f9; color: #be185d; padding: 2px 6px; border-radius: 4px; font-size: 14px; }
+        .k { color: #c084fc; } .s { color: #86efac; } .c { color: #64748b; font-style: italic; } .n { color: #fbbf24; } .f { color: #60a5fa; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 15px; }
+        th, td { border: 1px solid var(--border); padding: 10px 14px; text-align: left; }
+        th { background: var(--bg-soft); font-weight: 600; }
+        .cta { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: #fff; padding: 36px 30px; border-radius: 14px; margin: 40px 0 20px; text-align: center; }
+        .cta h3 { color: #fff; margin-top: 0; font-size: 22px; }
+        .cta p { color: rgba(255, 255, 255, 0.92); margin-bottom: 22px; }
+        .cta-btn { display: inline-block; background: #fff; color: var(--primary); padding: 12px 32px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; transition: transform 0.15s ease; }
+        .cta-btn:hover { text-decoration: none; transform: translateY(-2px); }
+        footer { border-top: 1px solid var(--border); padding: 24px 0; text-align: center; color: var(--text-light); font-size: 14px; }
+        footer a { color: var(--text-light); }
+        footer a:hover { color: var(--primary); }
+        .icp { margin-top: 6px; font-size: 13px; }
+        .related-posts { margin-top: 48px; padding-top: 32px; border-top: 2px solid #e5e7eb; }
+        .related-posts h2 { font-size: 1.4rem; margin-bottom: 20px; color: #111827; }
+        .related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+        .related-card { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; text-decoration: none; color: #374151; transition: all 0.2s; font-size: 0.95rem; }
+        .related-card:hover { background: #eff6ff; border-color: #2563eb; color: #2563eb; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1); }
+        .related-title { flex: 1; padding-right: 12px; }
+        .related-arrow { color: #9ca3af; font-size: 1.1rem; flex-shrink: 0; }
+        .related-card:hover .related-arrow { color: #2563eb; }
+        @media (max-width: 600px) { h1 { font-size: 26px; } h2 { font-size: 21px; } pre { font-size: 13px; padding: 16px; } .container { padding: 0 16px; } }
+    </style>
+</head>
+<body>
+    <nav class="top-nav">
+        <div class="container">
+            <a href="https://enlyai.com" class="brand">Enly<span>AI</span></a>
+            <a href="https://enlyai.com" class="back-link">← 返回首页</a>
+        </div>
+    </nav>
+
+    <article>
+        <div class="container">
+            <div class="article-meta">
+                <span class="tag">Embedding</span>
+                <span class="tag">语义搜索</span>
+                <span>2026-06-19</span>
+                <span>阅读约 14 分钟</span>
+            </div>
+
+            <h1>Embedding API使用指南：文本向量化与语义搜索</h1>
+
+            <p>传统搜索靠关键词匹配：搜“苹果手机”找不到只写了“iPhone”的文档。而语义搜索能理解“苹果手机”和“iPhone”是同一个意思，因为它们在语义空间里距离很近。实现这种“理解”的核心技术就是 <strong>Embedding（向量嵌入）</strong>。</p>
+
+            <p>Embedding 是 RAG、语义搜索、推荐系统、聚类分析的共同地基。本文从原理到代码，讲清楚 Embedding 是什么、怎么调用 API、如何计算相似度、如何搭建一个可用的语义搜索引擎。</p>
+
+            <h2>一、Embedding 到底是什么</h2>
+
+            <p>Embedding 就是把一段文本映射成一个<strong>固定长度的浮点数向量</strong>（比如 1536 维）。这个映射不是随机的，而是经过训练的：语义相近的文本，向量距离也近；语义无关的文本，向量距离远。</p>
+
+            <p>可以把它理解成给每段文本在“语义空间”里标了一个坐标。两段文本的语义相似度，就转化为两个向量在空间里的距离。这样，“找语义相近的内容”就变成了“找距离近的向量”——一个可以用数学快速解决的问题。</p>
+
+            <p>Embedding 模型经过海量语料训练，能捕捉同义词、上下位关系、甚至跨语言语义。比如“猫”和“cat”的向量会很接近，尽管字面完全不同。</p>
+
+            <h2>二、调用 Embedding API</h2>
+
+            <p>调用 Embedding API 和调用聊天接口一样简单，只是端点不同。下面用 OpenAI SDK 通过 EnlyAI 统一接入获取向量。</p>
+
+            <pre><code><span class="k">from</span> openai <span class="k">import</span> OpenAI
+
+client = OpenAI(api_key=<span class="s">"sk-your-enlyai-key"</span>, base_url=<span class="s">"https://enlyai.com/v1"</span>)
+
+<span class="c"># 单条文本向量化</span>
+resp = client.embeddings.create(
+    model=<span class="s">"text-embedding-3-small"</span>,
+    input=<span class="s">"大模型让搜索变得更智能"</span>
+)
+vector = resp.data[<span class="n">0</span>].embedding
+<span class="f">print</span>(<span class="f">f</span><span class="s">"向量维度：{len(vector)}"</span>)
+<span class="f">print</span>(<span class="f">f</span><span class="s">"前5维：{vector[:5]}"</span>)</code></pre>
+
+            <blockquote>
+                <p>提示：通过 EnlyAI 统一接入，一个 key 即可调用 text-embedding-3-small、text-embedding-3-large 等各类 Embedding 模型，无需在多个平台分别注册，调用方式与 OpenAI 完全一致。</p>
+            </blockquote>
+
+            <h3>批量向量化</h3>
+            <p>实际项目里要处理成千上万条文本，必须批量调用以降低请求次数和成本。Embedding API 原生支持传入列表：</p>
+
+            <pre><code><span class="k">def</span> <span class="f">batch_embed</span>(texts, model=<span class="s">"text-embedding-3-small"</span>, batch_size=<span class="n">100</span>):
+    <span class="s">"""分批获取向量，避免单次请求过大"""</span>
+    all_vecs = []
+    <span class="k">for</span> i <span class="k">in</span> <span class="f">range</span>(<span class="n">0</span>, <span class="f">len</span>(texts), batch_size):
+        batch = texts[i:i+batch_size]
+        resp = client.embeddings.create(model=model, input=batch)
+        all_vecs.extend([d.embedding <span class="k">for</span> d <span class="k">in</span> resp.data])
+    <span class="k">return</span> all_vecs
+
+docs = [<span class="s">"iPhone 降价了"</span>, <span class="s">"苹果手机促销"</span>, <span class="s">"今天天气不错"</span>, <span class="s">"如何写 Python"</span>]
+vectors = batch_embed(docs)</code></pre>
+
+            <h2>三、计算相似度：余弦相似度</h2>
+
+            <p>拿到向量后，怎么衡量“相似”？最常用的是<strong>余弦相似度</strong>：衡量两个向量方向的夹角，取值 -1 到 1，越接近 1 越相似。它只看方向不看长度，对文本长短不敏感，最适合文本场景。</p>
+
+            <pre><code><span class="k">import</span> numpy <span class="k">as</span> np
+
+<span class="k">def</span> <span class="f">cosine_similarity</span>(a, b):
+    a, b = np.array(a), np.array(b)
+    <span class="k">return</span> np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+
+<span class="c"># 对比语义相似度</span>
+<span class="f">print</span>(<span class="f">f</span><span class="s">"iPhone降价 vs 苹果手机促销: {cosine_similarity(vectors[0], vectors[1]):.3f}"</span>)
+<span class="f">print</span>(<span class="f">f</span><span class="s">"iPhone降价 vs 今天天气不错: {cosine_similarity(vectors[0], vectors[2]):.3f}"</span>)
+<span class="f">print</span>(<span class="f">f</span><span class="s">"iPhone降价 vs 如何写Python: {cosine_similarity(vectors[0], vectors[3]):.3f}"</span>)</code></pre>
+
+            <p>运行结果会显示前两个（同义）相似度高达 0.8+，后两个（无关）只有 0.3 左右。这就是语义搜索的基础。</p>
+
+            <h2>四、搭建语义搜索引擎</h2>
+
+            <p>把上面几步组合起来，就是一个最小可用的语义搜索系统：预先把文档向量化存好，查询时把问题向量化，找最相似的文档。</p>
+
+            <pre><code><span class="k">import</span> numpy <span class="k">as</span> np
+
+<span class="k">class</span> <span class="f">SemanticSearch</span>:
+    <span class="k">def</span> <span class="f">__init__</span>(self):
+        self.docs = []
+        self.vectors = []
+
+    <span class="k">def</span> <span class="f">add</span>(self, texts):
+        self.docs.extend(texts)
+        self.vectors.extend(batch_embed(texts))
+        self.matrix = np.array(self.vectors)
+        <span class="c"># 归一化后内积 = 余弦相似度，加速计算</span>
+        self.norm = self.matrix / np.linalg.norm(self.matrix, axis=<span class="n">1</span>, keepdims=<span class="k">True</span>)
+
+    <span class="k">def</span> <span class="f">search</span>(self, query, top_k=<span class="n">3</span>):
+        q = np.array(batch_embed([query])[<span class="n">0</span>])
+        q = q / np.linalg.norm(q)
+        scores = self.norm @ q  <span class="c"># 批量余弦相似度</span>
+        idx = np.argsort(scores)[::-<span class="n">1</span>][:top_k]
+        <span class="k">return</span> [(self.docs[i], <span class="f">float</span>(scores[i])) <span class="k">for</span> i <span class="k">in</span> idx]
+
+engine = SemanticSearch()
+engine.add([
+    <span class="s">"GPT-5.5 是 OpenAI 最新旗舰模型，推理能力强"</span>,
+    <span class="s">"Claude Opus 4.8 擅长长文本与代码"</span>,
+    <span class="s">"Gemini 3.5 Pro 多模态能力突出"</span>,
+    <span class="s">"DeepSeek V4-Pro 性价比高，中文好"</span>,
+])
+
+<span class="k">for</span> doc, score <span class="k">in</span> engine.search(<span class="s">"哪个模型最便宜"</span>):
+    <span class="f">print</span>(<span class="f">f</span><span class="s">"[{score:.3f}] {doc}"</span>)</code></pre>
+
+            <p>即使文档里没有“便宜”这个词，搜索引擎也能通过语义匹配到“性价比高”的 DeepSeek。这就是语义搜索超越关键词匹配的地方。</p>
+
+            <h2>五、Embedding 的其他应用</h2>
+
+            <h3>1. 文本聚类</h3>
+            <p>把向量做 K-means 聚类，能自动把语义相近的文本分组，用于用户反馈分类、新闻话题发现。</p>
+
+            <h3>2. 去重与近似去重</h3>
+            <p>计算两两相似度，高于阈值（如 0.95）的视为重复。比纯文本哈希更鲁棒，能识别“换种说法的重复”。</p>
+
+            <h3>3. 推荐系统</h3>
+            <p>把用户历史行为文本和候选内容都向量化，推荐相似度高的内容。冷启动阶段尤其有效。</p>
+
+            <h3>4. RAG 检索</h3>
+            <p>这是 Embedding 最热门的应用，配合向量数据库实现知识库问答，详见我们的 RAG 教程。</p>
+
+            <h2>六、模型选择与最佳实践</h2>
+
+            <table>
+                <tr><th>模型</th><th>维度</th><th>适用场景</th></tr>
+                <tr><td>text-embedding-3-small</td><td>1536</td><td>通用、性价比高，大多数场景首选</td></tr>
+                <tr><td>text-embedding-3-large</td><td>3072</td><td>精度要求高、预算充足</td></tr>
+            </table>
+
+            <p>几个关键实践要点：</p>
+            <ol>
+                <li><strong>索引与查询必须用同一模型</strong>：换模型要全量重新向量化，否则维度和语义空间不一致。</li>
+                <li><strong>向量要归一化</strong>：用余弦相似度时，归一化后能用更快的内积计算。</li>
+                <li><strong>缓存向量</strong>：向量化是有成本的，已计算的向量存盘复用，别重复算。</li>
+                <li><strong>控制输入长度</strong>：超长文本先切分再嵌入，单条别超过模型最大 token。</li>
+                <li><strong>批量请求</strong>：单条调用既慢又贵，务必批量。</li>
+            </ol>
+
+            <h2>七、用 EnlyAI 统一接入 Embedding</h2>
+
+            <p>Embedding 模型选型需要反复对比，通过 EnlyAI 统一接入，<strong>一个 key 调用所有 Embedding 模型</strong>，方便横向对比效果与成本：</p>
+
+            <pre><code>client = OpenAI(api_key=<span class="s">"sk-your-enlyai-key"</span>, base_url=<span class="s">"https://enlyai.com/v1"</span>)
+
+<span class="c"># 对比不同 Embedding 模型在同一查询上的相似度区分度</span>
+query = <span class="s">"如何降低 API 成本"</span>
+candidates = [<span class="s">"省钱技巧"</span>, <span class="s">"模型微调教程"</span>]
+
+<span class="k">for</span> model <span class="k">in</span> [<span class="s">"text-embedding-3-small"</span>, <span class="s">"text-embedding-3-large"</span>]:
+    q = client.embeddings.create(model=model, input=[query]+candidates)
+    vecs = [d.embedding <span class="k">for</span> d <span class="k">in</span> q.data]
+    sim0 = cosine_similarity(vecs[<span class="n">0</span>], vecs[<span class="n">1</span>])
+    sim1 = cosine_similarity(vecs[<span class="n">0</span>], vecs[<span class="n">2</span>])
+    <span class="f">print</span>(<span class="f">f</span><span class="s">"{model}: 相关={sim0:.3f} 无关={sim1:.3f} 区分度={sim0-sim1:.3f}"</span>)</code></pre>
+
+            <p>统一接入还能让 Embedding 与对话模型（GPT-5.5、Claude Opus 4.8）共用一套密钥和账单，RAG 系统的模型层管理大大简化。</p>
+
+            <h2>总结</h2>
+
+            <p>Embedding 是把“语义”变成“可计算”的桥梁。掌握它，你就掌握了语义搜索、RAG、推荐、聚类的共同地基。本文从 API 调用到相似度计算、再到完整搜索引擎，给出了可直接复用的代码。下一步可以把它接入向量数据库处理百万级数据，或结合 LLM 搭建 RAG 问答系统。</p>
+
+            <p>而把 Embedding 调用统一交给 EnlyAI，你就能在多个嵌入模型间灵活切换、与对话模型共用一套接入，把精力放在检索效果而非基础设施上。</p>
+
+            <div class="cta">
+                <h3>想快速搭建语义搜索与 RAG 系统？</h3>
+                <p>EnlyAI 提供 OpenAI 兼容的统一接口，一个 key 调用各类 Embedding 模型与 GPT-5.5、Claude Opus 4.8 等大模型，注册即送免费额度，向量化代码只需改一个 base_url 即可接入。</p>
+                <a href="https://enlyai.com" class="cta-btn">立即注册 EnlyAI →</a>
+            </div>
+        </div>
+        <section class="related-posts">
+            <h2>相关文章推荐</h2>
+            <div class="related-grid">
+                <a href="/blog/rag-tutorial.html" class="related-card"><span class="related-title">RAG检索增强生成实战教程</span><span class="related-arrow">→</span></a>
+                <a href="/blog/vector-database-guide.html" class="related-card"><span class="related-title">向量数据库选型指南：Pinecone vs Milvus vs Chroma对比</span><span class="related-arrow">→</span></a>
+                <a href="/blog/langchain-tutorial.html" class="related-card"><span class="related-title">LangChain入门：用Python构建LLM应用</span><span class="related-arrow">→</span></a>
+                <a href="/blog/fine-tuning-vs-rag.html" class="related-card"><span class="related-title">微调vs RAG：什么时候该微调模型，什么时候用RAG？</span><span class="related-arrow">→</span></a>
+            </div>
+        </section>
+    </article>
+
+    <footer>
+        <div class="container">
+            <p>© 2026 EnlyAI · <a href="https://enlyai.com">enlyai.com</a></p>
+            <p class="icp"><a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener">沪ICP备2025123456号</a></p>
+        </div>
+    </footer>
+</body>
+</html>

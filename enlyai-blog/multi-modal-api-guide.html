@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>多模态API调用教程：图片理解、OCR、视频分析 | EnlyAI 博客</title>
+    <meta name="description" content="多模态API调用教程，讲解图片理解、OCR 文字识别、视频分析能力，含 base64 编码、图片输入、GPT-5.5 vision 与 Gemini 多模态的 Python 代码示例，助你快速搭建视觉 AI 应用。">
+    <meta name="keywords" content="多模态API, 图片理解, GPT-5.5 vision, Gemini多模态, OCR, 视觉大模型">
+    <meta name="author" content="EnlyAI">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://enlyai.com/blog/multi-modal-api-guide.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="多模态API调用教程：图片理解、OCR、视频分析">
+    <meta property="og:description" content="讲解图片理解、OCR、视频分析能力，含 base64 编码与多模态 API 调用的 Python 代码示例。">
+    <meta property="og:url" content="https://enlyai.com/blog/multi-modal-api-guide.html">
+    <meta property="og:site_name" content="EnlyAI">
+    <meta property="og:locale" content="zh_CN">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="多模态API调用教程：图片理解、OCR、视频分析">
+    <meta name="twitter:description" content="讲解图片理解、OCR、视频分析，含 Python 代码示例。">
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "headline": "多模态API调用教程：图片理解、OCR、视频分析",
+        "description": "多模态API调用教程，讲解图片理解、OCR 文字识别、视频分析能力，含 base64 编码、图片输入、GPT-5.5 vision 与 Gemini 多模态的 Python 代码示例。",
+        "keywords": "多模态API, 图片理解, GPT-5.5 vision, Gemini多模态, OCR, 视觉大模型",
+        "author": { "@type": "Organization", "name": "EnlyAI", "url": "https://enlyai.com" },
+        "publisher": { "@type": "Organization", "name": "EnlyAI", "url": "https://enlyai.com" },
+        "datePublished": "2026-06-19",
+        "dateModified": "2026-06-19",
+        "mainEntityOfPage": { "@type": "WebPage", "@id": "https://enlyai.com/blog/multi-modal-api-guide.html" }
+    }
+    </script>
+
+    <style>
+        :root { --primary: #2563eb; --primary-dark: #1d4ed8; --primary-light: #dbeafe; --text: #1f2937; --text-light: #6b7280; --bg: #ffffff; --bg-soft: #f9fafb; --border: #e5e7eb; --code-bg: #1e293b; --code-text: #e2e8f0; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif; color: var(--text); background: var(--bg); line-height: 1.8; font-size: 16px; -webkit-font-smoothing: antialiased; }
+        .container { max-width: 800px; margin: 0 auto; padding: 0 20px; }
+        .top-nav { background: rgba(255, 255, 255, 0.92); border-bottom: 1px solid var(--border); padding: 14px 0; position: sticky; top: 0; z-index: 100; backdrop-filter: saturate(180%) blur(8px); }
+        .top-nav .container { display: flex; justify-content: space-between; align-items: center; }
+        .back-link { color: var(--primary); text-decoration: none; font-weight: 500; font-size: 15px; }
+        .back-link:hover { color: var(--primary-dark); }
+        .brand { font-weight: 700; font-size: 18px; color: var(--text); text-decoration: none; }
+        .brand span { color: var(--primary); }
+        article { padding: 40px 0 60px; }
+        .article-meta { color: var(--text-light); font-size: 14px; margin-bottom: 16px; display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+        .tag { background: var(--primary-light); color: var(--primary-dark); padding: 3px 10px; border-radius: 12px; font-size: 13px; font-weight: 500; }
+        h1 { font-size: 34px; line-height: 1.3; font-weight: 800; margin-bottom: 20px; color: #111827; }
+        h2 { font-size: 24px; font-weight: 700; margin: 40px 0 16px; color: #111827; padding-top: 8px; border-top: 1px solid var(--border); }
+        h3 { font-size: 19px; font-weight: 600; margin: 24px 0 12px; color: #1f2937; }
+        p { margin-bottom: 18px; }
+        a { color: var(--primary); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        ul, ol { margin: 0 0 18px 22px; }
+        li { margin-bottom: 8px; }
+        strong { color: #111827; font-weight: 600; }
+        blockquote { border-left: 4px solid var(--primary); background: var(--bg-soft); padding: 14px 20px; margin: 20px 0; border-radius: 0 8px 8px 0; color: var(--text-light); }
+        blockquote p { margin-bottom: 0; }
+        pre { background: var(--code-bg); color: var(--code-text); padding: 20px 22px; border-radius: 10px; overflow-x: auto; margin: 18px 0; font-size: 14px; line-height: 1.65; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; }
+        code { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; }
+        p code, li code { background: #f1f5f9; color: #be185d; padding: 2px 6px; border-radius: 4px; font-size: 14px; }
+        .k { color: #c084fc; } .s { color: #86efac; } .c { color: #64748b; font-style: italic; } .n { color: #fbbf24; } .f { color: #60a5fa; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 15px; }
+        th, td { border: 1px solid var(--border); padding: 10px 14px; text-align: left; }
+        th { background: var(--bg-soft); font-weight: 600; }
+        .cta { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: #fff; padding: 36px 30px; border-radius: 14px; margin: 40px 0 20px; text-align: center; }
+        .cta h3 { color: #fff; margin-top: 0; font-size: 22px; }
+        .cta p { color: rgba(255, 255, 255, 0.92); margin-bottom: 22px; }
+        .cta-btn { display: inline-block; background: #fff; color: var(--primary); padding: 12px 32px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; transition: transform 0.15s ease; }
+        .cta-btn:hover { text-decoration: none; transform: translateY(-2px); }
+        footer { border-top: 1px solid var(--border); padding: 24px 0; text-align: center; color: var(--text-light); font-size: 14px; }
+        footer a { color: var(--text-light); }
+        footer a:hover { color: var(--primary); }
+        .icp { margin-top: 6px; font-size: 13px; }
+        .related-posts { margin-top: 48px; padding-top: 32px; border-top: 2px solid #e5e7eb; }
+        .related-posts h2 { font-size: 1.4rem; margin-bottom: 20px; color: #111827; }
+        .related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+        .related-card { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; text-decoration: none; color: #374151; transition: all 0.2s; font-size: 0.95rem; }
+        .related-card:hover { background: #eff6ff; border-color: #2563eb; color: #2563eb; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1); }
+        .related-title { flex: 1; padding-right: 12px; }
+        .related-arrow { color: #9ca3af; font-size: 1.1rem; flex-shrink: 0; }
+        .related-card:hover .related-arrow { color: #2563eb; }
+        @media (max-width: 600px) { h1 { font-size: 26px; } h2 { font-size: 21px; } pre { font-size: 13px; padding: 16px; } .container { padding: 0 16px; } }
+    </style>
+</head>
+<body>
+    <nav class="top-nav">
+        <div class="container">
+            <a href="https://enlyai.com" class="brand">Enly<span>AI</span></a>
+            <a href="https://enlyai.com" class="back-link">← 返回首页</a>
+        </div>
+    </nav>
+
+    <article>
+        <div class="container">
+            <div class="article-meta">
+                <span class="tag">多模态</span>
+                <span class="tag">视觉AI</span>
+                <span>2026-06-19</span>
+                <span>阅读约 14 分钟</span>
+            </div>
+
+            <h1>多模态API调用教程：图片理解、OCR、视频分析</h1>
+
+            <p>过去大模型只能“读字”，现在它能“看图”了。给 GPT-5.5 一张发票照片，它能直接读出金额和日期；给 Gemini 3.5 Pro 一张产品图，它能写出营销文案；给 Claude Opus 4.8 一张架构图，它能讲解设计思路。这就是<strong>多模态（Multimodal）</strong>能力——模型同时理解文本和图像。</p>
+
+            <p>多模态让 AI 应用场景一下子拓宽了：票据识别、医疗影像辅助、商品审核、内容合规、图表分析……本文从图片输入讲起，覆盖 OCR、图表理解、视频分析，给出可直接复用的 Python 代码。</p>
+
+            <h2>一、多模态模型能力概览</h2>
+
+            <p>2026 年主流多模态模型各有侧重：</p>
+            <ul>
+                <li><strong>GPT-5.5 / GPT-5.4</strong>：图片理解强，OCR、图表、推理均衡，通用首选。</li>
+                <li><strong>Gemini 3.5 Pro</strong>：原生支持图片和视频，长视频分析能力突出。</li>
+                <li><strong>Claude Opus 4.8</strong>：图文混合文档（如带图的技术文档）理解强，长上下文。</li>
+            </ul>
+
+            <p>调用方式上，OpenAI 兼容接口已成为事实标准——把图片以 base64 或 URL 形式放进 messages 即可。通过 EnlyAI 统一接入，<strong>一套代码切换不同多模态模型</strong>。</p>
+
+            <h2>二、图片输入的两种方式</h2>
+
+            <h3>方式1：base64 编码（本地图片）</h3>
+            <p>本地图片或不想公开的图片，转成 base64 字符串直接传给 API。适合小图、隐私图片。</p>
+
+            <pre><code><span class="k">import</span> base64
+<span class="k">from</span> openai <span class="k">import</span> OpenAI
+
+client = OpenAI(api_key=<span class="s">"sk-your-enlyai-key"</span>, base_url=<span class="s">"https://enlyai.com/v1"</span>)
+
+<span class="c"># 读取图片并转 base64</span>
+<span class="k">with</span> <span class="k">open</span>(<span class="s">"invoice.png"</span>, <span class="s">"rb"</span>) <span class="k">as</span> f:
+    img_b64 = base64.b64encode(f.read()).decode()
+
+resp = client.chat.completions.create(
+    model=<span class="s">"gpt-5.5"</span>,
+    messages=[{
+        <span class="s">"role"</span>: <span class="s">"user"</span>,
+        <span class="s">"content"</span>: [
+            {<span class="s">"type"</span>: <span class="s">"text"</span>, <span class="s">"text"</span>: <span class="s">"请识别这张发票上的金额、日期、发票号，输出 JSON。"</span>},
+            {<span class="s">"type"</span>: <span class="s">"image_url"</span>, <span class="s">"image_url"</span>: {<span class="s">"url"</span>: <span class="f">f</span><span class="s">"data:image/png;base64,{img_b64}"</span>}}
+        ]
+    }],
+    temperature=<span class="n">0.1</span>
+)
+<span class="f">print</span>(resp.choices[<span class="n">0</span>].message.content)</code></pre>
+
+            <h3>方式2：图片 URL（公网图片）</h3>
+            <p>图片已托管在公网（如 OSS、CDN），直接传 URL，API 自行下载。适合大图、批量处理，省去 base64 传输开销。</p>
+
+            <pre><code>resp = client.chat.completions.create(
+    model=<span class="s">"gpt-5.5"</span>,
+    messages=[{
+        <span class="s">"role"</span>: <span class="s">"user"</span>,
+        <span class="s">"content"</span>: [
+            {<span class="s">"type"</span>: <span class="s">"text"</span>, <span class="s">"text"</span>: <span class="s">"这张图里有什么？用中文描述。"</span>},
+            {<span class="s">"type"</span>: <span class="s">"image_url"</span>, <span class="s">"image_url"</span>: {<span class="s">"url"</span>: <span class="s">"https://example.com/photo.jpg"</span>}}
+        ]
+    }]
+)</code></pre>
+
+            <blockquote>
+                <p>提示：通过 EnlyAI 统一接入，调用 GPT-5.5、Gemini 3.5 Pro、Claude Opus 4.8 的多模态接口方式完全一致，只需改 model 名称即可切换，一个 key 搞定所有视觉模型。</p>
+            </blockquote>
+
+            <h2>三、OCR 文字识别实战</h2>
+
+            <p>多模态模型做 OCR 比传统 OCR 引擎更聪明：能理解版式、纠正错字、提取结构化字段。下面是一个发票信息提取的完整示例：</p>
+
+            <pre><code><span class="k">def</span> <span class="f">extract_invoice</span>(image_path):
+    <span class="k">with</span> <span class="k">open</span>(image_path, <span class="s">"rb"</span>) <span class="k">as</span> f:
+        img_b64 = base64.b64encode(f.read()).decode()
+
+    prompt = <span class="s">"""你是一个发票识别专家。请从图片中提取以下字段，输出严格 JSON：
+{
+  "invoice_no": "发票号码",
+  "date": "开票日期 YYYY-MM-DD",
+  "amount": "金额(数字)",
+  "buyer": "购买方名称",
+  "seller": "销售方名称"
+}
+无法识别的字段填 null，不要输出 JSON 以外的内容。"""</span>
+
+    resp = client.chat.completions.create(
+        model=<span class="s">"gpt-5.5"</span>,
+        messages=[{
+            <span class="s">"role"</span>: <span class="s">"user"</span>,
+            <span class="s">"content"</span>: [
+                {<span class="s">"type"</span>: <span class="s">"text"</span>, <span class="s">"text"</span>: prompt},
+                {<span class="s">"type"</span>: <span class="s">"image_url"</span>, <span class="s">"image_url"</span>: {<span class="s">"url"</span>: <span class="f">f</span><span class="s">"data:image/png;base64,{img_b64}"</span>}}
+            ]
+        }],
+        temperature=<span class="n">0</span>,
+        response_format={<span class="s">"type"</span>: <span class="s">"json_object"</span>}
+    )
+    <span class="k">return</span> resp.choices[<span class="n">0</span>].message.content
+
+<span class="k">import</span> json
+result = json.loads(extract_invoice(<span class="s">"invoice.png"</span>))
+<span class="f">print</span>(result)</code></pre>
+
+            <p>关键技巧：用 <code>response_format</code> 强制 JSON 输出，用 <code>temperature=0</code> 保证稳定，prompt 里给出 schema 示例。这样提取的字段可直接入库。</p>
+
+            <h2>四、图表与截图理解</h2>
+
+            <p>多模态模型能“看懂”图表，这是传统 OCR 做不到的。比如给它一张销售折线图，让它总结趋势：</p>
+
+            <pre><code>resp = client.chat.completions.create(
+    model=<span class="s">"gemini-3.5-pro"</span>,  <span class="c"># Gemini 图表理解强</span>
+    messages=[{
+        <span class="s">"role"</span>: <span class="s">"user"</span>,
+        <span class="s">"content"</span>: [
+            {<span class="s">"type"</span>: <span class="s">"text"</span>, <span class="s">"text"</span>: <span class="s">"这是某产品季度销售折线图。请分析：1)整体趋势 2)最高和最低点 3)给出3条经营建议。"</span>},
+            {<span class="s">"type"</span>: <span class="s">"image_url"</span>, <span class="s">"image_url"</span>: {<span class="s">"url"</span>: <span class="f">f</span><span class="s">"data:image/png;base64,{chart_b64}"</span>}}
+        ]
+    }]
+)</code></pre>
+
+            <p>对于 UI 截图，模型能识别按钮、表单、布局，可用于自动化测试、无障碍审查、设计稿转代码等场景。</p>
+
+            <h2>五、多图对比与推理</h2>
+
+            <p>一次请求可以传多张图片，让模型做对比。比如商品质检：传标准图和实拍图，让模型判断是否合格。</p>
+
+            <pre><code>resp = client.chat.completions.create(
+    model=<span class="s">"gpt-5.5"</span>,
+    messages=[{
+        <span class="s">"role"</span>: <span class="s">"user"</span>,
+        <span class="s">"content"</span>: [
+            {<span class="s">"type"</span>: <span class="s">"text"</span>, <span class="s">"text"</span>: <span class="s">"第一张是标准品，第二张是实拍品。判断实拍品是否有瑕疵，输出 合格/不合格 及原因。"</span>},
+            {<span class="s">"type"</span>: <span class="s">"image_url"</span>, <span class="s">"image_url"</span>: {<span class="s">"url"</span>: <span class="f">f</span><span class="s">"data:image/png;base64,{std_b64}"</span>}},
+            {<span class="s">"type"</span>: <span class="s">"image_url"</span>, <span class="s">"image_url"</span>: {<span class="s">"url"</span>: <span class="f">f</span><span class="s">"data:image/png;base64,{real_b64}"</span>}}
+        ]
+    }]
+)</code></pre>
+
+            <h2>六、视频分析（Gemini 优势领域）</h2>
+
+            <p>Gemini 3.5 Pro 原生支持视频输入，适合监控分析、会议纪要、教学内容提取。视频通常通过 File API 上传后引用：</p>
+
+            <pre><code><span class="c"># 视频分析概念示例（Gemini 原生接口风格）</span>
+<span class="c"># 实际通过 EnlyAI 调用时，视频需先上传获取引用</span>
+resp = client.chat.completions.create(
+    model=<span class="s">"gemini-3.5-pro"</span>,
+    messages=[{
+        <span class="s">"role"</span>: <span class="s">"user"</span>,
+        <span class="s">"content"</span>: [
+            {<span class="s">"type"</span>: <span class="s">"text"</span>, <span class="s">"text"</span>: <span class="s">"这段会议视频里讨论了哪些议题？列出关键决议。"</span>},
+            {<span class="s">"type"</span>: <span class="s">"image_url"</span>, <span class="s">"image_url"</span>: {<span class="s">"url"</span>: video_file_uri}}
+        ]
+    }]
+)</code></pre>
+
+            <p>对于长视频，建议先抽帧成关键图片序列再用图片接口分析，成本更低、可控性更强。</p>
+
+            <h2>七、最佳实践与避坑</h2>
+
+            <ol>
+                <li><strong>控制图片尺寸</strong>：大图先压缩到 1568px 以内长边，既省 token 又不影响识别。</li>
+                <li><strong>选对格式</strong>：照片用 JPEG，含文字/线条的用 PNG，避免压缩失真影响 OCR。</li>
+                <li><strong>prompt 要具体</strong>：“识别这张图”太泛，“提取发票金额并输出 JSON”才精准。</li>
+                <li><strong>低温度保稳定</strong>：OCR、提取类任务 temperature 设 0，避免每次结果不同。</li>
+                <li><strong>处理失败重试</strong>：复杂图片偶尔识别错，可让模型“再检查一遍”或换模型重试。</li>
+                <li><strong>注意成本</strong>：图片按 token 计费，一张图约几百到上千 token，批量处理要做好缓存。</li>
+                <li><strong>隐私合规</strong>：含敏感信息的图片走 base64 不走公网 URL，确认服务商数据处理协议。</li>
+            </ol>
+
+            <h2>八、用 EnlyAI 统一接入多模态模型</h2>
+
+            <p>不同多模态模型各有所长，实际项目常需要组合使用。通过 EnlyAI 统一接入，<strong>一套代码、一个 key 调用所有视觉模型</strong>，按场景选最优模型：</p>
+
+            <pre><code>client = OpenAI(api_key=<span class="s">"sk-your-enlyai-key"</span>, base_url=<span class="s">"https://enlyai.com/v1"</span>)
+
+<span class="k">def</span> <span class="f">smart_vision</span>(image_b64, task):
+    <span class="c"># 按任务类型选模型</span>
+    model_map = {
+        <span class="s">"ocr"</span>: <span class="s">"gpt-5.5"</span>,            <span class="c"># OCR 精度高</span>
+        <span class="s">"chart"</span>: <span class="s">"gemini-3.5-pro"</span>,   <span class="c"># 图表理解强</span>
+        <span class="s">"doc"</span>: <span class="s">"claude-opus-4-8"</span>,    <span class="c"># 图文文档</span>
+        <span class="s">"cheap"</span>: <span class="s">"gpt-5.4-mini"</span>      <span class="c"># 简单识别省钱</span>
+    }
+    model = model_map.get(task, <span class="s">"gpt-5.5"</span>)
+    <span class="k">return</span> client.chat.completions.create(
+        model=model,
+        messages=[{<span class="s">"role"</span>: <span class="s">"user"</span>, <span class="s">"content"</span>: [
+            {<span class="s">"type"</span>: <span class="s">"text"</span>, <span class="s">"text"</span>: <span class="s">"描述这张图"</span>},
+            {<span class="s">"type"</span>: <span class="s">"image_url"</span>, <span class="s">"image_url"</span>: {<span class="s">"url"</span>: <span class="f">f</span><span class="s">"data:image/png;base64,{image_b64}"</span>}}
+        ]}]
+    )</code></pre>
+
+            <p>统一接入还能实现故障转移：某个视觉模型波动时，改一个字符串切到备用模型，业务不中断。</p>
+
+            <h2>总结</h2>
+
+            <p>多模态 API 把大模型的能力从“读字”扩展到“看图看视频”，打开了票据识别、图表分析、质检、内容审核等一大批场景。掌握 base64 与 URL 两种图片输入方式、结构化输出的 prompt 技巧、按场景选模型的方法，你就能搭建出实用的视觉 AI 应用。</p>
+
+            <p>而把多模态模型调用统一交给 EnlyAI，你就能在 GPT-5.5、Gemini 3.5 Pro、Claude Opus 4.8 间灵活切换，用一套代码覆盖所有视觉场景，把精力放在业务逻辑而非多平台对接上。</p>
+
+            <div class="cta">
+                <h3>想用一套代码调用所有多模态大模型？</h3>
+                <p>EnlyAI 提供 OpenAI 兼容的统一接口，一个 key 调用 GPT-5.5、Gemini 3.5 Pro、Claude Opus 4.8 的多模态能力，支持图片理解、OCR、视频分析，注册即送免费额度。</p>
+                <a href="https://enlyai.com" class="cta-btn">立即注册 EnlyAI →</a>
+            </div>
+        </div>
+        <section class="related-posts">
+            <h2>相关文章推荐</h2>
+            <div class="related-grid">
+                <a href="/blog/gemini-api-guide.html" class="related-card"><span class="related-title">Gemini API入门指南：Google AI接入</span><span class="related-arrow">→</span></a>
+                <a href="/blog/claude-api-tutorial.html" class="related-card"><span class="related-title">Claude API使用教程：从注册到调用</span><span class="related-arrow">→</span></a>
+                <a href="/blog/python-llm-api-tutorial.html" class="related-card"><span class="related-title">用Python调用LLM API的5种方式</span><span class="related-arrow">→</span></a>
+                <a href="/blog/ai-app-architecture.html" class="related-card"><span class="related-title">AI应用架构设计：从单体到微服务的演进</span><span class="related-arrow">→</span></a>
+            </div>
+        </section>
+    </article>
+
+    <footer>
+        <div class="container">
+            <p>© 2026 EnlyAI · <a href="https://enlyai.com">enlyai.com</a></p>
+            <p class="icp"><a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener">沪ICP备2025123456号</a></p>
+        </div>
+    </footer>
+</body>
+</html>

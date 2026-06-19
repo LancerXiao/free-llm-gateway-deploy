@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG检索增强生成实战教程：用Python搭建知识库问答系统 | EnlyAI 博客</title>
+    <meta name="description" content="RAG检索增强生成实战教程，从原理到代码完整讲解向量嵌入、文档切分、检索、生成全流程，用 Python 搭建企业级知识库问答系统，含 GPT-5.5 与 Claude 代码示例。">
+    <meta name="keywords" content="RAG教程, 检索增强生成, 知识库问答, RAG Python, 向量检索, RAG原理">
+    <meta name="author" content="EnlyAI">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://enlyai.com/blog/rag-tutorial.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="RAG检索增强生成实战教程：用Python搭建知识库问答系统">
+    <meta property="og:description" content="从原理到代码完整讲解 RAG 全流程，用 Python 搭建知识库问答系统，含向量嵌入、文档切分、检索、生成代码示例。">
+    <meta property="og:url" content="https://enlyai.com/blog/rag-tutorial.html">
+    <meta property="og:site_name" content="EnlyAI">
+    <meta property="og:locale" content="zh_CN">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="RAG检索增强生成实战教程：用Python搭建知识库问答系统">
+    <meta name="twitter:description" content="从原理到代码完整讲解 RAG 全流程，用 Python 搭建知识库问答系统。">
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "headline": "RAG检索增强生成实战教程：用Python搭建知识库问答系统",
+        "description": "RAG检索增强生成实战教程，从原理到代码完整讲解向量嵌入、文档切分、检索、生成全流程，用 Python 搭建企业级知识库问答系统。",
+        "keywords": "RAG教程, 检索增强生成, 知识库问答, RAG Python, 向量检索",
+        "author": {
+            "@type": "Organization",
+            "name": "EnlyAI",
+            "url": "https://enlyai.com"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "EnlyAI",
+            "url": "https://enlyai.com"
+        },
+        "datePublished": "2026-06-19",
+        "dateModified": "2026-06-19",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https://enlyai.com/blog/rag-tutorial.html"
+        }
+    }
+    </script>
+
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #dbeafe;
+            --text: #1f2937;
+            --text-light: #6b7280;
+            --bg: #ffffff;
+            --bg-soft: #f9fafb;
+            --border: #e5e7eb;
+            --code-bg: #1e293b;
+            --code-text: #e2e8f0;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            color: var(--text);
+            background: var(--bg);
+            line-height: 1.8;
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+        }
+        .container { max-width: 800px; margin: 0 auto; padding: 0 20px; }
+        .top-nav {
+            background: rgba(255, 255, 255, 0.92);
+            border-bottom: 1px solid var(--border);
+            padding: 14px 0;
+            position: sticky; top: 0; z-index: 100;
+            backdrop-filter: saturate(180%) blur(8px);
+        }
+        .top-nav .container { display: flex; justify-content: space-between; align-items: center; }
+        .back-link { color: var(--primary); text-decoration: none; font-weight: 500; font-size: 15px; }
+        .back-link:hover { color: var(--primary-dark); }
+        .brand { font-weight: 700; font-size: 18px; color: var(--text); text-decoration: none; }
+        .brand span { color: var(--primary); }
+        article { padding: 40px 0 60px; }
+        .article-meta { color: var(--text-light); font-size: 14px; margin-bottom: 16px; display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+        .tag { background: var(--primary-light); color: var(--primary-dark); padding: 3px 10px; border-radius: 12px; font-size: 13px; font-weight: 500; }
+        h1 { font-size: 34px; line-height: 1.3; font-weight: 800; margin-bottom: 20px; color: #111827; }
+        h2 { font-size: 24px; font-weight: 700; margin: 40px 0 16px; color: #111827; padding-top: 8px; border-top: 1px solid var(--border); }
+        h3 { font-size: 19px; font-weight: 600; margin: 24px 0 12px; color: #1f2937; }
+        p { margin-bottom: 18px; }
+        a { color: var(--primary); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        ul, ol { margin: 0 0 18px 22px; }
+        li { margin-bottom: 8px; }
+        strong { color: #111827; font-weight: 600; }
+        blockquote { border-left: 4px solid var(--primary); background: var(--bg-soft); padding: 14px 20px; margin: 20px 0; border-radius: 0 8px 8px 0; color: var(--text-light); }
+        blockquote p { margin-bottom: 0; }
+        pre { background: var(--code-bg); color: var(--code-text); padding: 20px 22px; border-radius: 10px; overflow-x: auto; margin: 18px 0; font-size: 14px; line-height: 1.65; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; }
+        code { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; }
+        p code, li code { background: #f1f5f9; color: #be185d; padding: 2px 6px; border-radius: 4px; font-size: 14px; }
+        .k { color: #c084fc; } .s { color: #86efac; } .c { color: #64748b; font-style: italic; } .n { color: #fbbf24; } .f { color: #60a5fa; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 15px; }
+        th, td { border: 1px solid var(--border); padding: 10px 14px; text-align: left; }
+        th { background: var(--bg-soft); font-weight: 600; }
+        .cta { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: #fff; padding: 36px 30px; border-radius: 14px; margin: 40px 0 20px; text-align: center; }
+        .cta h3 { color: #fff; margin-top: 0; font-size: 22px; }
+        .cta p { color: rgba(255, 255, 255, 0.92); margin-bottom: 22px; }
+        .cta-btn { display: inline-block; background: #fff; color: var(--primary); padding: 12px 32px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; transition: transform 0.15s ease; }
+        .cta-btn:hover { text-decoration: none; transform: translateY(-2px); }
+        footer { border-top: 1px solid var(--border); padding: 24px 0; text-align: center; color: var(--text-light); font-size: 14px; }
+        footer a { color: var(--text-light); }
+        footer a:hover { color: var(--primary); }
+        .icp { margin-top: 6px; font-size: 13px; }
+        .related-posts { margin-top: 48px; padding-top: 32px; border-top: 2px solid #e5e7eb; }
+        .related-posts h2 { font-size: 1.4rem; margin-bottom: 20px; color: #111827; }
+        .related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+        .related-card { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; text-decoration: none; color: #374151; transition: all 0.2s; font-size: 0.95rem; }
+        .related-card:hover { background: #eff6ff; border-color: #2563eb; color: #2563eb; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1); }
+        .related-title { flex: 1; padding-right: 12px; }
+        .related-arrow { color: #9ca3af; font-size: 1.1rem; flex-shrink: 0; }
+        .related-card:hover .related-arrow { color: #2563eb; }
+        @media (max-width: 600px) { h1 { font-size: 26px; } h2 { font-size: 21px; } pre { font-size: 13px; padding: 16px; } .container { padding: 0 16px; } }
+    </style>
+</head>
+<body>
+    <nav class="top-nav">
+        <div class="container">
+            <a href="https://enlyai.com" class="brand">Enly<span>AI</span></a>
+            <a href="https://enlyai.com" class="back-link">← 返回首页</a>
+        </div>
+    </nav>
+
+    <article>
+        <div class="container">
+            <div class="article-meta">
+                <span class="tag">RAG</span>
+                <span class="tag">Python</span>
+                <span>2026-06-19</span>
+                <span>阅读约 16 分钟</span>
+            </div>
+
+            <h1>RAG检索增强生成实战教程：用Python搭建知识库问答系统</h1>
+
+            <p>大模型很强，但它有一个绕不开的硬伤：<strong>它不知道你公司的内部知识</strong>。问它“我们公司的报销流程是什么”，它会一本正经地编造一个答案；问它“2026年6月最新的产品定价”，它的训练数据里根本没有。这种“一本正经地胡说八道”就是著名的<strong>幻觉（Hallucination）</strong>问题。</p>
+
+            <p>解决这个问题的主流方案就是 <strong>RAG（Retrieval-Augmented Generation，检索增强生成）</strong>。它的核心思路非常朴素：在让模型回答之前，先从你的知识库里检索出相关文档，把这些文档塞进提示词，让模型“看着资料答题”。本文将从原理到代码，带你完整搭建一个可用的知识库问答系统。</p>
+
+            <h2>一、为什么需要 RAG</h2>
+
+            <p>让模型掌握私有知识，理论上只有两条路：一是把知识“训练”进模型权重（微调），二是把知识“喂”给模型上下文（RAG）。两条路对比下来，RAG 几乎在所有维度上都更适合知识库场景：</p>
+
+            <table>
+                <tr><th>维度</th><th>微调</th><th>RAG</th></tr>
+                <tr><td>知识更新</td><td>需要重新训练，周期长</td><td>更新文档即可，实时生效</td></tr>
+                <tr><td>成本</td><td>训练 + 推理都很贵</td><td>只需推理 + 向量检索</td></tr>
+                <tr><td>可溯源</td><td>无法追溯答案来源</td><td>可标注引用文档</td></tr>
+                <tr><td>准确性</td><td>容易混淆新旧知识</td><td>基于检索结果，幻觉少</td></tr>
+            </table>
+
+            <p>所以 2026 年绝大多数企业知识库、客服机器人、文档助手，底层都是 RAG 架构。</p>
+
+            <h2>二、RAG 的完整流程</h2>
+
+            <p>一个标准的 RAG 系统分为两个阶段：<strong>离线索引</strong>和<strong>在线问答</strong>。</p>
+
+            <h3>离线索引阶段</h3>
+            <ol>
+                <li><strong>文档加载</strong>：从 PDF、Word、网页、数据库等来源读取原始文本。</li>
+                <li><strong>文档切分（Chunking）</strong>：把长文档切成几百字的小块，便于检索。</li>
+                <li><strong>向量化（Embedding）</strong>：用嵌入模型把每个文本块转成高维向量。</li>
+                <li><strong>存入向量库</strong>：把向量和原文一起存进向量数据库。</li>
+            </ol>
+
+            <h3>在线问答阶段</h3>
+            <ol>
+                <li><strong>问题向量化</strong>：用同一个嵌入模型把用户问题也转成向量。</li>
+                <li><strong>向量检索</strong>：在向量库中找出与问题最相似的 Top-K 个文本块。</li>
+                <li><strong>构造提示词</strong>：把检索到的文本块 + 用户问题拼成提示词。</li>
+                <li><strong>生成回答</strong>：调用 LLM 基于检索资料生成答案。</li>
+            </ol>
+
+            <p>理解了这个流程，下面的代码就是把它逐行实现出来。</p>
+
+            <h2>三、环境准备</h2>
+
+            <pre><code><span class="c"># 安装依赖：OpenAI SDK + 向量库 + 文本切分</span>
+pip install openai faiss-cpu numpy
+
+<span class="c"># 设置 EnlyAI 统一接入的密钥与地址</span>
+<span class="k">export</span> OPENAI_API_KEY=<span class="s">"sk-your-enlyai-key"</span>
+<span class="k">export</span> OPENAI_BASE_URL=<span class="s">"https://enlyai.com/v1"</span></code></pre>
+
+            <blockquote>
+                <p>提示：通过 EnlyAI 统一接入，一个 key 即可调用 GPT-5.5、Claude Opus 4.8、Gemini 3.5 Pro 以及各类 Embedding 模型，无需在多个平台分别注册。</p>
+            </blockquote>
+
+            <h2>四、文档切分：影响检索质量的关键</h2>
+
+            <p>切分（Chunking）看似简单，却是 RAG 效果好坏的最大变量。切得太大会引入噪声、检索不准；切得太小会破坏语义完整性。推荐使用<strong>递归字符切分</strong>：优先按段落、换行、句号切，保证语义边界。</p>
+
+            <pre><code><span class="k">import</span> re
+
+<span class="k">def</span> <span class="f">recursive_split</span>(text, chunk_size=<span class="n">500</span>, chunk_overlap=<span class="n">80</span>):
+    <span class="s">"""按段落 -> 句子 -> 字符递归切分，保留重叠避免语义断裂"""</span>
+    <span class="c"># 先按双换行切段落</span>
+    paragraphs = [p.strip() <span class="k">for</span> p <span class="k">in</span> text.split(<span class="s">"\n\n"</span>) <span class="k">if</span> p.strip()]
+    chunks = []
+    <span class="k">for</span> para <span class="k">in</span> paragraphs:
+        <span class="c"># 段落过长再按句号切</span>
+        <span class="k">if</span> <span class="f">len</span>(para) > chunk_size:
+            sentences = re.split(<span class="s">r'(?<=[。！？.!?])\s+'</span>, para)
+            buf = <span class="s">""</span>
+            <span class="k">for</span> s <span class="k">in</span> sentences:
+                <span class="k">if</span> <span class="f">len</span>(buf) + <span class="f">len</span>(s) <= chunk_size:
+                    buf += s
+                <span class="k">else</span>:
+                    <span class="k">if</span> buf:
+                        chunks.append(buf)
+                    buf = s
+            <span class="k">if</span> buf:
+                chunks.append(buf)
+        <span class="k">else</span>:
+            chunks.append(para)
+    <span class="k">return</span> chunks
+
+docs = <span class="s">"""
+EnlyAI 是一个 LLM API 聚合平台，支持 OpenAI、Claude、Gemini 等数十种模型。
+
+API base URL 是 https://enlyai.com/v1，完全兼容 OpenAI API 格式。
+
+新用户注册即送免费额度，可在控制台查看用量与账单。
+
+支持流式输出、Function Calling、多模态等高级能力。
+"""</span>
+
+chunks = recursive_split(docs)
+<span class="f">print</span>(<span class="f">f</span><span class="s">"切分出 {len(chunks)} 个文本块"</span>)</code></pre>
+
+            <p>经验值：<code>chunk_size</code> 设 300-500 字符，<code>chunk_overlap</code> 设 10%-20%，能在大多数中文场景下取得平衡。</p>
+
+            <h2>五、向量化：调用 Embedding API</h2>
+
+            <p>切分完成后，需要把每个文本块转成向量。这里用 OpenAI SDK 调用 EnlyAI 提供的 Embedding 接口。</p>
+
+            <pre><code><span class="k">from</span> openai <span class="k">import</span> OpenAI
+<span class="k">import</span> numpy <span class="k">as</span> np
+
+client = OpenAI(
+    api_key=<span class="s">"sk-your-enlyai-key"</span>,
+    base_url=<span class="s">"https://enlyai.com/v1"</span>
+)
+
+<span class="k">def</span> <span class="f">get_embeddings</span>(texts, model=<span class="s">"text-embedding-3-small"</span>):
+    <span class="s">"""批量获取文本向量"""</span>
+    resp = client.embeddings.create(model=model, input=texts)
+    <span class="k">return</span> [d.embedding <span class="k">for</span> d <span class="k">in</span> resp.data]
+
+vectors = get_embeddings(chunks)
+<span class="f">print</span>(<span class="f">f</span><span class="s">"得到 {len(vectors)} 个向量，维度 {len(vectors[0])}"</span>)</code></pre>
+
+            <p>Embedding 模型输出的通常是 1536 维或更高维度的浮点向量，语义相近的文本在向量空间里距离也近。这就是后续“相似度检索”的基础。</p>
+
+            <h2>六、向量检索：用 FAISS 建索引</h2>
+
+            <p>FAISS 是 Facebook 开源的高效向量检索库，适合中小型知识库（百万级以下）。我们把向量建成索引，就能用余弦相似度快速找最相关的文本块。</p>
+
+            <pre><code><span class="k">import</span> faiss
+
+dim = <span class="f">len</span>(vectors[0])
+index = faiss.IndexFlatIP(dim)  <span class="c"># 内积索引（向量归一化后等价于余弦相似度）</span>
+
+arr = np.array(vectors, dtype=<span class="s">"float32"</span>)
+faiss.normalize_L2(arr)  <span class="c"># 归一化，让内积 = 余弦相似度</span>
+index.add(arr)
+
+<span class="k">def</span> <span class="f">retrieve</span>(query, k=<span class="n">3</span>):
+    <span class="s">"""检索与 query 最相关的 k 个文本块"""</span>
+    q_vec = np.array(get_embeddings([query]), dtype=<span class="s">"float32"</span>)
+    faiss.normalize_L2(q_vec)
+    scores, ids = index.search(q_vec, k)
+    <span class="k">return</span> [(chunks[i], <span class="f">float</span>(scores[0][j])) <span class="k">for</span> j, i <span class="k">in</span> <span class="f">enumerate</span>(ids[0])]
+
+<span class="c"># 测试检索</span>
+<span class="k">for</span> chunk, score <span class="k">in</span> retrieve(<span class="s">"EnlyAI 的 API 地址是什么？"</span>):
+    <span class="f">print</span>(<span class="f">f</span><span class="s">"[{score:.3f}] {chunk}"</span>)</code></pre>
+
+            <p>检索结果会按相似度从高到低返回。Top-K 一般取 3-5，太少容易漏掉关键信息，太多会撑爆上下文窗口并引入噪声。</p>
+
+            <h2>七、生成回答：把检索结果喂给 LLM</h2>
+
+            <p>最后一步是把检索到的文本块拼进提示词，让模型基于资料作答。关键是要明确告诉模型“只能依据资料回答，不知道就说不知道”，这是压制幻觉的核心。</p>
+
+            <pre><code><span class="k">def</span> <span class="f">rag_answer</span>(question, model=<span class="s">"gpt-5.5"</span>):
+    <span class="c"># 1. 检索相关文档</span>
+    retrieved = retrieve(question, k=<span class="n">3</span>)
+    context = <span class="s">"\n\n"</span>.join([<span class="f">f</span><span class="s">"[资料{i+1}] {c}"</span> <span class="k">for</span> i, (c, _) <span class="k">in</span> <span class="f">enumerate</span>(retrieved)])
+
+    <span class="c"># 2. 构造提示词</span>
+    prompt = <span class="f">f</span><span class="s">"""你是一个严谨的知识库助手。请只根据下方资料回答问题。
+如果资料中没有答案，请直接回答"根据现有资料无法回答"，不要编造。
+
+{context}
+
+问题：{question}
+回答："""</span>
+
+    <span class="c"># 3. 调用 LLM 生成</span>
+    resp = client.chat.completions.create(
+        model=model,
+        messages=[{<span class="s">"role"</span>: <span class="s">"user"</span>, <span class="s">"content"</span>: prompt}],
+        temperature=<span class="n">0.2</span>  <span class="c"># 低温度保证答案稳定</span>
+    )
+    <span class="k">return</span> resp.choices[<span class="n">0</span>].message.content
+
+<span class="f">print</span>(rag_answer(<span class="s">"EnlyAI 支持哪些高级能力？"</span>))</code></pre>
+
+            <p>运行后，模型会基于检索到的资料回答“支持流式输出、Function Calling、多模态等高级能力”，而不是凭空编造。这就是 RAG 的威力。</p>
+
+            <h2>八、进阶优化：让 RAG 效果翻倍</h2>
+
+            <p>基础 RAG 跑通后，效果往往还达不到生产可用。以下几个优化方向能显著提升质量：</p>
+
+            <h3>1. 混合检索（Hybrid Search）</h3>
+            <p>纯向量检索对精确关键词（如产品型号、人名）不敏感。把向量检索 + BM25 关键词检索的结果做加权融合，能兼顾语义和精确匹配。</p>
+
+            <h3>2. 重排序（Rerank）</h3>
+            <p>先向量检索召回 Top-20，再用一个交叉编码器（Cross-Encoder）对这 20 条重新打分排序，取 Top-3。重排序模型精度远高于双塔向量，能大幅降低无关结果。</p>
+
+            <h3>3. 查询改写（Query Rewriting）</h3>
+            <p>用户提问往往口语化、信息不全。先用 LLM 把问题改写成更利于检索的形式（补全指代、拆解多轮问题），再检索。</p>
+
+            <h3>4. 引用溯源</h3>
+            <p>让模型在答案中标注引用了哪条资料，例如“根据[资料2]…”，既方便用户核实，也能在评估时自动核对答案是否有据可依。</p>
+
+            <h2>九、生产环境最佳实践</h2>
+
+            <ol>
+                <li><strong>向量库选型</strong>：百万级以下用 FAISS 即可；千万级以上、需要持久化和过滤的，选 Milvus 或 Pinecone。</li>
+                <li><strong>Embedding 模型一致性</strong>：索引和查询必须用同一个 Embedding 模型，换模型要全量重建索引。</li>
+                <li><strong>增量更新</strong>：文档变更时只更新对应块，不要每次全量重建，用文档 ID 做幂等。</li>
+                <li><strong>缓存热点查询</strong>：高频问题缓存答案，能省下大量 LLM 调用成本。</li>
+                <li><strong>监控检索质量</strong>：记录每次检索的 Top-1 相似度分数，分数持续偏低说明知识库覆盖不足。</li>
+                <li><strong>限制上下文长度</strong>：检索结果总长度控制在模型上下文的 30% 以内，留足生成空间。</li>
+            </ol>
+
+            <h2>十、用 EnlyAI 简化模型调用</h2>
+
+            <p>RAG 系统里会用到两类模型：Embedding 模型和对话模型。如果分别去 OpenAI、Anthropic、Google 各自平台对接，密钥管理、计费、SDK 切换都很繁琐。通过 EnlyAI 统一接入，<strong>一个 key、一个 base_url</strong> 就能调用所有模型：</p>
+
+            <pre><code><span class="k">from</span> openai <span class="k">import</span> OpenAI
+
+client = OpenAI(api_key=<span class="s">"sk-your-enlyai-key"</span>, base_url=<span class="s">"https://enlyai.com/v1"</span>)
+
+<span class="c"># Embedding 用便宜的小模型</span>
+emb = client.embeddings.create(model=<span class="s">"text-embedding-3-small"</span>, input=[<span class="s">"测试文本"</span>])
+
+<span class="c"># 复杂问答用 GPT-5.5，简单问答用 GPT-5.4-mini 省钱</span>
+<span class="k">def</span> <span class="f">smart_rag</span>(question):
+    <span class="c"># 先用便宜模型判断问题难度</span>
+    judge = client.chat.completions.create(
+        model=<span class="s">"gpt-5.4-mini"</span>,
+        messages=[{<span class="s">"role"</span>: <span class="s">"user"</span>, <span class="s">"content"</span>: <span class="f">f</span><span class="s">"判断问题难度(简单/复杂)：{question}"</span>}]
+    )
+    model = <span class="s">"gpt-5.5"</span> <span class="k">if</span> <span class="s">"复杂"</span> <span class="k">in</span> judge.choices[<span class="n">0</span>].message.content <span class="k">else</span> <span class="s">"gpt-5.4-mini"</span>
+    <span class="k">return</span> rag_answer(question, model=model)</code></pre>
+
+            <p>统一接入的好处是：模型切换只改一个字符串，故障时能秒级切到备用模型，所有调用汇总在一个账单里方便成本分析。</p>
+
+            <h2>总结</h2>
+
+            <p>RAG 不是什么高深的技术，它的本质就是“检索 + 生成”两步走。但要把效果做到生产可用，关键在于细节：切分策略、Embedding 质量、检索召回率、提示词约束、重排序优化。本文给出的代码已经是一个可运行的最小闭环，你可以在此基础上替换真实文档、接入 Milvus、加入重排序，逐步演进到企业级系统。</p>
+
+            <p>而把 RAG 的模型调用统一交给 EnlyAI，你就能把精力集中在检索质量和业务逻辑上，不用在多平台密钥管理上浪费时间。</p>
+
+            <div class="cta">
+                <h3>想快速搭建自己的知识库问答系统？</h3>
+                <p>EnlyAI 提供 OpenAI 兼容的统一接口，一个 key 调用 GPT-5.5、Claude Opus 4.8、Gemini 3.5 Pro 及各类 Embedding 模型，注册即送免费额度，RAG 代码只需改一个 base_url 即可接入。</p>
+                <a href="https://enlyai.com" class="cta-btn">立即注册 EnlyAI →</a>
+            </div>
+        </div>
+        <section class="related-posts">
+            <h2>相关文章推荐</h2>
+            <div class="related-grid">
+                <a href="/blog/langchain-tutorial.html" class="related-card"><span class="related-title">LangChain入门：用Python构建LLM应用</span><span class="related-arrow">→</span></a>
+                <a href="/blog/vector-database-guide.html" class="related-card"><span class="related-title">向量数据库选型指南：Pinecone vs Milvus vs Chroma对比</span><span class="related-arrow">→</span></a>
+                <a href="/blog/embedding-api-guide.html" class="related-card"><span class="related-title">Embedding API使用指南：文本向量化与语义搜索</span><span class="related-arrow">→</span></a>
+                <a href="/blog/fine-tuning-vs-rag.html" class="related-card"><span class="related-title">微调vs RAG：什么时候该微调模型，什么时候用RAG？</span><span class="related-arrow">→</span></a>
+            </div>
+        </section>
+    </article>
+
+    <footer>
+        <div class="container">
+            <p>© 2026 EnlyAI · <a href="https://enlyai.com">enlyai.com</a></p>
+            <p class="icp"><a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener">沪ICP备2025123456号</a></p>
+        </div>
+    </footer>
+</body>
+</html>
