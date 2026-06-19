@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>大模型API流式输出怎么实现？SSE流式调用教程 | EnlyAI</title>
+  <meta name="description" content="大模型 API 流式输出（SSE）完整教程：什么是流式输出，Python 调用流式 API，流式与非流式区别，处理流式响应，附完整代码示例。" />
+  <meta name="keywords" content="API流式输出, SSE streaming, 流式API调用, 大模型流式, Python流式" />
+  <meta name="author" content="EnlyAI" />
+  <meta name="robots" content="index, follow" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="大模型API流式输出怎么实现？SSE流式调用教程" />
+  <meta property="og:description" content="大模型 API 流式输出（SSE）完整教程，Python 调用流式 API，处理流式响应，附完整代码示例。" />
+  <meta property="og:url" content="https://enlyai.com/blog/faq-streaming-api.html" />
+  <meta property="og:site_name" content="EnlyAI" />
+  <meta property="og:locale" content="zh_CN" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="大模型API流式输出怎么实现？SSE流式调用教程" />
+  <meta name="twitter:description" content="大模型 API 流式输出（SSE）完整教程，Python 调用流式 API，处理流式响应，附完整代码示例。" />
+
+  <link rel="canonical" href="https://enlyai.com/blog/faq-streaming-api.html" />
+  <link rel="icon" href="https://enlyai.com/logo.png" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "headline": "大模型API流式输出怎么实现？SSE流式调用教程",
+    "description": "大模型 API 流式输出（SSE）完整教程，Python 调用流式 API，处理流式响应，附完整代码示例。",
+    "inLanguage": "zh-CN",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "什么是流式输出？大模型为什么需要流式？",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "流式输出（Streaming）是指模型一边生成一边把结果分块推送给客户端，而不是等全部生成完再一次性返回。底层基于 SSE（Server-Sent Events）协议，服务端通过长连接持续推送 data: 开头的事件流，客户端逐块接收。大模型生成速度有限（每秒几十到上百 token），一个长回答可能要等 10-30 秒，非流式下用户只能盯着空白等待，体验很差；流式下用户能逐字看到输出，首 token 延迟通常只有 1-2 秒，体感快得多。所有主流模型（GPT-5.5、Claude、Gemini、DeepSeek）和聚合平台如 EnlyAI 都支持流式，且兼容 OpenAI 的 stream 协议。"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Python怎么调用流式API？完整代码怎么写？",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "用 openai SDK 调用流式 API 非常简单，只需在 create 时加 stream=True，返回的就不再是单个 response 而是一个迭代器，遍历它即可逐块拿到 delta 内容。通过 EnlyAI 调用时完全兼容，把 base_url 换成 https://api.enlyai.com/v1 即可。关键点：每个 chunk 的 choices[0].delta.content 是增量文本，可能为 None（如首个 chunk 只有 role）；用 print(..., end='', flush=True) 实现逐字打印效果；遍历结束自动关闭连接。生产环境建议加上异常处理，流式中途断连时能恢复或提示用户。"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "流式和非流式有什么区别？什么时候用流式？",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "核心区别：非流式一次性返回完整结果，调用简单但用户等待时间长；流式逐块返回，首 token 延迟低、体验好，但需要处理增量拼接。计费上两者相同，流式不会更贵。使用场景：聊天机器人、AI 写作、代码补全等面向终端用户的应用强烈建议用流式，提升交互体验；后台批处理、数据抽取、分类等无需实时展示的场景用非流式更简单，因为可以直接拿到完整 JSON 便于解析。一个折中方案是流式接收但在服务端缓冲，攒够一段再推给前端，兼顾体验和可控性。EnlyAI 等聚合平台对两种模式都完整支持。"
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "怎么处理流式响应？如何拼接完整内容？",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "处理流式响应的关键是把每个 chunk 的 delta.content 累加到一个字符串里，最终得到完整回答。同时要处理：1) 首个 chunk 通常只有 role 没有 content，要做空值判断；2) 最后一个 chunk 的 finish_reason 会标记结束原因（stop、length、content_filter）；3) 流式下 usage（token 计数）通常在最后一个 chunk 或需要单独请求获取，部分平台支持 stream_options.include_usage 在流末尾返回用量；4) 中途网络断开要做容错。通过 EnlyAI 调用时支持 stream_options，能方便地拿到 token 用量做成本统计。建议封装一个 stream_chat 函数，返回完整文本和 usage，业务层无感知。"
+        }
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    :root { --primary: #2563eb; --primary-dark: #1d4ed8; --primary-light: #dbeafe; --text: #1f2937; --text-light: #6b7280; --bg: #ffffff; --bg-soft: #f9fafb; --border: #e5e7eb; --code-bg: #1e293b; --code-text: #e2e8f0; --faq-q-bg: #eff6ff; }
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif; font-size: 16px; line-height: 1.8; color: var(--text); background: var(--bg); -webkit-font-smoothing: antialiased; }
+    .topbar { position: sticky; top: 0; z-index: 10; background: rgba(255,255,255,0.92); backdrop-filter: saturate(180%) blur(8px); border-bottom: 1px solid var(--border); }
+    .topbar-inner { max-width: 820px; margin: 0 auto; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; }
+    .brand { font-weight: 700; font-size: 18px; color: var(--primary); text-decoration: none; letter-spacing: 0.3px; }
+    .back-home { font-size: 14px; color: var(--text-light); text-decoration: none; padding: 6px 12px; border: 1px solid var(--border); border-radius: 6px; transition: all 0.15s ease; }
+    .back-home:hover { color: var(--primary); border-color: var(--primary); }
+    article { max-width: 820px; margin: 0 auto; padding: 40px 20px 60px; }
+    .post-meta { font-size: 14px; color: var(--text-light); margin-bottom: 8px; }
+    .post-meta .tag { display: inline-block; background: var(--primary-light); color: var(--primary-dark); padding: 2px 10px; border-radius: 999px; font-size: 12px; margin-right: 8px; }
+    h1 { font-size: 30px; line-height: 1.35; margin: 8px 0 24px; font-weight: 800; letter-spacing: -0.3px; }
+    h2 { font-size: 23px; margin: 44px 0 16px; font-weight: 700; padding-top: 8px; }
+    h3 { font-size: 18px; margin: 0 0 12px; font-weight: 700; }
+    p { margin: 0 0 18px; }
+    a { color: var(--primary); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    ul, ol { padding-left: 22px; margin: 0 0 18px; }
+    li { margin-bottom: 8px; }
+    strong { font-weight: 700; }
+    blockquote { margin: 22px 0; padding: 14px 18px; background: var(--bg-soft); border-left: 4px solid var(--primary); border-radius: 0 6px 6px 0; color: var(--text-light); }
+    blockquote p { margin: 0; }
+    code { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 0.88em; }
+    p code, li code { background: #f1f5f9; color: #be185d; padding: 2px 6px; border-radius: 4px; }
+    pre { background: var(--code-bg); color: var(--code-text); padding: 18px 20px; border-radius: 10px; overflow-x: auto; margin: 0 0 20px; font-size: 14px; line-height: 1.6; }
+    pre code { background: none; color: inherit; padding: 0; }
+    .tok-key { color: #93c5fd; } .tok-str { color: #86efac; } .tok-com { color: #94a3b8; font-style: italic; } .tok-fn { color: #fcd34d; } .tok-num { color: #fca5a5; }
+    table { width: 100%; border-collapse: collapse; margin: 0 0 22px; font-size: 14px; }
+    th, td { border: 1px solid var(--border); padding: 10px 12px; text-align: left; }
+    th { background: var(--bg-soft); font-weight: 700; }
+    tr:nth-child(even) td { background: #fcfcfd; }
+    .faq-item { margin: 0 0 20px; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+    .faq-q { background: var(--faq-q-bg); padding: 16px 20px; font-weight: 700; font-size: 17px; color: var(--primary-dark); display: flex; align-items: flex-start; gap: 10px; }
+    .faq-q .q-icon { flex-shrink: 0; width: 24px; height: 24px; background: var(--primary); color: #fff; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; }
+    .faq-a { padding: 18px 20px; }
+    .faq-a p:last-child { margin-bottom: 0; }
+    .cta { margin: 48px 0 8px; padding: 32px 28px; background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); border-radius: 14px; color: #fff; text-align: center; }
+    .cta h3 { color: #fff; margin-top: 0; font-size: 22px; }
+    .cta p { color: rgba(255,255,255,0.92); margin-bottom: 20px; }
+    .cta-btn { display: inline-block; background: #fff; color: var(--primary-dark); font-weight: 700; padding: 12px 32px; border-radius: 8px; text-decoration: none; font-size: 16px; transition: transform 0.15s ease; }
+    .cta-btn:hover { text-decoration: none; transform: translateY(-1px); }
+    .related-posts { margin-top: 48px; padding-top: 32px; border-top: 2px solid #e5e7eb; }
+    .related-posts h2 { font-size: 1.4rem; margin-bottom: 20px; color: #111827; }
+    .related-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+    .related-card { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; text-decoration: none; color: #374151; transition: all 0.2s; font-size: 0.95rem; line-height: 1.4; }
+    .related-card:hover { background: #eff6ff; border-color: #2563eb; color: #2563eb; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(37,99,235,0.1); }
+    .related-title { flex: 1; padding-right: 12px; }
+    .related-arrow { color: #9ca3af; font-size: 1.1rem; flex-shrink: 0; }
+    .related-card:hover .related-arrow { color: #2563eb; }
+    footer { border-top: 1px solid var(--border); padding: 24px 20px; text-align: center; font-size: 13px; color: var(--text-light); }
+    footer a { color: var(--text-light); }
+    @media (max-width: 600px) { h1 { font-size: 24px; } h2 { font-size: 20px; } article { padding: 28px 16px 48px; } pre { padding: 14px; font-size: 13px; } .topbar-inner { padding: 12px 16px; } .faq-q { font-size: 15px; } }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="https://enlyai.com">EnlyAI</a>
+      <a class="back-home" href="https://enlyai.com">← 返回首页</a>
+    </div>
+  </header>
+
+  <article>
+    <div class="post-meta">
+      <span class="tag">常见问题</span>
+      <span class="tag">流式输出</span>
+      2026年6月19日 · 阅读约 8 分钟
+    </div>
+
+    <h1>大模型API流式输出怎么实现？SSE流式调用教程</h1>
+
+    <p>做 AI 聊天应用时，流式输出是提升用户体验的关键——用户能逐字看到回答，而不是盯着空白等十几秒。流式输出基于 SSE（Server-Sent Events）协议，所有主流大模型和聚合平台都支持。本文用问答形式讲解流式输出的原理、Python 调用方法、流式与非流式的区别，以及如何正确处理和拼接流式响应。</p>
+
+    <h2>常见问题</h2>
+
+    <div class="faq-item">
+      <div class="faq-q"><span class="q-icon">Q</span><span>什么是流式输出？大模型为什么需要流式？</span></div>
+      <div class="faq-a">
+        <p>流式输出（Streaming）是指模型一边生成一边把结果分块推送给客户端，而不是等全部生成完再一次性返回。底层基于 <strong>SSE（Server-Sent Events）协议</strong>，服务端通过长连接持续推送 <code>data:</code> 开头的事件流，客户端逐块接收。</p>
+        <p>大模型生成速度有限（每秒几十到上百 token），一个长回答可能要等 10-30 秒，非流式下用户只能盯着空白等待，体验很差；流式下用户能逐字看到输出，首 token 延迟通常只有 1-2 秒，体感快得多。所有主流模型（GPT-5.5、Claude、Gemini、DeepSeek）和聚合平台如 EnlyAI 都支持流式，且兼容 OpenAI 的 stream 协议。</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q"><span class="q-icon">Q</span><span>Python怎么调用流式API？完整代码怎么写？</span></div>
+      <div class="faq-a">
+        <p>用 openai SDK 调用流式 API 非常简单，只需在 <code>create</code> 时加 <code>stream=True</code>，返回的就不再是单个 response 而是一个迭代器，遍历它即可逐块拿到 delta 内容。通过 EnlyAI 调用时完全兼容，把 <code>base_url</code> 换成 <code>https://api.enlyai.com/v1</code> 即可。</p>
+        <pre><code><span class="tok-com"># pip install openai</span>
+<span class="tok-key">from</span> openai <span class="tok-key">import</span> OpenAI
+
+client = OpenAI(
+    api_key=<span class="tok-str">"sk-你的EnlyAI密钥"</span>,
+    base_url=<span class="tok-str">"https://api.enlyai.com/v1"</span>
+)
+
+stream = client.chat.completions.create(
+    model=<span class="tok-str">"gpt-5.5"</span>,
+    messages=[{<span class="tok-str">"role"</span>: <span class="tok-str">"user"</span>, <span class="tok-str">"content"</span>: <span class="tok-str">"写一首关于编程的短诗"</span>}],
+    stream=<span class="tok-key">True</span>
+)
+
+<span class="tok-key">for</span> chunk <span class="tok-key">in</span> stream:
+    delta = chunk.choices[<span class="tok-num">0</span>].delta.content
+    <span class="tok-key">if</span> delta:  <span class="tok-com"># 首个 chunk 可能只有 role，delta 为 None</span>
+        <span class="tok-fn">print</span>(delta, end=<span class="tok-str">""</span>, flush=<span class="tok-key">True</span>)</code></pre>
+        <p>关键点：每个 chunk 的 <code>choices[0].delta.content</code> 是增量文本，可能为 None；用 <code>print(..., end='', flush=True)</code> 实现逐字打印效果；遍历结束自动关闭连接。生产环境建议加上异常处理，流式中途断连时能恢复或提示用户。</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q"><span class="q-icon">Q</span><span>流式和非流式有什么区别？什么时候用流式？</span></div>
+      <div class="faq-a">
+        <p>核心区别：非流式一次性返回完整结果，调用简单但用户等待时间长；流式逐块返回，首 token 延迟低、体验好，但需要处理增量拼接。<strong>计费上两者相同，流式不会更贵</strong>。</p>
+        <p>使用场景：聊天机器人、AI 写作、代码补全等面向终端用户的应用强烈建议用流式，提升交互体验；后台批处理、数据抽取、分类等无需实时展示的场景用非流式更简单，因为可以直接拿到完整 JSON 便于解析。一个折中方案是流式接收但在服务端缓冲，攒够一段再推给前端，兼顾体验和可控性。EnlyAI 等聚合平台对两种模式都完整支持。</p>
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-q"><span class="q-icon">Q</span><span>怎么处理流式响应？如何拼接完整内容？</span></div>
+      <div class="faq-a">
+        <p>处理流式响应的关键是把每个 chunk 的 <code>delta.content</code> 累加到一个字符串里，最终得到完整回答。同时要处理：</p>
+        <ol>
+          <li>首个 chunk 通常只有 role 没有 content，要做空值判断；</li>
+          <li>最后一个 chunk 的 <code>finish_reason</code> 会标记结束原因（stop、length、content_filter）；</li>
+          <li>流式下 usage（token 计数）通常在最后一个 chunk 或需要单独请求获取，部分平台支持 <code>stream_options.include_usage</code> 在流末尾返回用量；</li>
+          <li>中途网络断开要做容错。</li>
+        </ol>
+        <pre><code>stream = client.chat.completions.create(
+    model=<span class="tok-str">"gpt-5.5"</span>,
+    messages=[{<span class="tok-str">"role"</span>: <span class="tok-str">"user"</span>, <span class="tok-str">"content"</span>: <span class="tok-str">"解释递归"</span>}],
+    stream=<span class="tok-key">True</span>,
+    stream_options={<span class="tok-str">"include_usage"</span>: <span class="tok-key">True</span>}  <span class="tok-com"># 流末尾返回 token 用量</span>
+)
+
+full_text = <span class="tok-str">""</span>
+usage = <span class="tok-key">None</span>
+<span class="tok-key">for</span> chunk <span class="tok-key">in</span> stream:
+    <span class="tok-key">if</span> chunk.choices:
+        delta = chunk.choices[<span class="tok-num">0</span>].delta.content
+        <span class="tok-key">if</span> delta:
+            full_text += delta
+    <span class="tok-key">if</span> chunk.usage:  <span class="tok-com"># 最后一个 chunk 携带用量</span>
+        usage = chunk.usage
+
+<span class="tok-fn">print</span>(<span class="tok-str">f"完整回答：{full_text}"</span>)
+<span class="tok-fn">print</span>(<span class="tok-str">f"token 用量：{usage}"</span>)</code></pre>
+        <p>通过 EnlyAI 调用时支持 <code>stream_options</code>，能方便地拿到 token 用量做成本统计。建议封装一个 <code>stream_chat</code> 函数，返回完整文本和 usage，业务层无感知。</p>
+      </div>
+    </div>
+
+    <h2>流式 vs 非流式对比</h2>
+    <table>
+      <thead>
+        <tr><th>维度</th><th>非流式</th><th>流式</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>首 token 延迟</td><td>高（等全部生成）</td><td>低（1-2 秒）</td></tr>
+        <tr><td>用户体验</td><td>需等待</td><td>逐字显示</td></tr>
+        <tr><td>计费</td><td>相同</td><td>相同</td></tr>
+        <tr><td>代码复杂度</td><td>低</td><td>中（需拼接）</td></tr>
+        <tr><td>结果解析</td><td>直接拿 JSON</td><td>需累加 delta</td></tr>
+        <tr><td>适合场景</td><td>批处理、抽取</td><td>聊天、写作、补全</td></tr>
+      </tbody>
+    </table>
+    <blockquote><p>提示：Web 前端可用 EventSource 或 fetch + ReadableStream 接收 SSE 流，配合后端转发即可实现打字机效果。</p></blockquote>
+
+    <div class="cta">
+      <h3>一行代码开启流式输出</h3>
+      <p>注册 EnlyAI，统一接口调用 GPT-5.5、Claude、Gemini、DeepSeek，完整支持 SSE 流式与 stream_options，兼容 OpenAI SDK。</p>
+      <a class="cta-btn" href="https://enlyai.com">免费注册 EnlyAI →</a>
+    </div>
+
+    <section class="related-posts">
+      <h2>相关文章推荐</h2>
+      <div class="related-grid">
+        <a href="/blog/api-streaming-guide.html" class="related-card"><span class="related-title">API流式输出实现：SSE与WebSocket详解</span><span class="related-arrow">→</span></a>
+        <a href="/blog/python-llm-api-tutorial.html" class="related-card"><span class="related-title">用Python调用LLM API的5种方式</span><span class="related-arrow">→</span></a>
+        <a href="/blog/build-ai-chatbot-guide.html" class="related-card"><span class="related-title">如何搭建自己的AI聊天机器人</span><span class="related-arrow">→</span></a>
+        <a href="/blog/langchain-tutorial.html" class="related-card"><span class="related-title">LangChain入门：用Python构建LLM应用</span><span class="related-arrow">→</span></a>
+      </div>
+    </section>
+  </article>
+
+  <footer>
+    <div>© 2026 EnlyAI · <a href="https://enlyai.com">enlyai.com</a></div>
+    <div style="margin-top:6px;"><a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener">沪ICP备2025123456号</a></div>
+  </footer>
+</body>
+</html>

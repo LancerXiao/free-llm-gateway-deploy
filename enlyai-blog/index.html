@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EnlyAI 博客 | LLM API 技术教程与最佳实践</title>
+    <meta name="description" content="EnlyAI 技术博客，分享 LLM API 使用教程、成本优化技巧、模型对比分析、AI 应用开发实践。学习如何低成本调用 GPT-5.5、Claude Opus 4.8、Gemini 3.5 Pro 等大模型 API。">
+    <meta name="keywords" content="LLM API 教程, GPT-5.5 API, Claude Opus 4.8 API, Gemini 3.5 Pro API, AI 开发, API 成本优化, EnlyAI 博客">
+    <link rel="canonical" href="https://enlyai.com/blog/">
+    <meta property="og:title" content="EnlyAI 博客 | LLM API 技术教程与最佳实践">
+    <meta property="og:description" content="分享 LLM API 使用教程、成本优化技巧、模型对比分析、AI 应用开发实践。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://enlyai.com/blog/">
+    <meta property="og:site_name" content="EnlyAI">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="EnlyAI 博客 | LLM API 技术教程与最佳实践">
+    <meta name="twitter:description" content="分享 LLM API 使用教程、成本优化技巧、模型对比分析、AI 应用开发实践。">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Blog",
+        "name": "EnlyAI 技术博客",
+        "description": "LLM API 技术教程与最佳实践",
+        "url": "https://enlyai.com/blog/",
+        "publisher": {
+            "@type": "Organization",
+            "name": "EnlyAI",
+            "url": "https://enlyai.com"
+        }
+    }
+    </script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+        .header {
+            background: #fff;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 16px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header-inner {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo { font-size: 22px; font-weight: 700; color: #2563eb; text-decoration: none; }
+        .nav a { color: #475569; text-decoration: none; margin-left: 24px; font-size: 15px; }
+        .nav a:hover { color: #2563eb; }
+        .hero {
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            color: #fff;
+            padding: 60px 24px;
+            text-align: center;
+        }
+        .hero h1 { font-size: 36px; margin-bottom: 12px; }
+        .hero p { font-size: 18px; opacity: 0.9; max-width: 600px; margin: 0 auto; }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            color: #1e293b;
+        }
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+        }
+        .blog-card {
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+        }
+        .blog-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        }
+        .card-tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin: 16px 16px 0;
+        }
+        .tag-guide { background: #dbeafe; color: #1e40af; }
+        .tag-compare { background: #fef3c7; color: #92400e; }
+        .tag-tutorial { background: #d1fae5; color: #065f46; }
+        .tag-cost { background: #fce7f3; color: #9d174d; }
+        .tag-advanced { background: #e0e7ff; color: #3730a3; }
+        .tag-faq { background: #ede9fe; color: #5b21b6; }
+        .card-body { padding: 16px; flex: 1; display: flex; flex-direction: column; }
+        .card-title { font-size: 18px; font-weight: 600; margin-bottom: 8px; color: #1e293b; }
+        .card-desc { font-size: 14px; color: #64748b; flex: 1; line-height: 1.6; }
+        .card-meta { font-size: 13px; color: #94a3b8; margin-top: 12px; }
+        .footer {
+            background: #1e293b;
+            color: #94a3b8;
+            text-align: center;
+            padding: 24px;
+            font-size: 14px;
+        }
+        .footer a { color: #94a3b8; text-decoration: none; }
+        .footer a:hover { color: #fff; }
+        .beian { margin-top: 8px; font-size: 13px; }
+        .beian a { display: inline-flex; align-items: center; gap: 4px; }
+        @media (max-width: 640px) {
+            .hero h1 { font-size: 26px; }
+            .hero p { font-size: 16px; }
+            .blog-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="https://enlyai.com" class="logo">EnlyAI</a>
+            <nav class="nav">
+                <a href="https://enlyai.com">首页</a>
+                <a href="https://enlyai.com/blog/">博客</a>
+                <a href="https://enlyai.com/pricing">定价</a>
+                <a href="https://enlyai.com/about">关于</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <h1>EnlyAI 技术博客</h1>
+        <p>LLM API 使用教程、成本优化技巧、模型对比分析与 AI 应用开发最佳实践</p>
+    </section>
+
+    <main class="container">
+        <h2 class="section-title">全部文章（16 篇）</h2>
+        <div class="blog-grid">
+            <a href="/blog/free-gpt4-api-guide.html" class="blog-card">
+                <span class="card-tag tag-guide">入门指南</span>
+                <div class="card-body">
+                    <h3 class="card-title">2026年免费调用GPT-5 API的完整指南</h3>
+                    <p class="card-desc">介绍如何通过 EnlyAI 等平台免费或低成本调用 GPT-5.5 API，包含注册步骤、Python 和 cURL 代码示例。</p>
+                    <div class="card-meta">2026-06-17 · 8 分钟阅读</div>
+                </div>
+            </a>
+
+            <a href="/blog/llm-api-comparison.html" class="blog-card">
+                <span class="card-tag tag-compare">模型对比</span>
+                <div class="card-body">
+                    <h3 class="card-title">OpenAI vs Claude vs Gemini API对比</h3>
+                    <p class="card-desc">从性能、价格、适用场景等维度对比三大 LLM API，帮助你选择最适合的模型。</p>
+                    <div class="card-meta">2026-06-17 · 10 分钟阅读</div>
+                </div>
+            </a>
+
+            <a href="/blog/python-llm-api-tutorial.html" class="blog-card">
+                <span class="card-tag tag-tutorial">教程</span>
+                <div class="card-body">
+                    <h3 class="card-title">用Python调用LLM API的5种方式</h3>
+                    <p class="card-desc">介绍使用 Python 调用各种 LLM API 的方法，包括 OpenAI SDK、requests、LangChain 等。</p>
+                    <div class="card-meta">2026-06-17 · 12 分钟阅读</div>
+                </div>
+            </a>
+
+            <a href="/blog/llm-api-cost-optimization.html" class="blog-card">
+                <span class="card-tag tag-cost">成本优化</span>
+                <div class="card-body">
+                    <h3 class="card-title">LLM API成本对比与省钱技巧</h3>
+                    <p class="card-desc">对比各平台 LLM API 价格，分享 6 大省钱技巧，帮助你将 API 成本降低 80%。</p>
+                    <div class="card-meta">2026-06-17 · 10 分钟阅读</div>
+                </div>
+            </a>
+
+            <a href="/blog/build-ai-chatbot-guide.html" class="blog-card">
+                <span class="card-tag tag-tutorial">教程</span>
+                <div class="card-body">
+                    <h3 class="card-title">如何搭建自己的AI聊天机器人</h3>
+                    <p class="card-desc">手把手教你用 LLM API 搭建 AI 聊天机器人，从零到上线完整流程。</p>
+                    <div class="card-meta">2026-06-17 · 15 分钟阅读</div>
+                </div>
+            </a>
+
+            <a href="/blog/one-api-vs-new-api.html" class="blog-card">
+                <span class="card-tag tag-compare">技术对比</span>
+                <div class="card-body">
+                    <h3 class="card-title">One API vs New API：LLM聚合平台对比</h3>
+                    <p class="card-desc">对比 One API 和 New API 两个开源 LLM API 聚合平台的功能与差异。</p>
+                    <div class="card-meta">2026-06-17 · 10 分钟阅读</div>
+                </div>
+            </a>
+
+            <a href="/blog/best-llm-api-platforms-2026.html" class="blog-card">
+                <span class="card-tag tag-guide">推荐</span>
+                <div class="card-body">
+                    <h3 class="card-title">2026年最佳LLM API聚合平台推荐</h3>
+                    <p class="card-desc">推荐 2026 年值得使用的 LLM API 聚合平台，对比功能与价格。</p>
+                    <div class="card-meta">2026-06-17 · 8 分钟阅读</div>
+                </div>
+            </a>
+
+            <a href="/blog/openai-api-alternatives.html" class="blog-card">
+                <span class="card-tag tag-cost">替代方案</span>
+                <div class="card-body">
+                    <h3 class="card-title">OpenAI API替代方案：更便宜的选择</h3>
+                    <p class="card-desc">介绍 OpenAI API 的替代方案，帮助开发者降低成本，包含迁移指南。</p>
+                    <div class="card-meta">2026-06-17 · 10 分钟阅读</div>
+                </div>
+            </a>
+
+            <a href="/blog/claude-api-tutorial.html" class="blog-card">
+                <span class="card-tag tag-tutorial">教程</span>
+                <div class="card-body">
+                    <h3 class="card-title">Claude API使用教程：从注册到调用</h3>
+                    <p class="card-desc">详细介绍 Claude API 的使用方法，包括模型特点、API 调用、代码示例。</p>
+                    <div class="card-meta">2026-06-17 · 10 分钟阅读</div>
+                </div>
+            </a>
+
+            <a href="/blog/gemini-api-guide.html" class="blog-card">
+                <span class="card-tag tag-tutorial">教程</span>
+                <div class="card-body">
+                    <h3 class="card-title">Gemini API入门指南：Google AI接入</h3>
+                    <p class="card-desc">介绍 Google Gemini API 的使用方法，包括模型能力、接入步骤、代码示例。</p>
+                    <div class="card-meta">2026-06-17 · 10 分钟阅读</div>
+                </div>
+            </a>
+
+            <a href="/blog/deepseek-api-guide.html" class="blog-card">
+                <span class="card-tag tag-tutorial">教程</span>
+                <div class="card-body">
+                    <h3 class="card-title">DeepSeek API调用方法与模型对比</h3>
+                    <p class="card-desc">介绍 DeepSeek API 的使用方法，对比 DeepSeek 各模型的能力与价格。</p>
+                    <div class="card-meta">2026-06-17 · 8 分钟阅读</div>
+                </div>
+            </a>
+
+            <a href="/blog/openai-api-key-guide.html" class="blog-card">
+                <span class="card-tag tag-guide">入门指南</span>
+                <div class="card-body">
+                    <h3 class="card-title">OpenAI API密钥申请与使用完整流程</h3>
+                    <p class="card-desc">详细介绍 OpenAI API 密钥的申请流程和使用方法。</p>
+                    <div class="card-meta">2026-06-17 · 10 分钟阅读</div>
+                </div>
+            </a>
+
+            <a href="/blog/langchain-tutorial.html" class="blog-card">
+                <span class="card-tag tag-advanced">进阶</span>
+                <div class="card-body">
+                    <h3 class="card-title">LangChain入门：用Python构建LLM应用</h3>
+                    <p class="card-desc">介绍 LangChain 框架的使用方法，教你用 Python 构建 LLM 应用。</p>
+                    <div class="card-meta">2026-06-17 · 15 分钟阅读</div>
+                </div>
+            </a>
+
+            <a href="/blog/api-streaming-guide.html" class="blog-card">
+                <span class="card-tag tag-advanced">进阶</span>
+                <div class="card-body">
+                    <h3 class="card-title">API流式输出实现：SSE与WebSocket详解</h3>
+                    <p class="card-desc">详解 API 流式输出的实现方式，包括 SSE 和 WebSocket 的对比与代码示例。</p>
+                    <div class="card-meta">2026-06-17 · 12 分钟阅读</div>
+                </div>
+            </a>
+
+            <a href="/blog/api-rate-limiting-best-practices.html" class="blog-card">
+                <span class="card-tag tag-advanced">进阶</span>
+                <div class="card-body">
+                    <h3 class="card-title">大模型API限流与重试最佳实践</h3>
+                    <p class="card-desc">介绍大模型 API 调用中的限流处理和重试机制的最佳实践。</p>
+                    <div class="card-meta">2026-06-17 · 10 分钟阅读</div>
+                </div>
+            </a>
+
+            <a href="/blog/how-to-choose-llm-model.html" class="blog-card">
+                <span class="card-tag tag-compare">模型对比</span>
+                <div class="card-body">
+                    <h3 class="card-title">如何选择合适的LLM模型：场景对比指南</h3>
+                    <p class="card-desc">根据不同使用场景，指导如何选择最合适的 LLM 模型。</p>
+                    <div class="card-meta">2026-06-17 · 10 分钟阅读</div>
+                </div>
+            </a>
+        </div>
+
+        <h2 class="section-title" style="margin-top: 48px;">常见问题 FAQ（8 篇）</h2>
+        <div class="blog-grid">
+            <a href="/blog/faq-gpt5-api-pricing.html" class="blog-card">
+                <span class="card-tag tag-faq">常见问题</span>
+                <div class="card-body">
+                    <h3 class="card-title">GPT-5 API价格多少钱？2026年最新收费标准与省钱方法</h3>
+                    <p class="card-desc">详解 GPT-5.5、GPT-5.4、GPT-5.4-mini 的 API 价格，分享 5 种省钱技巧与免费额度领取方法，附 Python 成本计算示例。</p>
+                    <div class="card-meta">2026-06-19 · 8 分钟阅读</div>
+                </div>
+            </a>
+
+            <a href="/blog/faq-claude-api-context.html" class="blog-card">
+                <span class="card-tag tag-faq">常见问题</span>
+                <div class="card-body">
+                    <h3 class="card-title">Claude API上下文长度是多少？各模型上下文窗口对比</h3>
+                    <p class="card-desc">对比 Claude Opus 4.8、Sonnet 4.6、Haiku 4.5 上下文窗口，与 GPT-5.5 横向比较，超长文本处理模型选择指南。</p>
+                    <div class="card-meta">2026-06-19 · 7 分钟阅读</div>
+                </div>
+            </a>
+
+            <a href="/blog/faq-llm-api-free-tier.html" class="blog-card">
+                <span class="card-tag tag-faq">常见问题</span>
+                <div class="card-body">
+                    <h3 class="card-title">哪些大模型API有免费额度？2026年免费API汇总</h3>
+                    <p class="card-desc">汇总 GPT-5.5、Claude、Gemini、DeepSeek 免费额度政策，5 种合法白嫖方法，EnlyAI 注册赠送额度使用指南。</p>
+                    <div class="card-meta">2026-06-19 · 8 分钟阅读</div>
+                </div>
+            </a>
+
+            <a href="/blog/faq-api-rate-limit.html" class="blog-card">
+                <span class="card-tag tag-faq">常见问题</span>
+                <div class="card-body">
+                    <h3 class="card-title">大模型API限流怎么办？各平台QPS限制与解决方案</h3>
+                    <p class="card-desc">说明 OpenAI、Claude、Gemini RPM/TPM 限制，429 处理、提高并发、指数退避自动重试的完整 Python 实现。</p>
+                    <div class="card-meta">2026-06-19 · 9 分钟阅读</div>
+                </div>
+            </a>
+
+            <a href="/blog/faq-deepseek-vs-gpt.html" class="blog-card">
+                <span class="card-tag tag-faq">常见问题</span>
+                <div class="card-body">
+                    <h3 class="card-title">DeepSeek和GPT-5哪个好？性能价格全面对比</h3>
+                    <p class="card-desc">从性能、价格、中文能力、代码能力对比 DeepSeek V4-Pro 与 GPT-5.5，国产模型稳定性分析与接入示例。</p>
+                    <div class="card-meta">2026-06-19 · 9 分钟阅读</div>
+                </div>
+            </a>
+
+            <a href="/blog/faq-openai-api-error.html" class="blog-card">
+                <span class="card-tag tag-faq">常见问题</span>
+                <div class="card-body">
+                    <h3 class="card-title">OpenAI API报错怎么办？常见错误代码与解决方案</h3>
+                    <p class="card-desc">详解 429、401、500、超时等常见错误代码成因与处理，附 Python 统一错误处理与自动重试完整代码。</p>
+                    <div class="card-meta">2026-06-19 · 9 分钟阅读</div>
+                </div>
+            </a>
+
+            <a href="/blog/faq-streaming-api.html" class="blog-card">
+                <span class="card-tag tag-faq">常见问题</span>
+                <div class="card-body">
+                    <h3 class="card-title">大模型API流式输出怎么实现？SSE流式调用教程</h3>
+                    <p class="card-desc">讲解流式输出原理与 SSE 协议，Python 调用流式 API、流式与非流式区别、流式响应拼接的完整代码示例。</p>
+                    <div class="card-meta">2026-06-19 · 8 分钟阅读</div>
+                </div>
+            </a>
+
+            <a href="/blog/faq-choose-llm-for-coding.html" class="blog-card">
+                <span class="card-tag tag-faq">常见问题</span>
+                <div class="card-body">
+                    <h3 class="card-title">编程用哪个大模型最好？2026年代码生成模型对比</h3>
+                    <p class="card-desc">对比 GPT-5.5、Claude Opus 4.8、DeepSeek V4-Pro 代码能力，用 API 搭建代码助手的 Python 示例与选型建议。</p>
+                    <div class="card-meta">2026-06-19 · 9 分钟阅读</div>
+                </div>
+            </a>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div>
+            <a href="https://enlyai.com">EnlyAI</a> · 
+            <a href="https://enlyai.com/blog/">博客</a> · 
+            <a href="https://enlyai.com/pricing">定价</a> · 
+            <a href="https://enlyai.com/about">关于</a>
+        </div>
+        <div class="beian">
+            <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">粤ICP备2026055772号-1</a>
+        </div>
+    </footer>
+</body>
+</html>
