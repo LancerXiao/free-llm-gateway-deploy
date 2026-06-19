@@ -249,6 +249,56 @@
       article { padding: 28px 16px 48px; }
       pre { font-size: 13px; padding: 14px; }
     }
+  
+    .related-posts {
+      margin-top: 48px;
+      padding-top: 32px;
+      border-top: 2px solid #e5e7eb;
+    }
+    .related-posts h2 {
+      font-size: 1.4rem;
+      margin-bottom: 20px;
+      color: #111827;
+    }
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .related-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      text-decoration: none;
+      color: #374151;
+      transition: all 0.2s;
+      font-size: 0.95rem;
+      line-height: 1.4;
+    }
+    .related-card:hover {
+      background: #eff6ff;
+      border-color: #2563eb;
+      color: #2563eb;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+    }
+    .related-title {
+      flex: 1;
+      padding-right: 12px;
+    }
+    .related-arrow {
+      color: #9ca3af;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .related-card:hover .related-arrow {
+      color: #2563eb;
+    }
+
   </style>
 </head>
 <body>
@@ -318,7 +368,7 @@ OPENAI_BASE_URL=https://enlyai.com/v1</code></pre>
   -H <span class="tok-s">"Content-Type: application/json"</span> \
   -H <span class="tok-s">"Authorization: Bearer $OPENAI_API_KEY"</span> \
   -d <span class="tok-s">'{
-    "model": "gpt-4o-mini",
+    "model": "gpt-5.4-mini",
     "messages": [
       {"role": "user", "content": "你好，请用一句话介绍你自己"}
     ]
@@ -357,7 +407,7 @@ client = OpenAI(
     base_url=os.getenv(<span class="tok-s">"OPENAI_BASE_URL"</span>, <span class="tok-s">"https://enlyai.com/v1"</span>),
 )
 
-<span class="tok-k">def</span> <span class="tok-f">chat</span>(user_message: str, model: str = <span class="tok-s">"gpt-4o-mini"</span>) -> str:
+<span class="tok-k">def</span> <span class="tok-f">chat</span>(user_message: str, model: str = <span class="tok-s">"gpt-5.4-mini"</span>) -> str:
     response = client.chat.completions.create(
         model=model,
         messages=[{<span class="tok-s">"role"</span>: <span class="tok-s">"user"</span>, <span class="tok-s">"content"</span>: user_message}],
@@ -381,7 +431,7 @@ client = OpenAI(
             {<span class="tok-s">"role"</span>: <span class="tok-s">"system"</span>, <span class="tok-s">"content"</span>: system_prompt}
         ]
 
-    <span class="tok-k">def</span> <span class="tok-f">ask</span>(self, user_input: str, model: str = <span class="tok-s">"gpt-4o-mini"</span>) -> str:
+    <span class="tok-k">def</span> <span class="tok-f">ask</span>(self, user_input: str, model: str = <span class="tok-s">"gpt-5.4-mini"</span>) -> str:
         self.history.append({<span class="tok-s">"role"</span>: <span class="tok-s">"user"</span>, <span class="tok-s">"content"</span>: user_input})
         response = client.chat.completions.create(
             model=model,
@@ -408,7 +458,7 @@ print(session.ask(<span class="tok-s">"那它们各自适合什么场景？"</sp
 
     <p>用户等待 AI 回复时，逐字流式输出比等十几秒一次性返回体验好得多。OpenAI 兼容接口支持 <code>stream=True</code>，返回的是一个迭代器：</p>
 
-    <pre><code><span class="tok-k">def</span> <span class="tok-f">chat_stream</span>(user_input: str, model: str = <span class="tok-s">"gpt-4o-mini"</span>):
+    <pre><code><span class="tok-k">def</span> <span class="tok-f">chat_stream</span>(user_input: str, model: str = <span class="tok-s">"gpt-5.4-mini"</span>):
     response = client.chat.completions.create(
         model=model,
         messages=[{<span class="tok-s">"role"</span>: <span class="tok-s">"user"</span>, <span class="tok-s">"content"</span>: user_input}],
@@ -447,7 +497,7 @@ sessions: Dict[str, ChatSession] = {}
     <span class="tok-k">def</span> <span class="tok-f">generate</span>():
         session.history.append({<span class="tok-s">"role"</span>: <span class="tok-s">"user"</span>, <span class="tok-s">"content"</span>: user_input})
         stream = client.chat.completions.create(
-            model=<span class="tok-s">"gpt-4o-mini"</span>,
+            model=<span class="tok-s">"gpt-5.4-mini"</span>,
             messages=session.history,
             stream=<span class="tok-k">True</span>,
         )
@@ -515,9 +565,9 @@ sessions: Dict[str, ChatSession] = {}
     <p>不是所有问题都需要最贵的模型。一个实用的分层策略：</p>
 
     <ul>
-      <li><strong>闲聊/简单问答</strong>：用 <code>gpt-4o-mini</code> 这类小模型，响应快、成本低，单次对话几分钱。</li>
-      <li><strong>代码生成/复杂推理</strong>：用 <code>gpt-4o</code>、<code>claude-sonnet</code> 这类中端模型，质量与成本平衡。</li>
-      <li><strong>高难度分析</strong>：用 <code>o3</code>、<code>claude-opus</code> 这类旗舰模型，只在必要时调用。</li>
+      <li><strong>闲聊/简单问答</strong>：用 <code>gpt-5.4-mini</code> 这类小模型，响应快、成本低，单次对话几分钱。</li>
+      <li><strong>代码生成/复杂推理</strong>：用 <code>gpt-5.5</code>、<code>claude-sonnet-4-6</code> 这类主力模型，质量与成本平衡。</li>
+      <li><strong>高难度分析</strong>：用 <code>claude-opus-4-8</code> 这类旗舰模型；轻量推理可用 <code>o4-mini</code>，只在必要时调用。</li>
     </ul>
 
     <p>这也是用聚合平台的价值所在——你可以在同一个接口下，按场景动态切换模型，而不需要维护多套 SDK 和多份 Key。EnlyAI 这类平台还提供统一的用量看板，让你一眼看清每个模型花了多少钱。</p>
@@ -533,6 +583,13 @@ sessions: Dict[str, ChatSession] = {}
       <p>EnlyAI 提供 OpenAI 兼容的统一 API，一个 Key 即可调用 GPT、Claude、Gemini 等数十种模型。本文所有代码示例只需替换 base URL 为 <code>https://enlyai.com/v1</code> 即可直接运行。</p>
       <a class="cta-btn" href="https://enlyai.com">立即注册 EnlyAI，开始搭建 →</a>
     </div>
+    <section class="related-posts">
+      <h2>相关文章推荐</h2>
+      <div class="related-grid">
+        <a href="/blog/langchain-tutorial.html" class="related-card"><span class="related-title">LangChain入门：用Python构建LLM应用</span><span class="related-arrow">→</span></a><a href="/blog/python-llm-api-tutorial.html" class="related-card"><span class="related-title">用Python调用LLM API的5种方式</span><span class="related-arrow">→</span></a><a href="/blog/api-streaming-guide.html" class="related-card"><span class="related-title">API流式输出实现：SSE与WebSocket详解</span><span class="related-arrow">→</span></a><a href="/blog/api-rate-limiting-best-practices.html" class="related-card"><span class="related-title">大模型API限流与重试最佳实践</span><span class="related-arrow">→</span></a>
+      </div>
+    </section>
+
   </article>
 
   <footer>

@@ -252,6 +252,56 @@
       table { font-size: 12px; }
       th, td { padding: 8px 6px; }
     }
+  
+    .related-posts {
+      margin-top: 48px;
+      padding-top: 32px;
+      border-top: 2px solid #e5e7eb;
+    }
+    .related-posts h2 {
+      font-size: 1.4rem;
+      margin-bottom: 20px;
+      color: #111827;
+    }
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .related-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      text-decoration: none;
+      color: #374151;
+      transition: all 0.2s;
+      font-size: 0.95rem;
+      line-height: 1.4;
+    }
+    .related-card:hover {
+      background: #eff6ff;
+      border-color: #2563eb;
+      color: #2563eb;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+    }
+    .related-title {
+      flex: 1;
+      padding-right: 12px;
+    }
+    .related-arrow {
+      color: #9ca3af;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .related-card:hover .related-arrow {
+      color: #2563eb;
+    }
+
   </style>
 </head>
 <body>
@@ -278,7 +328,7 @@
     <ul>
       <li><strong>OpenAI（GPT-5.5 / o 系列）</strong>：综合能力最均衡，生态最成熟，工具调用和函数调用支持完善，是大多数应用的默认选择。GPT-5.5 于 2026 年 4 月发布，是当前 OpenAI 的旗舰模型。</li>
       <li><strong>Anthropic Claude（Claude Sonnet 4.6 / Opus 4.8 系列）</strong>：长文本理解和写作能力突出，输出风格自然克制，在代码生成和文档处理上口碑极佳。Claude Opus 4.8 于 2026 年 5 月发布，是 Anthropic 当前旗舰。</li>
-      <li><strong>Google Gemini（Gemini 3.1 Pro 系列）</strong>：原生多模态，与 Google 生态深度整合，2M 超长上下文窗口是它的招牌能力。</li>
+      <li><strong>Google Gemini（Gemini 3.5 Pro 系列）</strong>：原生多模态，与 Google 生态深度整合，2M 超长上下文窗口是它的招牌能力。</li>
     </ul>
     <p>需要强调的是，这三家的能力差距在持续缩小，很多任务上已经难分伯仲。选型的关键在于结合自己的具体场景、预算和接入成本来权衡。</p>
 
@@ -316,7 +366,7 @@
           <td>长文理解与摘要优秀</td>
         </tr>
         <tr>
-          <td>Gemini 3.1 Pro</td>
+          <td>Gemini 3.5 Pro</td>
           <td>2M</td>
           <td>超长上下文领先，适合整仓分析</td>
         </tr>
@@ -519,6 +569,13 @@ models = [<span class="tok-str">"gpt-5.5"</span>, <span class="tok-str">"claude-
       <p>EnlyAI 把 OpenAI、Claude、Gemini 聚合到统一接口，兼容 OpenAI SDK，改一行 <code>base_url</code> 即可在三大模型间自由切换。注册即享免费试用。</p>
       <a class="cta-btn" href="https://enlyai.com">免费注册 EnlyAI →</a>
     </div>
+    <section class="related-posts">
+      <h2>相关文章推荐</h2>
+      <div class="related-grid">
+        <a href="/blog/how-to-choose-llm-model.html" class="related-card"><span class="related-title">如何选择合适的LLM模型：场景对比指南</span><span class="related-arrow">→</span></a><a href="/blog/best-llm-api-platforms-2026.html" class="related-card"><span class="related-title">2026年最佳LLM API聚合平台推荐</span><span class="related-arrow">→</span></a><a href="/blog/llm-api-cost-optimization.html" class="related-card"><span class="related-title">LLM API成本对比与省钱技巧</span><span class="related-arrow">→</span></a><a href="/blog/one-api-vs-new-api.html" class="related-card"><span class="related-title">One API vs New API：LLM聚合平台对比</span><span class="related-arrow">→</span></a>
+      </div>
+    </section>
+
   </article>
 
   <footer>

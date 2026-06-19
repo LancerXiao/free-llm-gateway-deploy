@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude API使用教程：从注册到调用 | EnlyAI 博客</title>
+    <meta name="description" content="详细介绍 Claude API 的使用方法，包括模型特点、API 调用、代码示例，覆盖 Claude Sonnet 4.6、Opus 4.8、Haiku 4.5 等模型的接入与 Python/cURL 调用。">
+    <meta name="keywords" content="Claude API 教程, Claude 4 API, Anthropic API, Claude 调用方法">
+    <meta name="author" content="EnlyAI">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://enlyai.com/blog/claude-api-tutorial">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Claude API使用教程：从注册到调用">
+    <meta property="og:description" content="详细介绍 Claude API 的使用方法，包括模型特点、API 调用、代码示例。">
+    <meta property="og:url" content="https://enlyai.com/blog/claude-api-tutorial">
+    <meta property="og:site_name" content="EnlyAI">
+    <meta property="og:locale" content="zh_CN">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Claude API使用教程：从注册到调用">
+    <meta name="twitter:description" content="详细介绍 Claude API 的使用方法，包括模型特点、API 调用、代码示例。">
+
+    <!-- Schema.org 结构化数据 -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "headline": "Claude API使用教程：从注册到调用",
+        "description": "详细介绍 Claude API 的使用方法，包括模型特点、API 调用、代码示例，覆盖 Claude Sonnet 4.6、Opus 4.8、Haiku 4.5 等模型的接入与 Python/cURL 调用。",
+        "keywords": "Claude API 教程, Claude 4 API, Anthropic API, Claude 调用方法",
+        "author": {
+            "@type": "Organization",
+            "name": "EnlyAI",
+            "url": "https://enlyai.com"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "EnlyAI",
+            "url": "https://enlyai.com"
+        },
+        "datePublished": "2026-06-18",
+        "dateModified": "2026-06-18",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https://enlyai.com/blog/claude-api-tutorial"
+        }
+    }
+    </script>
+
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #dbeafe;
+            --text: #1f2937;
+            --text-light: #6b7280;
+            --bg: #ffffff;
+            --bg-soft: #f9fafb;
+            --border: #e5e7eb;
+            --code-bg: #1e293b;
+            --code-text: #e2e8f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            color: var(--text);
+            background: var(--bg);
+            line-height: 1.8;
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .top-nav {
+            border-bottom: 1px solid var(--border);
+            padding: 14px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: saturate(180%) blur(8px);
+            background: rgba(255, 255, 255, 0.92);
+        }
+
+        .top-nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .back-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 15px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .back-link:hover {
+            color: var(--primary-dark);
+        }
+
+        .brand {
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--text);
+            text-decoration: none;
+            letter-spacing: -0.3px;
+        }
+
+        .brand span {
+            color: var(--primary);
+        }
+
+        article {
+            padding: 40px 0 60px;
+        }
+
+        .article-meta {
+            color: var(--text-light);
+            font-size: 14px;
+            margin-bottom: 16px;
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .tag {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        h1 {
+            font-size: 34px;
+            line-height: 1.3;
+            font-weight: 800;
+            margin-bottom: 20px;
+            letter-spacing: -0.5px;
+            color: #111827;
+        }
+
+        h2 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 40px 0 16px;
+            color: #111827;
+            padding-top: 8px;
+            border-top: 1px solid var(--border);
+        }
+
+        h3 {
+            font-size: 19px;
+            font-weight: 600;
+            margin: 24px 0 12px;
+            color: #1f2937;
+        }
+
+        p {
+            margin-bottom: 18px;
+            color: var(--text);
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        ul, ol {
+            margin: 0 0 18px 22px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        strong {
+            color: #111827;
+            font-weight: 600;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            background: var(--bg-soft);
+            padding: 14px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+            color: var(--text-light);
+        }
+
+        blockquote p {
+            margin-bottom: 0;
+        }
+
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 20px 22px;
+            border-radius: 10px;
+            overflow-x: auto;
+            margin: 18px 0;
+            font-size: 14px;
+            line-height: 1.65;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+        }
+
+        code {
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+        }
+
+        p code, li code {
+            background: #f1f5f9;
+            color: #be185d;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        /* 语法高亮 */
+        .k { color: #c084fc; }   /* keyword */
+        .s { color: #86efac; }   /* string */
+        .c { color: #64748b; font-style: italic; }  /* comment */
+        .n { color: #fbbf24; }   /* number */
+        .f { color: #60a5fa; }   /* function */
+        .o { color: #f472b6; }   /* operator */
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 15px;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 10px 14px;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-soft);
+            font-weight: 600;
+        }
+
+        .cta {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: #fff;
+            padding: 36px 30px;
+            border-radius: 14px;
+            margin: 40px 0 20px;
+            text-align: center;
+        }
+
+        .cta h3 {
+            color: #fff;
+            margin-top: 0;
+            font-size: 22px;
+        }
+
+        .cta p {
+            color: rgba(255, 255, 255, 0.92);
+            margin-bottom: 22px;
+        }
+
+        .cta-btn {
+            display: inline-block;
+            background: #fff;
+            color: var(--primary);
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            text-decoration: none;
+            transition: transform 0.15s ease;
+        }
+
+        .cta-btn:hover {
+            text-decoration: none;
+            transform: translateY(-2px);
+        }
+
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 24px 0;
+            text-align: center;
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        footer a {
+            color: var(--text-light);
+        }
+
+        footer a:hover {
+            color: var(--primary);
+        }
+
+        .icp {
+            margin-top: 6px;
+            font-size: 13px;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 26px; }
+            h2 { font-size: 21px; }
+            pre { font-size: 13px; padding: 16px; }
+            .container { padding: 0 16px; }
+        }
+    
+    .related-posts {
+      margin-top: 48px;
+      padding-top: 32px;
+      border-top: 2px solid #e5e7eb;
+    }
+    .related-posts h2 {
+      font-size: 1.4rem;
+      margin-bottom: 20px;
+      color: #111827;
+    }
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .related-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      text-decoration: none;
+      color: #374151;
+      transition: all 0.2s;
+      font-size: 0.95rem;
+      line-height: 1.4;
+    }
+    .related-card:hover {
+      background: #eff6ff;
+      border-color: #2563eb;
+      color: #2563eb;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+    }
+    .related-title {
+      flex: 1;
+      padding-right: 12px;
+    }
+    .related-arrow {
+      color: #9ca3af;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .related-card:hover .related-arrow {
+      color: #2563eb;
+    }
+
+  </style>
+</head>
+<body>
+    <nav class="top-nav">
+        <div class="container">
+            <a href="https://enlyai.com" class="brand">Enly<span>AI</span></a>
+            <a href="https://enlyai.com" class="back-link">← 返回首页</a>
+        </div>
+    </nav>
+
+    <article>
+        <div class="container">
+            <div class="article-meta">
+                <span class="tag">Claude</span>
+                <span class="tag">Anthropic</span>
+                <span>2026-06-18</span>
+                <span>阅读约 13 分钟</span>
+            </div>
+
+            <h1>Claude API使用教程：从注册到调用</h1>
+
+            <p>在众多大语言模型中，Anthropic 推出的 Claude 凭借出色的长文本理解、严谨的推理能力和优秀的中文表现，成为许多开发者在写作、编程、分析场景下的首选。然而 Claude 的官方 API 与 OpenAI 在请求格式上有不少差异，新手第一次接入时常常卡在鉴权、消息结构和模型选择上。</p>
+
+            <p>本教程会从零开始，带你完整走一遍 Claude API 的接入流程：先了解 Claude 各个模型的特点与适用场景，再分别演示<strong>原生 Anthropic API</strong>和<strong>通过 EnlyAI 用 OpenAI 兼容格式调用 Claude</strong>两种方式，最后给出流式输出、多轮对话和成本控制的实战建议。文中的代码示例都可以直接复制运行。</p>
+
+            <h2>一、Claude 模型家族与特点</h2>
+
+            <p>Anthropic 采用“三档模型”策略，用同一个 API 接口提供不同能力级别的模型，开发者只需修改 <code>model</code> 字段即可切换。理解每个模型的定位，是合理控制成本和效果的第一步。</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>模型</th>
+                        <th>定位</th>
+                        <th>上下文窗口</th>
+                        <th>典型场景</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Claude Sonnet 4.6</td>
+                        <td>均衡旗舰</td>
+                        <td>300K</td>
+                        <td>编程、推理、复杂任务</td>
+                    </tr>
+                    <tr>
+                        <td>Claude Opus 4.8</td>
+                        <td>最强能力</td>
+                        <td>1M</td>
+                        <td>深度分析、创作</td>
+                    </tr>
+                    <tr>
+                        <td>Claude Haiku 4.5</td>
+                        <td>轻量快速</td>
+                        <td>200K</td>
+                        <td>高频调用、实时场景</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p>Claude 的几个核心优势值得重点关注：</p>
+            <ul>
+                <li><strong>最高 1M 超长上下文</strong>：Claude Opus 4.8 提供 1M 上下文窗口、128K 输出，可以一次性塞进整本书或大型代码库，适合长文档摘要、代码库问答；Sonnet 4.6 也有 300K 上下文。</li>
+                <li><strong>中文表现优秀</strong>：在中文写作、翻译、古文理解上表现稳定，不像部分模型会出现“翻译腔”。</li>
+                <li><strong>推理与编码能力强</strong>：Claude Sonnet 4.6 在多项编码基准上表现领先，尤其擅长理解和重构大型项目代码；Opus 4.8 支持自适应推理，复杂任务表现更佳。</li>
+                <li><strong>输出风格可控</strong>：Anthropic 在“诚实性”上做了大量对齐工作，模型更倾向于承认不确定、拒绝臆造。</li>
+            </ul>
+
+            <blockquote>
+                <p>选型建议：日常开发和复杂推理优先用 Claude Sonnet 4.6，性价比最高（$3/$15 per 1M tokens）；需要极致质量且预算充足时上 Opus 4.8（$5/$25 per 1M tokens）；高并发、低延迟场景用 Haiku 4.5（$1/$5 per 1M tokens）。</p>
+            </blockquote>
+
+            <h2>二、获取 Claude API Key</h2>
+
+            <p>调用 Claude API 需要一个 API Key。官方途径是在 Anthropic Console 注册账号、绑定付款方式后创建 Key。但 Anthropic 官方对部分地区和支付方式有访问限制，注册流程相对繁琐，且需要单独维护一套密钥和账单。</p>
+
+            <p>更省心的做法是使用 <strong>EnlyAI 这类 LLM API 聚合平台</strong>。EnlyAI 完全兼容 OpenAI API 格式，注册后即可拿到一个统一密钥，不仅能调用 Claude 全系列模型，还能无缝切换 GPT、Gemini 等其他模型，所有调用汇总在一份账单里，无需分别管理多个平台账号。本文后续示例会同时给出两种接入方式。</p>
+
+            <h2>三、原生 Anthropic API 调用方式</h2>
+
+            <p>Anthropic 官方 SDK 提供了 <code>anthropic</code> 这个 Python 包。它的请求结构与 OpenAI 有明显区别：系统提示词 <code>system</code> 是顶层参数而非放在 messages 里，消息角色只有 <code>user</code> 和 <code>assistant</code> 两种。</p>
+
+            <p>首先安装 SDK：</p>
+
+            <pre><code><span class="c"># 安装 Anthropic 官方 SDK</span>
+pip install anthropic</code></pre>
+
+            <p>最基础的调用示例：</p>
+
+            <pre><code><span class="k">import</span> os
+<span class="k">from</span> anthropic <span class="k">import</span> Anthropic
+
+client = Anthropic(
+    api_key=os.environ.get(<span class="s">"ANTHROPIC_API_KEY"</span>)
+)
+
+message = client.messages.create(
+    model=<span class="s">"claude-sonnet-4-6"</span>,
+    max_tokens=<span class="n">1024</span>,
+    system=<span class="s">"你是一位简洁的技术写作助手"</span>,
+    messages=[
+        {<span class="s">"role"</span>: <span class="s">"user"</span>, <span class="s">"content"</span>: <span class="s">"用三句话解释什么是 RAG"</span>}
+    ]
+)
+
+<span class="f">print</span>(message.content[<span class="n">0</span>].text)</code></pre>
+
+            <p>对应的 cURL 命令，注意 Anthropic 要求同时传 <code>x-api-key</code> 和 <code>anthropic-version</code> 两个头：</p>
+
+            <pre><code>curl https://api.anthropic.com/v1/messages \
+  -H <span class="s">"x-api-key: $ANTHROPIC_API_KEY"</span> \
+  -H <span class="s">"anthropic-version: 2023-06-01"</span> \
+  -H <span class="s">"content-type: application/json"</span> \
+  -d <span class="s">'{
+    "model": "claude-sonnet-4-6",
+    "max_tokens": 1024,
+    "system": "你是一位简洁的技术写作助手",
+    "messages": [{"role": "user", "content": "用三句话解释什么是 RAG"}]
+  }'</span></code></pre>
+
+            <p>几个关键参数说明：</p>
+            <ul>
+                <li><code>max_tokens</code>：必填项，限制输出长度，Anthropic 不像 OpenAI 有默认值。</li>
+                <li><code>system</code>：系统提示词，单独放在顶层，不进入 messages 数组。</li>
+                <li><code>messages</code>：对话历史，角色只能是 <code>user</code> 或 <code>assistant</code>，需交替排列。</li>
+                <li><code>temperature</code>：取值 0 到 1，控制随机性，默认 1.0。</li>
+            </ul>
+
+            <h2>四、通过 EnlyAI 用 OpenAI 兼容格式调用 Claude</h2>
+
+            <p>原生 Anthropic SDK 的格式与 OpenAI 不兼容，这意味着如果你项目里已经用了 OpenAI SDK，想切换到 Claude 就得改请求结构。EnlyAI 解决了这个痛点——它把 Claude 的接口<strong>转译成 OpenAI 兼容格式</strong>，你只需把 <code>base_url</code> 指向 <code>https://enlyai.com/v1</code>，就能用熟悉的 OpenAI SDK 直接调用 Claude。</p>
+
+            <pre><code><span class="k">from</span> openai <span class="k">import</span> OpenAI
+
+client = OpenAI(
+    api_key=<span class="s">"sk-your-enlyai-key"</span>,
+    base_url=<span class="s">"https://enlyai.com/v1"</span>
+)
+
+response = client.chat.completions.create(
+    model=<span class="s">"claude-sonnet-4-6"</span>,
+    messages=[
+        {<span class="s">"role"</span>: <span class="s">"system"</span>, <span class="s">"content"</span>: <span class="s">"你是一位简洁的技术写作助手"</span>},
+        {<span class="s">"role"</span>: <span class="s">"user"</span>, <span class="s">"content"</span>: <span class="s">"用三句话解释什么是 RAG"</span>}
+    ]
+)
+
+<span class="f">print</span>(response.choices[<span class="n">0</span>].message.content)</code></pre>
+
+            <p>对应的 cURL，格式与调用 GPT 完全一致：</p>
+
+            <pre><code>curl https://enlyai.com/v1/chat/completions \
+  -H <span class="s">"Authorization: Bearer sk-your-enlyai-key"</span> \
+  -H <span class="s">"Content-Type: application/json"</span> \
+  -d <span class="s">'{
+    "model": "claude-sonnet-4-6",
+    "messages": [
+      {"role": "system", "content": "你是一位简洁的技术写作助手"},
+      {"role": "user", "content": "用三句话解释什么是 RAG"}
+    ]
+  }'</span></code></pre>
+
+            <p>这种方式的好处显而易见：</p>
+            <ul>
+                <li><strong>零迁移成本</strong>：原本基于 OpenAI SDK 的代码几乎不用改，只换 <code>base_url</code> 和 <code>model</code>。</li>
+                <li><strong>统一密钥</strong>：一个 key 调用 Claude、GPT、Gemini 等所有模型，不用维护多套凭证。</li>
+                <li><strong>统一计费</strong>：所有调用汇总在 EnlyAI 一份账单，方便做成本分析。</li>
+                <li><strong>故障可切换</strong>：Claude 服务波动时，改个 model 名就能临时切到 GPT 或 Gemini。</li>
+            </ul>
+
+            <h2>五、流式输出与多轮对话</h2>
+
+            <p>和大多数 LLM 一样，Claude 支持流式输出（Streaming），可以让用户更快看到第一个字，显著改善交互体验。通过 EnlyAI 调用时，流式接口与 OpenAI 完全一致。</p>
+
+            <pre><code><span class="k">from</span> openai <span class="k">import</span> OpenAI
+
+client = OpenAI(
+    api_key=<span class="s">"sk-your-enlyai-key"</span>,
+    base_url=<span class="s">"https://enlyai.com/v1"</span>
+)
+
+stream = client.chat.completions.create(
+    model=<span class="s">"claude-sonnet-4-6"</span>,
+    messages=[{<span class="s">"role"</span>: <span class="s">"user"</span>, <span class="s">"content"</span>: <span class="s">"写一段 200 字的产品文案，主题是 AI 编程助手"</span>}],
+    stream=<span class="k">True</span>
+)
+
+<span class="k">for</span> chunk <span class="k">in</span> stream:
+    delta = chunk.choices[<span class="n">0</span>].delta.content
+    <span class="k">if</span> delta:
+        <span class="f">print</span>(delta, end=<span class="s">""</span>, flush=<span class="k">True</span>)</code></pre>
+
+            <p>多轮对话只需把历史消息按顺序追加到 <code>messages</code> 数组即可。Claude 会根据完整上下文理解对话脉络：</p>
+
+            <pre><code>messages = [
+    {<span class="s">"role"</span>: <span class="s">"system"</span>, <span class="s">"content"</span>: <span class="s">"你是一位耐心的编程导师"</span>},
+    {<span class="s">"role"</span>: <span class="s">"user"</span>, <span class="s">"content"</span>: <span class="s">"Python 里列表和元组有什么区别？"</span>},
+    {<span class="s">"role"</span>: <span class="s">"assistant"</span>, <span class="s">"content"</span>: <span class="s">"列表可变，元组不可变……"</span>},
+    {<span class="s">"role"</span>: <span class="s">"user"</span>, <span class="s">"content"</span>: <span class="s">"那什么时候该用元组？"</span>}
+]
+
+resp = client.chat.completions.create(
+    model=<span class="s">"claude-sonnet-4-6"</span>,
+    messages=messages
+)
+<span class="f">print</span>(resp.choices[<span class="n">0</span>].message.content)</code></pre>
+
+            <h2>六、成本控制与最佳实践</h2>
+
+            <p>Claude 按 token 计费，输入和输出价格不同（通常输出更贵）。要控制成本，可以从以下几个方面入手：</p>
+
+            <ol>
+                <li><strong>按场景选模型</strong>：简单分类、抽取用 Haiku；复杂推理用 Sonnet；只有真正需要极致质量时才上 Opus。模型选对，成本能差一个数量级。</li>
+                <li><strong>控制上下文长度</strong>：Opus 4.8 的 1M 上下文是上限不是目标。塞进去的 token 都要付费，且过长上下文会拖慢响应。做长文档处理时，优先用检索（RAG）裁剪相关片段，而不是整篇丢进去。</li>
+                <li><strong>设置 max_tokens</strong>：明确限制输出长度，避免模型“刹不住车”产生冗长回复。</li>
+                <li><strong>缓存重复前缀</strong>：Anthropic 支持 prompt caching，对固定的系统提示词和长文档做缓存，可大幅降低重复调用的输入成本。</li>
+                <li><strong>监控 token 用量</strong>：每次响应里的 <code>usage</code> 字段记录了输入输出 token 数，务必落库统计，否则账单容易失控。</li>
+            </ol>
+
+            <p>下面是一个读取 token 用量的示例：</p>
+
+            <pre><code>resp = client.chat.completions.create(
+    model=<span class="s">"claude-sonnet-4-6"</span>,
+    messages=[{<span class="s">"role"</span>: <span class="s">"user"</span>, <span class="s">"content"</span>: <span class="s">"你好"</span>}]
+)
+
+usage = resp.usage
+<span class="f">print</span>(<span class="s">f"输入 token: {usage.prompt_tokens}"</span>)
+<span class="f">print</span>(<span class="s">f"输出 token: {usage.completion_tokens}"</span>)
+<span class="f">print</span>(<span class="s">f"总计: {usage.total_tokens}"</span>)</code></pre>
+
+            <h2>七、常见问题排查</h2>
+
+            <p>接入 Claude API 时，几个高频问题及解决思路：</p>
+
+            <ul>
+                <li><strong>401 鉴权失败</strong>：检查 API Key 是否正确、是否过期。用 EnlyAI 时确认 key 以 <code>sk-</code> 开头且未多余空格。</li>
+                <li><strong>400 消息格式错误</strong>：原生 Anthropic API 中，messages 必须以 <code>user</code> 开头且 user/assistant 交替；system 不能放进 messages。</li>
+                <li><strong>429 限流</strong>：触发速率限制，降低请求频率或升级套餐。生产环境建议加指数退避重试。</li>
+                <li><strong>输出被截断</strong>：调大 <code>max_tokens</code>，或检查 <code>stop</code> 参数是否误触发。</li>
+                <li><strong>中文回答偏短</strong>：在 system prompt 里明确要求“详细回答”或指定字数范围。</li>
+            </ul>
+
+            <p>掌握以上内容，你已经能独立完成 Claude API 的接入和调用了。无论是用原生 Anthropic SDK 追求最新特性，还是通过 EnlyAI 用 OpenAI 兼容格式统一管理多模型，都能根据项目需求灵活选择。</p>
+
+            <div class="cta">
+                <h3>想用一套 API 调用 Claude、GPT、Gemini？</h3>
+                <p>EnlyAI 提供 OpenAI 兼容的统一接口，支持 Claude 全系列模型，注册即送免费额度，无需单独申请 Anthropic 账号，一套密钥搞定所有主流大模型。</p>
+                <a href="https://enlyai.com" class="cta-btn">立即注册 EnlyAI →</a>
+            </div>
+        </div>
+    <section class="related-posts">
+      <h2>相关文章推荐</h2>
+      <div class="related-grid">
+        <a href="/blog/gemini-api-guide.html" class="related-card"><span class="related-title">Gemini API入门指南：Google AI接入</span><span class="related-arrow">→</span></a><a href="/blog/deepseek-api-guide.html" class="related-card"><span class="related-title">DeepSeek API调用方法与模型对比</span><span class="related-arrow">→</span></a><a href="/blog/openai-api-key-guide.html" class="related-card"><span class="related-title">OpenAI API密钥申请与使用完整流程</span><span class="related-arrow">→</span></a><a href="/blog/llm-api-comparison.html" class="related-card"><span class="related-title">OpenAI vs Claude vs Gemini API对比</span><span class="related-arrow">→</span></a>
+      </div>
+    </section>
+
+    </article>
+
+    <footer>
+        <div class="container">
+            <p>© 2026 EnlyAI · <a href="https://enlyai.com">enlyai.com</a></p>
+            <p class="icp"><a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener">粤ICP备2026055772号-1</a></p>
+        </div>
+    </footer>
+</body>
+</html>

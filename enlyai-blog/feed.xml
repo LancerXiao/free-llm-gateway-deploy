@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>EnlyAI 技术博客</title>
+    <link>https://enlyai.com/blog/</link>
+    <atom:link href="https://enlyai.com/blog/feed.xml" rel="self" type="application/rss+xml"/>
+    <description>LLM API 使用教程、模型对比、成本优化、AI应用开发实践。学习如何低成本调用 GPT-5.5、Claude Opus 4.8、Gemini 3.5 Pro、DeepSeek V4-Pro 等大模型 API。</description>
+    <language>zh-CN</language>
+    <lastBuildDate>Thu, 18 Jun 2026 12:00:00 +0800</lastBuildDate>
+    <item>
+      <title>2026年免费调用GPT-5 API的完整指南</title>
+      <link>https://enlyai.com/blog/free-gpt4-api-guide.html</link>
+      <guid isPermaLink="true">https://enlyai.com/blog/free-gpt4-api-guide.html</guid>
+      <description>介绍如何通过聚合平台免费调用GPT-5.5等大模型API，包含注册、获取key、Python调用示例。</description>
+      <pubDate>Mon, 15 Jun 2026 09:00:00 +0800</pubDate>
+    </item>
+    <item>
+      <title>OpenAI vs Claude vs Gemini API对比</title>
+      <link>https://enlyai.com/blog/llm-api-comparison.html</link>
+      <guid isPermaLink="true">https://enlyai.com/blog/llm-api-comparison.html</guid>
+      <description>2026年6月最新：GPT-5.5、Claude Opus 4.8、Gemini 3.5 Pro 三大旗舰模型API的价格、能力、适用场景深度对比。</description>
+      <pubDate>Mon, 15 Jun 2026 10:00:00 +0800</pubDate>
+    </item>
+    <item>
+      <title>用Python调用LLM API的5种方式</title>
+      <link>https://enlyai.com/blog/python-llm-api-tutorial.html</link>
+      <guid isPermaLink="true">https://enlyai.com/blog/python-llm-api-tutorial.html</guid>
+      <description>OpenAI SDK、httpx、LangChain、流式输出、异步调用5种Python接入大模型API的方式详解。</description>
+      <pubDate>Mon, 15 Jun 2026 11:00:00 +0800</pubDate>
+    </item>
+    <item>
+      <title>LLM API成本对比与省钱技巧</title>
+      <link>https://enlyai.com/blog/llm-api-cost-optimization.html</link>
+      <guid isPermaLink="true">https://enlyai.com/blog/llm-api-cost-optimization.html</guid>
+      <description>各大模型API价格横向对比，以及7个经过验证的省钱技巧，最高可省90%成本。</description>
+      <pubDate>Tue, 16 Jun 2026 09:00:00 +0800</pubDate>
+    </item>
+    <item>
+      <title>如何搭建自己的AI聊天机器人</title>
+      <link>https://enlyai.com/blog/build-ai-chatbot-guide.html</link>
+      <guid isPermaLink="true">https://enlyai.com/blog/build-ai-chatbot-guide.html</guid>
+      <description>从零搭建AI聊天机器人的完整指南，前端React+后端Python，接入大模型API。</description>
+      <pubDate>Tue, 16 Jun 2026 10:00:00 +0800</pubDate>
+    </item>
+    <item>
+      <title>One API vs New API：LLM聚合平台对比</title>
+      <link>https://enlyai.com/blog/one-api-vs-new-api.html</link>
+      <guid isPermaLink="true">https://enlyai.com/blog/one-api-vs-new-api.html</guid>
+      <description>两款主流LLM API聚合平台的功能、性能、易用性对比，帮你选对工具。</description>
+      <pubDate>Tue, 16 Jun 2026 11:00:00 +0800</pubDate>
+    </item>
+    <item>
+      <title>2026年最佳LLM API聚合平台推荐</title>
+      <link>https://enlyai.com/blog/best-llm-api-platforms-2026.html</link>
+      <guid isPermaLink="true">https://enlyai.com/blog/best-llm-api-platforms-2026.html</guid>
+      <description>盘点2026年值得用的LLM API聚合平台，从价格、模型覆盖、稳定性多维度评测。</description>
+      <pubDate>Wed, 17 Jun 2026 09:00:00 +0800</pubDate>
+    </item>
+    <item>
+      <title>OpenAI API替代方案：更便宜的选择</title>
+      <link>https://enlyai.com/blog/openai-api-alternatives.html</link>
+      <guid isPermaLink="true">https://enlyai.com/blog/openai-api-alternatives.html</guid>
+      <description>OpenAI API太贵？这些替代方案（Claude、Gemini、DeepSeek）更便宜且能力不弱。</description>
+      <pubDate>Wed, 17 Jun 2026 10:00:00 +0800</pubDate>
+    </item>
+    <item>
+      <title>Claude API使用教程：从注册到调用</title>
+      <link>https://enlyai.com/blog/claude-api-tutorial.html</link>
+      <guid isPermaLink="true">https://enlyai.com/blog/claude-api-tutorial.html</guid>
+      <description>Claude Opus 4.8 API完整接入教程，包含Python代码示例和最佳实践。</description>
+      <pubDate>Wed, 17 Jun 2026 11:00:00 +0800</pubDate>
+    </item>
+    <item>
+      <title>Gemini API入门指南：Google AI接入</title>
+      <link>https://enlyai.com/blog/gemini-api-guide.html</link>
+      <guid isPermaLink="true">https://enlyai.com/blog/gemini-api-guide.html</guid>
+      <description>Google Gemini 3.5 Pro/Flash API接入指南，2M超长上下文，原生多模态。</description>
+      <pubDate>Thu, 18 Jun 2026 09:00:00 +0800</pubDate>
+    </item>
+    <item>
+      <title>DeepSeek API调用方法与模型对比</title>
+      <link>https://enlyai.com/blog/deepseek-api-guide.html</link>
+      <guid isPermaLink="true">https://enlyai.com/blog/deepseek-api-guide.html</guid>
+      <description>DeepSeek V4-Pro/V4-Flash API调用教程，全球性价比最高的大模型API。</description>
+      <pubDate>Thu, 18 Jun 2026 10:00:00 +0800</pubDate>
+    </item>
+    <item>
+      <title>OpenAI API密钥申请与使用完整流程</title>
+      <link>https://enlyai.com/blog/openai-api-key-guide.html</link>
+      <guid isPermaLink="true">https://enlyai.com/blog/openai-api-key-guide.html</guid>
+      <description>OpenAI API key申请、充值、使用全流程，以及安全注意事项。</description>
+      <pubDate>Thu, 18 Jun 2026 11:00:00 +0800</pubDate>
+    </item>
+    <item>
+      <title>LangChain入门：用Python构建LLM应用</title>
+      <link>https://enlyai.com/blog/langchain-tutorial.html</link>
+      <guid isPermaLink="true">https://enlyai.com/blog/langchain-tutorial.html</guid>
+      <description>LangChain框架入门教程，用Python快速构建RAG、Agent等LLM应用。</description>
+      <pubDate>Thu, 18 Jun 2026 12:00:00 +0800</pubDate>
+    </item>
+    <item>
+      <title>API流式输出实现：SSE与WebSocket详解</title>
+      <link>https://enlyai.com/blog/api-streaming-guide.html</link>
+      <guid isPermaLink="true">https://enlyai.com/blog/api-streaming-guide.html</guid>
+      <description>大模型API流式输出的两种实现方式：SSE和WebSocket，含Python代码示例。</description>
+      <pubDate>Thu, 18 Jun 2026 13:00:00 +0800</pubDate>
+    </item>
+    <item>
+      <title>大模型API限流与重试最佳实践</title>
+      <link>https://enlyai.com/blog/api-rate-limiting-best-practices.html</link>
+      <guid isPermaLink="true">https://enlyai.com/blog/api-rate-limiting-best-practices.html</guid>
+      <description>大模型API调用中的限流、重试、降级策略，保障服务稳定性。</description>
+      <pubDate>Thu, 18 Jun 2026 14:00:00 +0800</pubDate>
+    </item>
+    <item>
+      <title>如何选择合适的LLM模型：场景对比指南</title>
+      <link>https://enlyai.com/blog/how-to-choose-llm-model.html</link>
+      <guid isPermaLink="true">https://enlyai.com/blog/how-to-choose-llm-model.html</guid>
+      <description>按场景选择大模型的实用指南：编程、写作、翻译、长文档、多模态，对应推荐模型。</description>
+      <pubDate>Thu, 18 Jun 2026 15:00:00 +0800</pubDate>
+    </item>
+  </channel>
+</rss>

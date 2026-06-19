@@ -343,7 +343,57 @@
             pre { padding: 16px; font-size: 13px; }
             .cta { padding: 28px 18px; }
         }
-    </style>
+    
+    .related-posts {
+      margin-top: 48px;
+      padding-top: 32px;
+      border-top: 2px solid #e5e7eb;
+    }
+    .related-posts h2 {
+      font-size: 1.4rem;
+      margin-bottom: 20px;
+      color: #111827;
+    }
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .related-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      text-decoration: none;
+      color: #374151;
+      transition: all 0.2s;
+      font-size: 0.95rem;
+      line-height: 1.4;
+    }
+    .related-card:hover {
+      background: #eff6ff;
+      border-color: #2563eb;
+      color: #2563eb;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+    }
+    .related-title {
+      flex: 1;
+      padding-right: 12px;
+    }
+    .related-arrow {
+      color: #9ca3af;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .related-card:hover .related-arrow {
+      color: #2563eb;
+    }
+
+  </style>
 </head>
 <body>
     <nav class="top-nav">
@@ -396,7 +446,7 @@
 
         <h3>Gemini（Google）</h3>
 
-        <p>Gemini 的优势在于原生多模态——文本、图像、音频、视频都能处理，且与 Google 生态深度集成。Gemini 3.1 Pro 拥有 2M 上下文窗口，是当前上下文最长的主流模型，对于需要结合搜索、地图、YouTube 等数据的应用，Gemini 是很自然的选择。它的免费额度和低价档位（$2/$12 per 1M tokens）对个人开发者很友好。</p>
+        <p>Gemini 的优势在于原生多模态——文本、图像、音频、视频都能处理，且与 Google 生态深度集成。Gemini 3.5 Pro 拥有 2M 上下文窗口，是当前上下文最长的主流模型，对于需要结合搜索、地图、YouTube 等数据的应用，Gemini 是很自然的选择。它的免费额度和低价档位（$2/$12 per 1M tokens）对个人开发者很友好。</p>
 
         <h3>DeepSeek</h3>
 
@@ -433,7 +483,7 @@
                     <td>略低，能力顶尖</td>
                 </tr>
                 <tr>
-                    <td>Gemini 3.1 Pro</td>
+                    <td>Gemini 3.5 Pro</td>
                     <td>约 $2</td>
                     <td>约 $12</td>
                     <td>约 40%</td>
@@ -593,6 +643,13 @@ MODEL_ROUTING = {
             <p>注册 EnlyAI，一个 Key 调用 DeepSeek、Claude、Gemini、Qwen 等全部模型。<br>兼容 OpenAI SDK，改一行代码即可迁移，注册即送免费额度。</p>
             <a href="https://enlyai.com" class="btn">立即免费注册 →</a>
         </div>
+    <section class="related-posts">
+      <h2>相关文章推荐</h2>
+      <div class="related-grid">
+        <a href="/blog/llm-api-cost-optimization.html" class="related-card"><span class="related-title">LLM API成本对比与省钱技巧</span><span class="related-arrow">→</span></a><a href="/blog/deepseek-api-guide.html" class="related-card"><span class="related-title">DeepSeek API调用方法与模型对比</span><span class="related-arrow">→</span></a><a href="/blog/claude-api-tutorial.html" class="related-card"><span class="related-title">Claude API使用教程：从注册到调用</span><span class="related-arrow">→</span></a><a href="/blog/gemini-api-guide.html" class="related-card"><span class="related-title">Gemini API入门指南：Google AI接入</span><span class="related-arrow">→</span></a>
+      </div>
+    </section>
+
     </article>
 
     <footer>

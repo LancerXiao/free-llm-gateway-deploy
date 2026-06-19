@@ -257,6 +257,56 @@
       article { padding: 28px 16px 48px; }
       pre { font-size: 13px; padding: 14px; }
     }
+  
+    .related-posts {
+      margin-top: 48px;
+      padding-top: 32px;
+      border-top: 2px solid #e5e7eb;
+    }
+    .related-posts h2 {
+      font-size: 1.4rem;
+      margin-bottom: 20px;
+      color: #111827;
+    }
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .related-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      text-decoration: none;
+      color: #374151;
+      transition: all 0.2s;
+      font-size: 0.95rem;
+      line-height: 1.4;
+    }
+    .related-card:hover {
+      background: #eff6ff;
+      border-color: #2563eb;
+      color: #2563eb;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+    }
+    .related-title {
+      flex: 1;
+      padding-right: 12px;
+    }
+    .related-arrow {
+      color: #9ca3af;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .related-card:hover .related-arrow {
+      color: #2563eb;
+    }
+
   </style>
 </head>
 <body>
@@ -330,7 +380,7 @@
       <li>同时暴露 OpenAI、Claude Messages、Gemini 三种原生格式接口，客户端可以用任意一种格式调用。</li>
       <li>支持 OpenAI ⇄ Claude、OpenAI → Gemini 的双向转换，意味着你用 OpenAI SDK 写的代码，后端可以路由到 Claude 模型，反之亦然。</li>
       <li>支持 OpenAI Responses API 和 Realtime API，覆盖了 OpenAI 最新的接口形态。</li>
-      <li>对推理模型的 reasoning effort（如 <code>o3-mini-high</code>、Claude thinking、Gemini 思考预算）做了原生支持。</li>
+      <li>对推理模型的 reasoning effort（如 <code>o4-mini-high</code>、Claude thinking、Gemini 思考预算）做了原生支持。</li>
     </ul>
 
     <p>举个具体例子。如果你的应用已经用 Anthropic SDK 写好了，想接入 GPT 模型，用 One API 就得改客户端代码；而用 New API，可以直接把 Claude 格式的请求路由到 GPT 后端，客户端一行不用改。这种灵活性在多模型混合调度的场景下价值很大。</p>
@@ -392,7 +442,7 @@ docker run --name new-api -d --restart always \
   -H <span class="tok-s">"Content-Type: application/json"</span> \
   -H <span class="tok-s">"Authorization: Bearer sk-你的令牌"</span> \
   -d <span class="tok-s">'{
-    "model": "gpt-4o-mini",
+    "model": "gpt-5.4-mini",
     "messages": [
       {"role": "user", "content": "用一句话解释什么是API网关"}
     ]
@@ -441,6 +491,13 @@ docker run --name new-api -d --restart always \
       <p>EnlyAI 基于 New API 构建，提供 OpenAI 兼容的统一 API。一个 Key 即可调用 GPT、Claude、Gemini 等数十种模型，无需运维，开箱即用。</p>
       <a class="cta-btn" href="https://enlyai.com">立即注册 EnlyAI，获取 API Key →</a>
     </div>
+    <section class="related-posts">
+      <h2>相关文章推荐</h2>
+      <div class="related-grid">
+        <a href="/blog/best-llm-api-platforms-2026.html" class="related-card"><span class="related-title">2026年最佳LLM API聚合平台推荐</span><span class="related-arrow">→</span></a><a href="/blog/llm-api-comparison.html" class="related-card"><span class="related-title">OpenAI vs Claude vs Gemini API对比</span><span class="related-arrow">→</span></a><a href="/blog/openai-api-alternatives.html" class="related-card"><span class="related-title">OpenAI API替代方案：更便宜的选择</span><span class="related-arrow">→</span></a><a href="/blog/how-to-choose-llm-model.html" class="related-card"><span class="related-title">如何选择合适的LLM模型：场景对比指南</span><span class="related-arrow">→</span></a>
+      </div>
+    </section>
+
   </article>
 
   <footer>

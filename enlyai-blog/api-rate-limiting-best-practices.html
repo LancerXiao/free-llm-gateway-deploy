@@ -335,7 +335,57 @@
             pre { font-size: 13px; padding: 16px; }
             .container { padding: 0 16px; }
         }
-    </style>
+    
+    .related-posts {
+      margin-top: 48px;
+      padding-top: 32px;
+      border-top: 2px solid #e5e7eb;
+    }
+    .related-posts h2 {
+      font-size: 1.4rem;
+      margin-bottom: 20px;
+      color: #111827;
+    }
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .related-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      text-decoration: none;
+      color: #374151;
+      transition: all 0.2s;
+      font-size: 0.95rem;
+      line-height: 1.4;
+    }
+    .related-card:hover {
+      background: #eff6ff;
+      border-color: #2563eb;
+      color: #2563eb;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+    }
+    .related-title {
+      flex: 1;
+      padding-right: 12px;
+    }
+    .related-arrow {
+      color: #9ca3af;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .related-card:hover .related-arrow {
+      color: #2563eb;
+    }
+
+  </style>
 </head>
 <body>
     <nav class="top-nav">
@@ -402,7 +452,7 @@ X-RateLimit-Reset-Requests: 12s
   -H <span class="s">"Authorization: Bearer sk-your-api-key"</span> \
   -H <span class="s">"Content-Type: application/json"</span> \
   -d <span class="s">'{
-    "model": "gpt-4o-mini",
+    "model": "gpt-5.4-mini",
     "messages": [{"role": "user", "content": "hello"}]
   }'</span></code></pre>
 
@@ -446,7 +496,7 @@ X-RateLimit-Reset-Requests: 12s
 
 <span class="c"># 使用示例</span>
 data = call_llm_with_retry({
-    <span class="s">"model"</span>: <span class="s">"gpt-4o-mini"</span>,
+    <span class="s">"model"</span>: <span class="s">"gpt-5.4-mini"</span>,
     <span class="s">"messages"</span>: [{<span class="s">"role"</span>: <span class="s">"user"</span>, <span class="s">"content"</span>: <span class="s">"解释什么是指数退避"</span>}]
 })
 <span class="f">print</span>(data[<span class="s">"choices"</span>][<span class="n">0</span>][<span class="s">"message"</span>][<span class="s">"content"</span>])</code></pre>
@@ -492,7 +542,7 @@ data = call_llm_with_retry({
     retry=retry_if_exception_type((RateLimitError, requests.RequestException)),
     reraise=<span class="k">True</span>
 )
-<span class="k">def</span> <span class="f">call_llm</span>(messages, model=<span class="s">"gpt-4o-mini"</span>):
+<span class="k">def</span> <span class="f">call_llm</span>(messages, model=<span class="s">"gpt-5.4-mini"</span>):
     resp = requests.post(
         <span class="s">"https://enlyai.com/v1/chat/completions"</span>,
         headers={<span class="s">"Authorization"</span>: <span class="s">"Bearer sk-your-api-key"</span>},
@@ -559,7 +609,7 @@ bucket = TokenBucket(rate=<span class="n">5</span>, capacity=<span class="n">10<
         resp = requests.post(
             <span class="s">"https://enlyai.com/v1/chat/completions"</span>,
             headers={<span class="s">"Authorization"</span>: <span class="s">"Bearer sk-your-api-key"</span>},
-            json={<span class="s">"model"</span>: <span class="s">"gpt-4o-mini"</span>, <span class="s">"messages"</span>: [{<span class="s">"role"</span>: <span class="s">"user"</span>, <span class="s">"content"</span>: item}]},
+            json={<span class="s">"model"</span>: <span class="s">"gpt-5.4-mini"</span>, <span class="s">"messages"</span>: [{<span class="s">"role"</span>: <span class="s">"user"</span>, <span class="s">"content"</span>: item}]},
             timeout=(<span class="n">10</span>, <span class="n">120</span>),  <span class="c"># 连接超时 10s，读取超时 120s</span>
         )
         resp.raise_for_status()
@@ -581,11 +631,11 @@ tasks = [<span class="s">"总结这段文字"</span>, <span class="s">"翻译这
 
             <p>当某个模型或通道持续失败时，继续重试只会雪上加霜。熔断器（Circuit Breaker）模式会在失败率达到阈值后“断开”一段时间，直接走降级逻辑，避免拖垮整个系统。</p>
 
-            <p>一个简单的降级策略是：主模型失败时切换到更便宜、更稳定的备用模型。例如 GPT-4o 失败时降级到 GPT-4o-mini，或者通过 EnlyAI 切换到 Claude、Gemini 等其他通道。</p>
+            <p>一个简单的降级策略是：主模型失败时切换到更便宜、更稳定的备用模型。例如 GPT-5.5 失败时降级到 GPT-5.4-mini，或者通过 EnlyAI 切换到 Claude、Gemini 等其他通道。</p>
 
             <pre><code><span class="k">def</span> <span class="f">call_with_fallback</span>(messages):
     <span class="c"># 主模型 -> 备用模型1 -> 备用模型2</span>
-    models = [<span class="s">"gpt-4o"</span>, <span class="s">"claude-3-5-sonnet"</span>, <span class="s">"gemini-1.5-pro"</span>]
+    models = [<span class="s">"gpt-5.5"</span>, <span class="s">"claude-sonnet-4-6"</span>, <span class="s">"gemini-3.5-pro"</span>]
     <span class="k">for</span> model <span class="k">in</span> models:
         <span class="k">try</span>:
             <span class="k">return</span> call_llm(messages, model=model)
@@ -660,6 +710,13 @@ tasks = [<span class="s">"总结这段文字"</span>, <span class="s">"翻译这
                 <a href="https://enlyai.com" class="cta-btn">立即注册 EnlyAI →</a>
             </div>
         </div>
+    <section class="related-posts">
+      <h2>相关文章推荐</h2>
+      <div class="related-grid">
+        <a href="/blog/api-streaming-guide.html" class="related-card"><span class="related-title">API流式输出实现：SSE与WebSocket详解</span><span class="related-arrow">→</span></a><a href="/blog/llm-api-cost-optimization.html" class="related-card"><span class="related-title">LLM API成本对比与省钱技巧</span><span class="related-arrow">→</span></a><a href="/blog/build-ai-chatbot-guide.html" class="related-card"><span class="related-title">如何搭建自己的AI聊天机器人</span><span class="related-arrow">→</span></a><a href="/blog/python-llm-api-tutorial.html" class="related-card"><span class="related-title">用Python调用LLM API的5种方式</span><span class="related-arrow">→</span></a>
+      </div>
+    </section>
+
     </article>
 
     <footer>

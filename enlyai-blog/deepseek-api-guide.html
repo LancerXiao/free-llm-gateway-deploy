@@ -1,0 +1,599 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DeepSeek API调用方法与模型对比 | EnlyAI</title>
+  <meta name="description" content="介绍 DeepSeek API 的使用方法，对比 DeepSeek V4-Pro 与 DeepSeek V4-Flash 等模型的能力与价格，附 Python、cURL 调用示例与流式输出代码，帮你快速接入国产高性价比大模型 API。" />
+  <meta name="keywords" content="DeepSeek API, DeepSeek 调用, DeepSeek 模型, 国产大模型 API" />
+  <meta name="author" content="EnlyAI" />
+  <meta name="robots" content="index, follow" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="DeepSeek API调用方法与模型对比" />
+  <meta property="og:description" content="介绍 DeepSeek API 的使用方法，对比 DeepSeek 各模型的能力与价格，附 Python、cURL 调用示例。" />
+  <meta property="og:url" content="https://enlyai.com/blog/deepseek-api-guide.html" />
+  <meta property="og:site_name" content="EnlyAI" />
+  <meta property="og:locale" content="zh_CN" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="DeepSeek API调用方法与模型对比" />
+  <meta name="twitter:description" content="介绍 DeepSeek API 的使用方法，对比 DeepSeek 各模型的能力与价格，附 Python、cURL 调用示例。" />
+
+  <link rel="canonical" href="https://enlyai.com/blog/deepseek-api-guide.html" />
+  <link rel="icon" href="https://enlyai.com/logo.png" />
+
+  <!-- Schema.org BlogPosting -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": "DeepSeek API调用方法与模型对比",
+    "description": "介绍 DeepSeek API 的使用方法，对比 DeepSeek V4-Pro 与 DeepSeek V4-Flash 等模型的能力与价格，附 Python、cURL 调用示例与流式输出代码，帮你快速接入国产高性价比大模型 API。",
+    "keywords": "DeepSeek API, DeepSeek 调用, DeepSeek 模型, 国产大模型 API",
+    "inLanguage": "zh-CN",
+    "author": {
+      "@type": "Organization",
+      "name": "EnlyAI",
+      "url": "https://enlyai.com"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "EnlyAI",
+      "url": "https://enlyai.com"
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https://enlyai.com/blog/deepseek-api-guide.html"
+    },
+    "datePublished": "2026-06-18",
+    "dateModified": "2026-06-18"
+  }
+  </script>
+
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --primary-light: #dbeafe;
+      --text: #1f2937;
+      --text-light: #6b7280;
+      --bg: #ffffff;
+      --bg-soft: #f9fafb;
+      --border: #e5e7eb;
+      --code-bg: #1e293b;
+      --code-text: #e2e8f0;
+    }
+
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+        "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.8;
+      color: var(--text);
+      background: var(--bg);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: saturate(180%) blur(8px);
+      border-bottom: 1px solid var(--border);
+    }
+    .topbar-inner {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand {
+      font-weight: 700;
+      font-size: 18px;
+      color: var(--primary);
+      text-decoration: none;
+      letter-spacing: 0.3px;
+    }
+    .back-home {
+      font-size: 14px;
+      color: var(--text-light);
+      text-decoration: none;
+      padding: 6px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      transition: all 0.15s ease;
+    }
+    .back-home:hover { color: var(--primary); border-color: var(--primary); }
+
+    article {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px 20px 60px;
+    }
+
+    .post-meta {
+      font-size: 14px;
+      color: var(--text-light);
+      margin-bottom: 8px;
+    }
+    .post-meta .tag {
+      display: inline-block;
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      padding: 2px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      margin-right: 8px;
+    }
+
+    h1 {
+      font-size: 30px;
+      line-height: 1.35;
+      margin: 8px 0 24px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+    }
+    h2 {
+      font-size: 23px;
+      margin: 44px 0 16px;
+      font-weight: 700;
+      padding-top: 8px;
+    }
+    h3 { font-size: 18px; margin: 28px 0 12px; font-weight: 700; }
+    p { margin: 0 0 18px; }
+
+    a { color: var(--primary); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    ul, ol { padding-left: 22px; margin: 0 0 18px; }
+    li { margin-bottom: 8px; }
+    strong { font-weight: 700; }
+
+    blockquote {
+      margin: 22px 0;
+      padding: 14px 18px;
+      background: var(--bg-soft);
+      border-left: 4px solid var(--primary);
+      border-radius: 0 6px 6px 0;
+      color: var(--text-light);
+    }
+    blockquote p { margin: 0; }
+
+    code {
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+      font-size: 0.88em;
+    }
+    p code, li code {
+      background: #f1f5f9;
+      color: #be185d;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    pre {
+      background: var(--code-bg);
+      color: var(--code-text);
+      padding: 18px 20px;
+      border-radius: 10px;
+      overflow-x: auto;
+      margin: 0 0 20px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    pre code { background: none; color: inherit; padding: 0; }
+    .tok-key { color: #93c5fd; }
+    .tok-str { color: #86efac; }
+    .tok-com { color: #94a3b8; font-style: italic; }
+    .tok-fn { color: #fcd34d; }
+    .tok-num { color: #fca5a5; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0 0 22px;
+      font-size: 14px;
+    }
+    th, td {
+      border: 1px solid var(--border);
+      padding: 10px 12px;
+      text-align: left;
+    }
+    th { background: var(--bg-soft); font-weight: 700; }
+    tr:nth-child(even) td { background: #fcfcfd; }
+
+    .cta {
+      margin: 48px 0 8px;
+      padding: 32px 28px;
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      border-radius: 14px;
+      color: #fff;
+      text-align: center;
+    }
+    .cta h3 { color: #fff; margin-top: 0; font-size: 22px; }
+    .cta p { color: rgba(255,255,255,0.92); margin-bottom: 20px; }
+    .cta-btn {
+      display: inline-block;
+      background: #fff;
+      color: var(--primary-dark);
+      font-weight: 700;
+      padding: 12px 32px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 16px;
+      transition: transform 0.15s ease;
+    }
+    .cta-btn:hover { text-decoration: none; transform: translateY(-1px); }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 24px 20px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-light);
+    }
+    footer a { color: var(--text-light); }
+
+    @media (max-width: 600px) {
+      h1 { font-size: 24px; }
+      h2 { font-size: 20px; }
+      article { padding: 28px 16px 48px; }
+      pre { padding: 14px 14px; font-size: 13px; }
+      .topbar-inner { padding: 12px 16px; }
+      table { font-size: 12px; }
+      th, td { padding: 8px 6px; }
+    }
+  
+    .related-posts {
+      margin-top: 48px;
+      padding-top: 32px;
+      border-top: 2px solid #e5e7eb;
+    }
+    .related-posts h2 {
+      font-size: 1.4rem;
+      margin-bottom: 20px;
+      color: #111827;
+    }
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .related-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      text-decoration: none;
+      color: #374151;
+      transition: all 0.2s;
+      font-size: 0.95rem;
+      line-height: 1.4;
+    }
+    .related-card:hover {
+      background: #eff6ff;
+      border-color: #2563eb;
+      color: #2563eb;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+    }
+    .related-title {
+      flex: 1;
+      padding-right: 12px;
+    }
+    .related-arrow {
+      color: #9ca3af;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .related-card:hover .related-arrow {
+      color: #2563eb;
+    }
+
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="https://enlyai.com">EnlyAI</a>
+      <a class="back-home" href="https://enlyai.com">← 返回首页</a>
+    </div>
+  </header>
+
+  <article>
+    <div class="post-meta">
+      <span class="tag">国产大模型</span>
+      <span class="tag">API 教程</span>
+      2026年6月18日 · 阅读约 13 分钟
+    </div>
+
+    <h1>DeepSeek API调用方法与模型对比</h1>
+
+    <p>DeepSeek 是近年来最受关注的国产大模型之一。凭借开源策略、极低的 API 价格和接近第一梯队的推理能力，它迅速成为许多开发者在成本敏感场景下的首选。无论你是想搭建一个低成本的 AI 助手，还是在现有产品里替换昂贵的 GPT-5.4 调用，DeepSeek 都值得认真评估。本文会从模型对比入手，带你完整走通 DeepSeek API 的调用流程，包含 cURL、Python 两种方式，以及流式输出和价格测算。</p>
+
+    <h2>一、DeepSeek 模型矩阵</h2>
+    <p>DeepSeek 目前主要通过 API 对外提供两类模型：通用对话模型 <strong>DeepSeek V4-Flash</strong> 和推理模型 <strong>DeepSeek V4-Pro</strong>。两者定位不同，适用场景也各有侧重，理解它们的差异是选型的第一步。</p>
+
+    <h3>DeepSeek V4-Flash：通用对话主力</h3>
+    <p>DeepSeek V4-Flash 是 MoE（混合专家）架构的通用大模型，总参数量达到 284B，兼顾了能力和效率。它的定位对标 GPT-5.5 和 Claude Sonnet 4.6，擅长日常对话、文本生成、翻译、代码补全和函数调用。V4-Flash 是业界价格最低的大模型之一（$0.14/$0.28 per 1M tokens），对于大多数应用场景是默认选择——响应快、价格低、能力全面。</p>
+
+    <h3>DeepSeek V4-Pro：深度推理专用</h3>
+    <p>DeepSeek V4-Pro 是 1.6T 参数的 MoE 推理模型，支持 1M 上下文窗口和 384K 输出，对标 OpenAI 的 o4-mini。它的特点是会在给出最终答案前进行长链思考（chain-of-thought），在数学、逻辑推理、复杂代码和科学问题上表现显著优于通用模型。V4-Pro 当前以促销价 $0.435/$0.87 per 1M tokens 提供。代价是输出 token 更多、延迟更高、单次调用成本也更高。因此 V4-Pro 适合用在「难题」上，而不是闲聊或简单问答。</p>
+
+    <blockquote>
+      <p>迁移提醒：旧的 <code>deepseek-chat</code> 和 <code>deepseek-reasoner</code> 模型将于 <strong>2026 年 7 月 24 日</strong>正式退役，请尽快迁移到 <code>deepseek-v4-flash</code>（替代 deepseek-chat）和 <code>deepseek-v4-pro</code>（替代 deepseek-reasoner）。接口格式完全兼容，只需更换 model 字段即可。</p>
+    </blockquote>
+
+    <table>
+      <thead>
+        <tr>
+          <th>维度</th>
+          <th>DeepSeek V4-Flash</th>
+          <th>DeepSeek V4-Pro</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>定位</td>
+          <td>通用对话与生成</td>
+          <td>深度推理（思考模式）</td>
+        </tr>
+        <tr>
+          <td>架构</td>
+          <td>MoE，284B 参数</td>
+          <td>MoE，1.6T 参数</td>
+        </tr>
+        <tr>
+          <td>上下文窗口</td>
+          <td>128K</td>
+          <td>1M</td>
+        </tr>
+        <tr>
+          <td>最大输出</td>
+          <td>8K</td>
+          <td>384K</td>
+        </tr>
+        <tr>
+          <td>擅长任务</td>
+          <td>对话、写作、代码、函数调用</td>
+          <td>数学、逻辑、复杂推理</td>
+        </tr>
+        <tr>
+          <td>响应速度</td>
+          <td>快</td>
+          <td>较慢（含思考过程）</td>
+        </tr>
+        <tr>
+          <td>建议场景</td>
+          <td>日常应用默认选择</td>
+          <td>难题、Agent 决策链</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>一个实用的策略是<strong>双模型分工</strong>：用 V4-Flash 处理高频的常规请求，把识别出的复杂问题路由给 V4-Pro。这样既控制了整体成本，又能在关键环节拿到推理质量。</p>
+
+    <h2>二、调用前置准备</h2>
+    <p>DeepSeek 官方 API 完全兼容 OpenAI 的接口格式，这意味着你不需要学习新的 SDK，现有的 OpenAI 客户端代码只要改两个地方就能跑起来：<code>base_url</code> 和 <code>api_key</code>。</p>
+    <p>调用前需要完成以下准备：</p>
+    <ol>
+      <li>注册 DeepSeek 开放平台账号，完成实名认证；</li>
+      <li>在控制台创建 API Key，妥善保存（密钥只在创建时显示一次）；</li>
+      <li>确认账户余额充足，DeepSeek 采用预充值计费模式；</li>
+      <li>记下 API 地址：<code>https://api.deepseek.com/v1</code>（官方）或使用聚合平台地址。</li>
+    </ol>
+    <blockquote>
+      <p>提示：如果你不想单独管理 DeepSeek 的账号和余额，也可以通过 EnlyAI 这类聚合平台调用，用同一个 Key 和同一个 <code>base_url</code> 同时访问 DeepSeek、OpenAI、Claude 等模型，后文会专门介绍。</p>
+    </blockquote>
+
+    <h2>三、用 cURL 调用 DeepSeek API</h2>
+    <p>cURL 是最直接的调试方式，适合快速验证接口是否通、Key 是否有效。DeepSeek 的 Chat Completions 接口路径为 <code>/chat/completions</code>，请求体格式与 OpenAI 完全一致。</p>
+
+    <pre><code><span class="tok-com"># 调用 DeepSeek V4-Flash 通用模型</span>
+curl https://api.deepseek.com/v1/chat/completions \
+  -H <span class="tok-str">"Content-Type: application/json"</span> \
+  -H <span class="tok-str">"Authorization: Bearer $DEEPSEEK_API_KEY"</span> \
+  -d <span class="tok-str">'{
+    "model": "deepseek-v4-flash",
+    "messages": [
+      {"role": "system", "content": "你是一个简洁的技术助手。"},
+      {"role": "user", "content": "用一句话解释什么是 MoE 架构。"}
+    ],
+    "temperature": 0.7
+  }'</span></code></pre>
+
+    <p>如果要切换到推理模型 V4-Pro，只需把 <code>model</code> 改为 <code>deepseek-v4-pro</code>：</p>
+
+    <pre><code><span class="tok-com"># 调用 DeepSeek V4-Pro 推理模型</span>
+curl https://api.deepseek.com/v1/chat/completions \
+  -H <span class="tok-str">"Content-Type: application/json"</span> \
+  -H <span class="tok-str">"Authorization: Bearer $DEEPSEEK_API_KEY"</span> \
+  -d <span class="tok-str">'{
+    "model": "deepseek-v4-pro",
+    "messages": [
+      {"role": "user", "content": "一个水池有两个进水管一个出水管，A管5小时注满，B管6小时注满，C管10小时排空，三管同开几小时注满？"}
+    ]
+  }'</span></code></pre>
+
+    <p>V4-Pro 的响应里会额外包含一个 <code>reasoning_content</code> 字段，记录模型的思考过程，<code>content</code> 才是最终答案。这个设计让你可以选择是否把思考链展示给终端用户。</p>
+
+    <h2>四、用 Python 调用 DeepSeek API</h2>
+    <p>生产环境推荐用 Python。由于接口兼容 OpenAI，你可以直接复用官方 <code>openai</code> SDK，只需把 <code>base_url</code> 指向 DeepSeek。</p>
+
+    <h3>方式一：使用 OpenAI SDK（推荐）</h3>
+    <pre><code><span class="tok-key">from</span> openai <span class="tok-key">import</span> OpenAI
+
+client = OpenAI(
+    api_key=<span class="tok-str">"你的 DeepSeek API Key"</span>,
+    base_url=<span class="tok-str">"https://api.deepseek.com/v1"</span>,
+)
+
+response = client.chat.completions.create(
+    model=<span class="tok-str">"deepseek-v4-flash"</span>,
+    messages=[
+        {<span class="tok-str">"role"</span>: <span class="tok-str">"system"</span>, <span class="tok-str">"content"</span>: <span class="tok-str">"你是一个专业的 Python 工程师。"</span>},
+        {<span class="tok-str">"role"</span>: <span class="tok-str">"user"</span>, <span class="tok-str">"content"</span>: <span class="tok-str">"写一个快速排序函数并解释原理。"</span>},
+    ],
+    temperature=<span class="tok-num">0.7</span>,
+)
+
+<span class="tok-fn">print</span>(response.choices[<span class="tok-num">0</span>].message.content)</code></pre>
+
+    <h3>方式二：使用 requests 库</h3>
+    <p>如果不想引入额外依赖，用标准 <code>requests</code> 库同样可以：</p>
+
+    <pre><code><span class="tok-key">import</span> requests
+
+url = <span class="tok-str">"https://api.deepseek.com/v1/chat/completions"</span>
+headers = {
+    <span class="tok-str">"Content-Type"</span>: <span class="tok-str">"application/json"</span>,
+    <span class="tok-str">"Authorization"</span>: <span class="tok-str">f"Bearer 你的API Key"</span>,
+}
+payload = {
+    <span class="tok-str">"model"</span>: <span class="tok-str">"deepseek-v4-flash"</span>,
+    <span class="tok-str">"messages"</span>: [
+        {<span class="tok-str">"role"</span>: <span class="tok-str">"user"</span>, <span class="tok-str">"content"</span>: <span class="tok-str">"用三句话介绍 DeepSeek。"</span>}
+    ],
+}
+
+resp = requests.post(url, headers=headers, json=payload, timeout=<span class="tok-num">60</span>)
+resp.raise_for_status()
+<span class="tok-fn">print</span>(resp.json()[<span class="tok-str">"choices"</span>][<span class="tok-num">0</span>][<span class="tok-str">"message"</span>][<span class="tok-str">"content"</span>])</code></pre>
+
+    <h2>五、流式输出（Streaming）</h2>
+    <p>对于聊天类应用，流式输出能显著改善用户体验——模型一边生成一边返回，用户不用干等整段结果。只需在请求里加上 <code>"stream": true</code>。</p>
+
+    <pre><code><span class="tok-key">from</span> openai <span class="tok-key">import</span> OpenAI
+
+client = OpenAI(
+    api_key=<span class="tok-str">"你的 DeepSeek API Key"</span>,
+    base_url=<span class="tok-str">"https://api.deepseek.com/v1"</span>,
+)
+
+stream = client.chat.completions.create(
+    model=<span class="tok-str">"deepseek-v4-flash"</span>,
+    messages=[{<span class="tok-str">"role"</span>: <span class="tok-str">"user"</span>, <span class="tok-str">"content"</span>: <span class="tok-str">"讲一个关于程序员的冷笑话。"</span>}],
+    stream=<span class="tok-key">True</span>,
+)
+
+<span class="tok-key">for</span> chunk <span class="tok-key">in</span> stream:
+    delta = chunk.choices[<span class="tok-num">0</span>].delta.content
+    <span class="tok-key">if</span> delta:
+        <span class="tok-fn">print</span>(delta, end=<span class="tok-str">""</span>, flush=<span class="tok-key">True</span>)</code></pre>
+
+    <p>流式模式下，每个 chunk 的 <code>delta.content</code> 是增量文本，拼接起来就是完整回答。注意 V4-Pro 模型流式输出时，思考过程会通过 <code>delta.reasoning_content</code> 单独推送，最终答案走 <code>delta.content</code>，处理时要注意区分。</p>
+
+    <h2>六、价格对比：为什么 DeepSeek 值得关注</h2>
+    <p>DeepSeek 最大的吸引力在于价格。以下是其官方定价与同类模型的量级对比（价格可能随官方调整，以官网为准）：</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>模型</th>
+          <th>输入价格（每百万 token）</th>
+          <th>输出价格（每百万 token）</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>DeepSeek V4-Flash</td>
+          <td>约 ¥1（$0.14）</td>
+          <td>约 ¥2（$0.28）</td>
+        </tr>
+        <tr>
+          <td>DeepSeek V4-Pro（促销价）</td>
+          <td>约 ¥3（$0.435）</td>
+          <td>约 ¥6（$0.87）</td>
+        </tr>
+        <tr>
+          <td>GPT-5.5（参考）</td>
+          <td>约 ¥18</td>
+          <td>约 ¥72</td>
+        </tr>
+        <tr>
+          <td>Claude Sonnet 4.6（参考）</td>
+          <td>约 ¥21</td>
+          <td>约 ¥105</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>可以看出，DeepSeek V4-Flash 的输入价格大约只有 GPT-5.5 的十八分之一，输出价格约三十六分之一，是业界最便宜的大模型之一。对于高并发的应用——比如客服机器人、内容生成流水线、批量数据处理——这个价差会直接转化为可观的利润空间。</p>
+    <p>DeepSeek 还有一个独特优势：<strong>上下文缓存（Context Caching）</strong>。当你重复发送相同的前缀（比如固定的 system prompt 或长文档），命中缓存后输入价格直接减半。这对多轮对话和 RAG 场景特别友好。</p>
+
+    <h2>七、通过 EnlyAI 统一调用 DeepSeek</h2>
+    <p>直接对接 DeepSeek 官方 API 有几个现实痛点：需要单独注册和充值、要管理多套 Key、切换模型时要改代码、官方平台偶尔有波动。如果你的应用同时还要用 GPT-5.5 或 Claude，多账号管理的负担会更明显。</p>
+    <p>EnlyAI 这类 LLM API 聚合平台解决的就是这个问题。它把 DeepSeek、OpenAI、Claude、Gemini 等多家模型统一到一套 OpenAI 兼容接口下，你只需要一个 Key、一个 <code>base_url</code>，就能在所有模型间自由切换。</p>
+
+    <p>通过 EnlyAI 调用 DeepSeek，代码几乎不用改，只换 <code>base_url</code> 和 Key：</p>
+
+    <pre><code><span class="tok-key">from</span> openai <span class="tok-key">import</span> OpenAI
+
+client = OpenAI(
+    api_key=<span class="tok-str">"你的 EnlyAI API Key"</span>,
+    base_url=<span class="tok-str">"https://enlyai.com/v1"</span>,
+)
+
+response = client.chat.completions.create(
+    model=<span class="tok-str">"deepseek-v4-flash"</span>,
+    messages=[{<span class="tok-str">"role"</span>: <span class="tok-str">"user"</span>, <span class="tok-str">"content"</span>: <span class="tok-str">"你好，介绍一下你自己。"</span>}],
+)
+<span class="tok-fn">print</span>(response.choices[<span class="tok-num">0</span>].message.content)</code></pre>
+
+    <p>这样做的好处是显而易见的：</p>
+    <ul>
+      <li><strong>一个 Key 管所有模型</strong>，不用在多家平台分别注册充值；</li>
+      <li><strong>统一计费和账单</strong>，成本一目了然，方便做预算控制；</li>
+      <li><strong>模型随时切换</strong>，把 <code>model</code> 从 <code>deepseek-v4-flash</code> 改成 <code>gpt-5.5</code> 就能换模型，业务代码零改动；</li>
+      <li><strong>多渠道容灾</strong>，单一上游波动时自动切换，稳定性更高。</li>
+    </ul>
+
+    <h2>八、常见问题</h2>
+
+    <h3>DeepSeek V4-Flash 和 V4-Pro 能不能在一次请求里混用？</h3>
+    <p>不能。每次请求只能指定一个 <code>model</code>。如果你想让 V4-Pro 先思考再交给 V4-Flash 润色，需要分两次调用：先用 V4-Pro 生成推理结果，再把结果作为上下文传给 V4-Flash 做格式化输出。</p>
+
+    <h3>V4-Pro 的思考过程会收费吗？</h3>
+    <p>会。V4-Pro 输出的 <code>reasoning_content</code> 也算输出 token，按输出价格计费。所以对于简单问题不要滥用 V4-Pro，否则成本会明显高于 V4-Flash。</p>
+
+    <h3>DeepSeek 支持函数调用（Function Calling）吗？</h3>
+    <p>支持。DeepSeek V4-Flash 兼容 OpenAI 的 function calling 格式，可以定义 tools 让模型调用外部函数。V4-Pro 目前对函数调用的支持有限，建议工具调用场景优先用 V4-Flash。</p>
+
+    <h3>国内访问 DeepSeek API 稳定吗？</h3>
+    <p>DeepSeek 是国产模型，国内直连延迟低、无需代理。但在高峰期偶尔会出现排队或限流，对延迟敏感的生产应用建议通过聚合平台做多渠道容灾，避免单点依赖。</p>
+
+    <h2>九、总结</h2>
+    <p>DeepSeek 用「接近旗舰的能力 + 极低的价格 + OpenAI 兼容接口」三张牌，在国产大模型里站稳了脚跟。日常应用选 V4-Flash，复杂推理选 V4-Pro，再配合上下文缓存进一步压低成本，是当前性价比很高的组合。而如果你同时还要用到 GPT-5.5、Claude 等海外模型，通过 EnlyAI 统一接入能省去大量账号管理和代码切换的麻烦，让模型选型真正变成一行配置的事。</p>
+
+    <div class="cta">
+      <h3>一个 Key，调用 DeepSeek 与全球模型</h3>
+      <p>EnlyAI 把 DeepSeek、OpenAI、Claude、Gemini 聚合到统一接口，兼容 OpenAI SDK，改一行 <code>base_url</code> 即可在所有模型间自由切换。注册即享免费试用。</p>
+      <a class="cta-btn" href="https://enlyai.com">免费注册 EnlyAI →</a>
+    </div>
+    <section class="related-posts">
+      <h2>相关文章推荐</h2>
+      <div class="related-grid">
+        <a href="/blog/openai-api-alternatives.html" class="related-card"><span class="related-title">OpenAI API替代方案：更便宜的选择</span><span class="related-arrow">→</span></a><a href="/blog/claude-api-tutorial.html" class="related-card"><span class="related-title">Claude API使用教程：从注册到调用</span><span class="related-arrow">→</span></a><a href="/blog/gemini-api-guide.html" class="related-card"><span class="related-title">Gemini API入门指南：Google AI接入</span><span class="related-arrow">→</span></a><a href="/blog/llm-api-cost-optimization.html" class="related-card"><span class="related-title">LLM API成本对比与省钱技巧</span><span class="related-arrow">→</span></a>
+      </div>
+    </section>
+
+  </article>
+
+  <footer>
+    <div>© 2026 EnlyAI · <a href="https://enlyai.com">enlyai.com</a></div>
+    <div style="margin-top:6px;"><a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener">粤ICP备2026055772号-1</a></div>
+  </footer>
+</body>
+</html>

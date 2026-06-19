@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API流式输出实现：SSE与WebSocket详解 | EnlyAI 博客</title>
+    <meta name="description" content="详解 API 流式输出的实现方式，包括 SSE 和 WebSocket 的对比与代码示例，教你用 Python 和 FastAPI 搭建 LLM 流式响应接口。">
+    <meta name="keywords" content="API 流式输出, SSE, Server-Sent Events, LLM 流式响应">
+    <meta name="author" content="EnlyAI">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://enlyai.com/blog/api-streaming-guide.html">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="API流式输出实现：SSE与WebSocket详解">
+    <meta property="og:description" content="详解 API 流式输出的实现方式，包括 SSE 和 WebSocket 的对比与代码示例，教你搭建 LLM 流式响应接口。">
+    <meta property="og:url" content="https://enlyai.com/blog/api-streaming-guide.html">
+    <meta property="og:site_name" content="EnlyAI">
+    <meta property="og:locale" content="zh_CN">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="API流式输出实现：SSE与WebSocket详解">
+    <meta name="twitter:description" content="详解 API 流式输出的实现方式，包括 SSE 和 WebSocket 的对比与代码示例。">
+
+    <!-- Schema.org 结构化数据 -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "headline": "API流式输出实现：SSE与WebSocket详解",
+        "description": "详解 API 流式输出的实现方式，包括 SSE 和 WebSocket 的对比与代码示例，教你用 Python 和 FastAPI 搭建 LLM 流式响应接口。",
+        "keywords": "API 流式输出, SSE, Server-Sent Events, LLM 流式响应",
+        "author": {
+            "@type": "Organization",
+            "name": "EnlyAI",
+            "url": "https://enlyai.com"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "EnlyAI",
+            "url": "https://enlyai.com"
+        },
+        "datePublished": "2026-06-18",
+        "dateModified": "2026-06-18",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https://enlyai.com/blog/api-streaming-guide.html"
+        }
+    }
+    </script>
+
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #dbeafe;
+            --text: #1f2937;
+            --text-light: #6b7280;
+            --bg: #ffffff;
+            --bg-soft: #f9fafb;
+            --border: #e5e7eb;
+            --code-bg: #1e293b;
+            --code-text: #e2e8f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            color: var(--text);
+            background: var(--bg);
+            line-height: 1.8;
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .top-nav {
+            background: #fff;
+            border-bottom: 1px solid var(--border);
+            padding: 14px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: saturate(180%) blur(8px);
+            background: rgba(255, 255, 255, 0.92);
+        }
+
+        .top-nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .back-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 15px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .back-link:hover {
+            color: var(--primary-dark);
+        }
+
+        .brand {
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--text);
+            text-decoration: none;
+            letter-spacing: -0.3px;
+        }
+
+        .brand span {
+            color: var(--primary);
+        }
+
+        article {
+            padding: 40px 0 60px;
+        }
+
+        .article-meta {
+            color: var(--text-light);
+            font-size: 14px;
+            margin-bottom: 16px;
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .tag {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        h1 {
+            font-size: 34px;
+            line-height: 1.3;
+            font-weight: 800;
+            margin-bottom: 20px;
+            letter-spacing: -0.5px;
+            color: #111827;
+        }
+
+        h2 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 40px 0 16px;
+            color: #111827;
+            padding-top: 8px;
+            border-top: 1px solid var(--border);
+        }
+
+        h3 {
+            font-size: 19px;
+            font-weight: 600;
+            margin: 24px 0 12px;
+            color: #1f2937;
+        }
+
+        p {
+            margin-bottom: 18px;
+            color: var(--text);
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        ul, ol {
+            margin: 0 0 18px 22px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        strong {
+            color: #111827;
+            font-weight: 600;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            background: var(--bg-soft);
+            padding: 14px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+            color: var(--text-light);
+        }
+
+        blockquote p {
+            margin-bottom: 0;
+        }
+
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 20px 22px;
+            border-radius: 10px;
+            overflow-x: auto;
+            margin: 18px 0;
+            font-size: 14px;
+            line-height: 1.65;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+        }
+
+        code {
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+        }
+
+        p code, li code {
+            background: #f1f5f9;
+            color: #be185d;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        /* 语法高亮 */
+        .k { color: #c084fc; }   /* keyword */
+        .s { color: #86efac; }   /* string */
+        .c { color: #64748b; font-style: italic; }  /* comment */
+        .n { color: #fbbf24; }   /* number */
+        .f { color: #60a5fa; }   /* function */
+        .o { color: #f472b6; }   /* operator */
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 15px;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 10px 14px;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-soft);
+            font-weight: 600;
+        }
+
+        .cta {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: #fff;
+            padding: 36px 30px;
+            border-radius: 14px;
+            margin: 40px 0 20px;
+            text-align: center;
+        }
+
+        .cta h3 {
+            color: #fff;
+            margin-top: 0;
+            font-size: 22px;
+        }
+
+        .cta p {
+            color: rgba(255, 255, 255, 0.92);
+            margin-bottom: 22px;
+        }
+
+        .cta-btn {
+            display: inline-block;
+            background: #fff;
+            color: var(--primary);
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            text-decoration: none;
+            transition: transform 0.15s ease;
+        }
+
+        .cta-btn:hover {
+            text-decoration: none;
+            transform: translateY(-2px);
+        }
+
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 24px 0;
+            text-align: center;
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        footer a {
+            color: var(--text-light);
+        }
+
+        footer a:hover {
+            color: var(--primary);
+        }
+
+        .icp {
+            margin-top: 6px;
+            font-size: 13px;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 26px; }
+            h2 { font-size: 21px; }
+            pre { font-size: 13px; padding: 16px; }
+            .container { padding: 0 16px; }
+        }
+    
+    .related-posts {
+      margin-top: 48px;
+      padding-top: 32px;
+      border-top: 2px solid #e5e7eb;
+    }
+    .related-posts h2 {
+      font-size: 1.4rem;
+      margin-bottom: 20px;
+      color: #111827;
+    }
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .related-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      text-decoration: none;
+      color: #374151;
+      transition: all 0.2s;
+      font-size: 0.95rem;
+      line-height: 1.4;
+    }
+    .related-card:hover {
+      background: #eff6ff;
+      border-color: #2563eb;
+      color: #2563eb;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+    }
+    .related-title {
+      flex: 1;
+      padding-right: 12px;
+    }
+    .related-arrow {
+      color: #9ca3af;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .related-card:hover .related-arrow {
+      color: #2563eb;
+    }
+
+  </style>
+</head>
+<body>
+    <nav class="top-nav">
+        <div class="container">
+            <a href="https://enlyai.com" class="brand">Enly<span>AI</span></a>
+            <a href="https://enlyai.com" class="back-link">← 返回首页</a>
+        </div>
+    </nav>
+
+    <article>
+        <div class="container">
+            <div class="article-meta">
+                <span class="tag">流式输出</span>
+                <span class="tag">SSE</span>
+                <span>2026-06-18</span>
+                <span>阅读约 14 分钟</span>
+            </div>
+
+            <h1>API流式输出实现：SSE与WebSocket详解</h1>
+
+            <p>用过 ChatGPT 的人都会注意到一个细节：回答不是一次性出现的，而是一个字一个字地“吐”出来。这种体验远比“等 10 秒后一次性显示全部内容”要好——用户能立刻看到模型在工作，感知等待时间大幅缩短。这种“边生成边返回”的机制，就是<strong>流式输出（Streaming）</strong>。</p>
+
+            <p>在 LLM 应用中，流式输出几乎成了标配。但实现流式有两种主流方案：<strong>SSE（Server-Sent Events）</strong> 和 <strong>WebSocket</strong>。它们各有适用场景，选错了会让架构变得复杂。本文会从原理讲到代码，帮你彻底搞懂这两种方案，并演示如何用 EnlyAI 统一 API 搭建一个流式聊天接口。</p>
+
+            <h2>一、为什么需要流式输出</h2>
+
+            <p>先理解一个关键概念：<strong>首字延迟（Time To First Token, TTFT）</strong>。它衡量的是用户发出请求后，看到第一个字符需要等多久。</p>
+
+            <p>传统非流式调用的工作流程是：用户请求 → 模型生成完整回复 → 一次性返回。如果模型要生成 800 字，可能需要 8 秒，用户在这 8 秒里只能盯着 loading 转圈。而流式调用是：用户请求 → 模型每生成一个 token 就立即推送 → 用户边看边等。虽然总耗时差不多，但首字延迟从 8 秒降到了 0.3 秒，体验天差地别。</p>
+
+            <p>流式输出对 LLM 应用尤其重要，原因有三：</p>
+            <ul>
+                <li><strong>LLM 生成是自回归的</strong>：每个 token 都依赖前一个，天然适合“边算边吐”。</li>
+                <li><strong>长回复很常见</strong>：一篇 2000 字的文章，非流式要等 20 秒，用户会以为卡死了。</li>
+                <li><strong>可随时中断</strong>：用户觉得方向不对可以随时停止，省 token。</li>
+            </ul>
+
+            <h2>二、SSE：服务器发送事件</h2>
+
+            <p>SSE（Server-Sent Events）是基于 HTTP 的单向流式协议。服务器通过一个持久的 HTTP 连接，持续向客户端推送数据。它是 HTML5 标准的一部分，浏览器原生支持。</p>
+
+            <p>SSE 的核心特点：</p>
+            <ul>
+                <li><strong>单向通信</strong>：只能服务器 → 客户端，客户端不能通过同一连接发数据。</li>
+                <li><strong>基于 HTTP</strong>：使用普通 HTTP 协议，走 80/443 端口，对基础设施友好。</li>
+                <li><strong>自动重连</strong>：浏览器断线后会自动重连，并带上 <code>Last-Event-ID</code> 头。</li>
+                <li><strong>文本协议</strong>：数据格式是纯文本，以 <code>data:</code> 开头，两个换行表示一条消息结束。</li>
+            </ul>
+
+            <p>一个典型的 SSE 响应长这样：</p>
+
+            <pre><code><span class="c">HTTP/1.1 200 OK</span>
+Content-Type: text/event-stream
+Cache-Control: no-cache
+Connection: keep-alive
+
+data: {"token": "你"}
+
+data: {"token": "好"}
+
+data: {"token": "，"}
+
+data: [DONE]</pre></code>
+
+            <p>每条消息以 <code>data:</code> 开头，后面跟 JSON 或纯文本，两个换行符分隔。客户端用 <code>EventSource</code> API 接收：</p>
+
+            <pre><code><span class="c">// 浏览器原生 SSE 客户端</span>
+<span class="k">const</span> source = <span class="k">new</span> <span class="f">EventSource</span>(<span class="s">"/api/chat?msg=你好"</span>);
+
+source.onmessage = (event) => {
+    <span class="k">if</span> (event.data === <span class="s">"[DONE]"</span>) {
+        source.close();
+        <span class="k">return</span>;
+    }
+    <span class="k">const</span> data = <span class="f">JSON.parse</span>(event.data);
+    <span class="f">console.log</span>(data.token);  <span class="c">// 逐字输出</span>
+};
+
+source.onerror = () => {
+    source.close();
+};</code></pre>
+
+            <h2>三、WebSocket：双向通信</h2>
+
+            <p>WebSocket 是一种全双工通信协议，建立在 TCP 之上。连接建立后，客户端和服务器可以随时互相发消息，不受请求-响应模式限制。</p>
+
+            <p>WebSocket 的核心特点：</p>
+            <ul>
+                <li><strong>双向通信</strong>：客户端和服务器都能主动推送消息。</li>
+                <li><strong>独立协议</strong>：握手后从 HTTP 升级为 WebSocket 协议（<code>ws://</code> 或 <code>wss://</code>）。</li>
+                <li><strong>低开销</strong>：握手后帧头很小，适合高频消息。</li>
+                <li><strong>需手动管理重连</strong>：断线后不会自动恢复，要自己写重连逻辑。</li>
+            </ul>
+
+            <p>WebSocket 适合需要双向实时交互的场景，比如在线协作、多人游戏、实时聊天室。但对于“客户端发一个问题、服务器流式返回答案”这种单向场景，WebSocket 有点大材小用。</p>
+
+            <h2>四、SSE vs WebSocket：如何选择</h2>
+
+            <p>这是开发者最常问的问题。结论是：<strong>对于 LLM 流式响应，绝大多数情况选 SSE</strong>。下面这张表帮你理清两者的差异：</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>维度</th>
+                        <th>SSE</th>
+                        <th>WebSocket</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>通信方向</td>
+                        <td>服务器 → 客户端（单向）</td>
+                        <td>双向</td>
+                    </tr>
+                    <tr>
+                        <td>底层协议</td>
+                        <td>HTTP</td>
+                        <td>TCP（握手时借用 HTTP）</td>
+                    </tr>
+                    <tr>
+                        <td>浏览器支持</td>
+                        <td>原生 EventSource API</td>
+                        <td>原生 WebSocket API</td>
+                    </tr>
+                    <tr>
+                        <td>自动重连</td>
+                        <td>是</td>
+                        <td>否（需手动实现）</td>
+                    </tr>
+                    <tr>
+                        <td>代理/CDN 兼容</td>
+                        <td>好（就是 HTTP）</td>
+                        <td>需特殊配置</td>
+                    </tr>
+                    <tr>
+                        <td>适合 LLM 流式</td>
+                        <td>✅ 非常适合</td>
+                        <td>可以，但偏重</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p>OpenAI 的官方 API 用的就是 SSE——你在请求里加 <code>"stream": true</code>，返回的就是 <code>text/event-stream</code> 格式。EnlyAI 完全兼容这个格式，所以接入零成本。</p>
+
+            <blockquote>
+                <p>选型建议：如果你的场景是“用户提问 → 模型流式回答”，用 SSE。如果是“多人实时协作编辑”或“语音对话”，才考虑 WebSocket。</p>
+            </blockquote>
+
+            <h2>五、用 Python 调用流式 API</h2>
+
+            <p>先看最基础的：用 OpenAI SDK 调用 EnlyAI 的流式接口。EnlyAI 完全兼容 OpenAI API 格式，base URL 是 <code>https://enlyai.com/v1</code>。</p>
+
+            <pre><code><span class="k">from</span> openai <span class="k">import</span> OpenAI
+
+client = OpenAI(
+    api_key=<span class="s">"sk-your-enlyai-key"</span>,
+    base_url=<span class="s">"https://enlyai.com/v1"</span>
+)
+
+stream = client.chat.completions.create(
+    model=<span class="s">"gpt-5.4-mini"</span>,
+    messages=[{<span class="s">"role"</span>: <span class="s">"user"</span>, <span class="s">"content"</span>: <span class="s">"讲一个 300 字的科幻小故事"</span>}],
+    stream=<span class="k">True</span>
+)
+
+<span class="k">for</span> chunk <span class="k">in</span> stream:
+    delta = chunk.choices[<span class="n">0</span>].delta.content
+    <span class="k">if</span> delta:
+        <span class="f">print</span>(delta, end=<span class="s">""</span>, flush=<span class="k">True</span>)</code></pre>
+
+            <p>对应的 cURL 命令，可以直接在终端测试流式效果：</p>
+
+            <pre><code>curl https://enlyai.com/v1/chat/completions \
+  -H <span class="s">"Authorization: Bearer sk-your-enlyai-key"</span> \
+  -H <span class="s">"Content-Type: application/json"</span> \
+  -N \
+  -d <span class="s">'{
+    "model": "gpt-5.4-mini",
+    "messages": [{"role": "user", "content": "讲一个 300 字的科幻小故事"}],
+    "stream": true
+  }'</span></code></pre>
+
+            <p><code>-N</code> 参数禁用 curl 的缓冲，让你能实时看到流式输出。你会看到类似这样的数据一块一块地返回：</p>
+
+            <pre><code>data: {"id":"chatcmpl-xxx","choices":[{"delta":{"content":"在"},"index":0}]}
+
+data: {"id":"chatcmpl-xxx","choices":[{"delta":{"content":"一"},"index":0}]}
+
+data: {"id":"chatcmpl-xxx","choices":[{"delta":{"content":"个"},"index":0}]}
+
+data: [DONE]</code></pre>
+
+            <h2>六、用 FastAPI 搭建 SSE 流式接口</h2>
+
+            <p>实际项目中，你通常需要在自己的后端包一层，把 LLM 的流式输出转发给前端。FastAPI 对 SSE 有很好的支持，下面是一个完整示例：</p>
+
+            <pre><code><span class="k">from</span> fastapi <span class="k">import</span> FastAPI
+<span class="k">from</span> fastapi.responses <span class="k">import</span> StreamingResponse
+<span class="k">from</span> pydantic <span class="k">import</span> BaseModel
+<span class="k">from</span> openai <span class="k">import</span> OpenAI
+<span class="k">import</span> json
+
+app = FastAPI()
+client = OpenAI(
+    api_key=<span class="s">"sk-your-enlyai-key"</span>,
+    base_url=<span class="s">"https://enlyai.com/v1"</span>
+)
+
+<span class="k">class</span> <span class="f">ChatRequest</span>(BaseModel):
+    message: <span class="k">str</span>
+    model: <span class="k">str</span> = <span class="s">"gpt-5.4-mini"</span>
+
+<span class="k">def</span> <span class="f">sse_format</span>(data: <span class="k">str</span>) -> <span class="k">str</span>:
+    <span class="s">"""把数据包装成 SSE 格式"""</span>
+    <span class="k">return</span> <span class="s">f"data: {data}\n\n"</span>
+
+<span class="k">def</span> <span class="f">stream_generator</span>(message: <span class="k">str</span>, model: <span class="k">str</span>):
+    <span class="s">"""调用 EnlyAI 流式接口并转发"""</span>
+    stream = client.chat.completions.create(
+        model=model,
+        messages=[{<span class="s">"role"</span>: <span class="s">"user"</span>, <span class="s">"content"</span>: message}],
+        stream=<span class="k">True</span>
+    )
+    <span class="k">for</span> chunk <span class="k">in</span> stream:
+        delta = chunk.choices[<span class="n">0</span>].delta.content
+        <span class="k">if</span> delta:
+            <span class="k">yield</span> <span class="f">sse_format</span>(<span class="f">json.dumps</span>({<span class="s">"token"</span>: delta}))
+    <span class="k">yield</span> <span class="f">sse_format</span>(<span class="s">"[DONE]"</span>)
+
+@app.post(<span class="s">"/api/chat"</span>)
+<span class="k">async def</span> <span class="f">chat</span>(req: ChatRequest):
+    <span class="k">return</span> StreamingResponse(
+        <span class="f">stream_generator</span>(req.message, req.model),
+        media_type=<span class="s">"text/event-stream"</span>,
+        headers={
+            <span class="s">"Cache-Control"</span>: <span class="s">"no-cache"</span>,
+            <span class="s">"Connection"</span>: <span class="s">"keep-alive"</span>,
+            <span class="s">"X-Accel-Buffering"</span>: <span class="s">"no"</span>,  <span class="c"># 禁用 Nginx 缓冲</span>
+        }
+    )</code></pre>
+
+            <p>启动服务后，前端用 <code>EventSource</code> 或 <code>fetch</code> 就能消费这个接口。注意 <code>X-Accel-Buffering: no</code> 这个 header 很关键——如果后端前面有 Nginx，不加这个会导致 Nginx 把流式数据缓冲成一整块再转发，流式效果就没了。</p>
+
+            <h2>七、前端消费 SSE 流</h2>
+
+            <p>浏览器原生的 <code>EventSource</code> 只支持 GET 请求，而我们的接口是 POST。这时可以用 <code>fetch</code> 配合 <code>ReadableStream</code> 手动解析 SSE：</p>
+
+            <pre><code><span class="k">async function</span> <span class="f">streamChat</span>(message) {
+    <span class="k">const</span> response = <span class="k">await</span> <span class="f">fetch</span>(<span class="s">"/api/chat"</span>, {
+        method: <span class="s">"POST"</span>,
+        headers: { <span class="s">"Content-Type"</span>: <span class="s">"application/json"</span> },
+        body: <span class="f">JSON.stringify</span>({ message })
+    });
+
+    <span class="k">const</span> reader = response.body.getReader();
+    <span class="k">const</span> decoder = <span class="k">new</span> <span class="f">TextDecoder</span>();
+    <span class="k">let</span> buffer = <span class="s">""</span>;
+
+    <span class="k">while</span> (<span class="k">true</span>) {
+        <span class="k">const</span> { done, value } = <span class="k">await</span> reader.read();
+        <span class="k">if</span> (done) <span class="k">break</span>;
+
+        buffer += decoder.decode(value, { stream: <span class="k">true</span> });
+        <span class="k">const</span> lines = buffer.split(<span class="s">"\n\n"</span>);
+        buffer = lines.pop();  <span class="c">// 保留不完整的部分</span>
+
+        <span class="k">for</span> (<span class="k">const</span> line <span class="k">of</span> lines) {
+            <span class="k">if</span> (!line.startsWith(<span class="s">"data: "</span>)) <span class="k">continue</span>;
+            <span class="k">const</span> data = line.slice(<span class="n">6</span>);
+            <span class="k">if</span> (data === <span class="s">"[DONE]"</span>) <span class="k">return</span>;
+            <span class="k">const</span> { token } = <span class="f">JSON.parse</span>(data);
+            <span class="f">console.log</span>(token);  <span class="c">// 逐字输出到页面</span>
+        }
+    }
+}</code></pre>
+
+            <p>这段代码的核心是：用 <code>ReadableStream</code> 读取响应体，按 <code>\n\n</code> 分割成完整的 SSE 事件，再解析每个事件的 <code>data</code> 字段。</p>
+
+            <h2>八、WebSocket 实现示例</h2>
+
+            <p>虽然 LLM 流式更推荐 SSE，但如果你确实需要双向通信（比如语音对话、实时协作），WebSocket 也能做。下面用 FastAPI 的 WebSocket 支持演示：</p>
+
+            <pre><code><span class="k">from</span> fastapi <span class="k">import</span> FastAPI, WebSocket
+<span class="k">from</span> openai <span class="k">import</span> OpenAI
+<span class="k">import</span> json
+
+app = FastAPI()
+client = OpenAI(
+    api_key=<span class="s">"sk-your-enlyai-key"</span>,
+    base_url=<span class="s">"https://enlyai.com/v1"</span>
+)
+
+@app.websocket(<span class="s">"/ws/chat"</span>)
+<span class="k">async def</span> <span class="f">websocket_chat</span>(ws: WebSocket):
+    <span class="k">await</span> ws.accept()
+    <span class="k">try</span>:
+        <span class="k">while</span> <span class="k">True</span>:
+            <span class="c"># 接收客户端消息</span>
+            data = <span class="k">await</span> ws.receive_json()
+            message = data.get(<span class="s">"message"</span>, <span class="s">""</span>)
+
+            <span class="c"># 调用 EnlyAI 流式接口</span>
+            stream = client.chat.completions.create(
+                model=<span class="s">"gpt-5.4-mini"</span>,
+                messages=[{<span class="s">"role"</span>: <span class="s">"user"</span>, <span class="s">"content"</span>: message}],
+                stream=<span class="k">True</span>
+            )
+            <span class="k">for</span> chunk <span class="k">in</span> stream:
+                delta = chunk.choices[<span class="n">0</span>].delta.content
+                <span class="k">if</span> delta:
+                    <span class="k">await</span> ws.send_json({<span class="s">"token"</span>: delta})
+            <span class="k">await</span> ws.send_json({<span class="s">"done"</span>: <span class="k">True</span>})
+    <span class="k">except</span> Exception:
+        <span class="k">pass</span>
+    <span class="k">finally</span>:
+        <span class="k">await</span> ws.close()</code></pre>
+
+            <p>WebSocket 的优势在这个场景体现得很明显：连接建立后，客户端可以连续发多条消息，不用每次都重新建连。但代价是你要自己处理心跳、重连、消息序号等细节。</p>
+
+            <h2>九、生产环境注意事项</h2>
+
+            <p>把流式接口推向生产，有几个坑必须提前知道：</p>
+
+            <ol>
+                <li><strong>禁用反向代理缓冲</strong>：Nginx 默认会缓冲响应体，必须在 location 里加 <code>proxy_buffering off;</code>，或在响应头加 <code>X-Accel-Buffering: no</code>，否则流式会变成“一次性返回”。</li>
+                <li><strong>设置合理的超时</strong>：LLM 生成长文本可能需要 30-60 秒，Nginx 的 <code>proxy_read_timeout</code> 默认 60 秒，长回复可能超时，建议调到 120 秒以上。</li>
+                <li><strong>处理客户端断开</strong>：用户关掉页面后，后端要能感知并停止调用 LLM，否则会白白烧 token。FastAPI 里可以用 <code>asyncio.CancelledError</code> 捕获。</li>
+                <li><strong>用异步提升并发</strong>：同步 SDK 会阻塞事件循环，高并发场景务必用 <code>AsyncOpenAI</code> 和 <code>async for</code>。</li>
+                <li><strong>前端做断线重连</strong>：SSE 虽然自动重连，但重连后要能接着上次的断点继续，可以用 <code>Last-Event-ID</code> 实现。</li>
+            </ol>
+
+            <h2>十、用 EnlyAI 统一 API 实现流式</h2>
+
+            <p>前面所有代码都用了 <code>gpt-5.4-mini</code>，但 EnlyAI 的价值在于<strong>一套接口、多种模型</strong>。你只需要改 <code>model</code> 字段，就能在 GPT、Claude、Gemini 之间切换，流式格式完全一致：</p>
+
+            <pre><code><span class="k">from</span> openai <span class="k">import</span> OpenAI
+
+client = OpenAI(
+    api_key=<span class="s">"sk-your-enlyai-key"</span>,
+    base_url=<span class="s">"https://enlyai.com/v1"</span>
+)
+
+<span class="c"># 同一套流式代码，只改 model 即可切换</span>
+<span class="k">for</span> model <span class="k">in</span> [<span class="s">"gpt-5.4-mini"</span>, <span class="s">"claude-sonnet-4-6"</span>, <span class="s">"gemini-3.5-flash"</span>]:
+    <span class="f">print</span>(<span class="s">f"\n=== {model} ==="</span>)
+    stream = client.chat.completions.create(
+        model=model,
+        messages=[{<span class="s">"role"</span>: <span class="s">"user"</span>, <span class="s">"content"</span>: <span class="s">"用一句话介绍自己"</span>}],
+        stream=<span class="k">True</span>
+    )
+    <span class="k">for</span> chunk <span class="k">in</span> stream:
+        delta = chunk.choices[<span class="n">0</span>].delta.content
+        <span class="k">if</span> delta:
+            <span class="f">print</span>(delta, end=<span class="s">""</span>, flush=<span class="k">True</span>)</code></pre>
+
+            <p>统一 API 的好处在流式场景下更加明显：</p>
+            <ul>
+                <li><strong>故障转移</strong>：某个模型流式服务波动时，改一个字符串就能切到备用模型，前端代码不用动。</li>
+                <li><strong>统一计费</strong>：所有模型的流式调用汇总在一个账单，token 消耗一目了然。</li>
+                <li><strong>一致的开发体验</strong>：不用为每个模型学一套流式 SDK，OpenAI 格式通吃。</li>
+            </ul>
+
+            <h2>总结</h2>
+
+            <p>流式输出是 LLM 应用的体验分水岭。在技术选型上，记住一个原则：<strong>单向流式选 SSE，双向实时选 WebSocket</strong>。对于绝大多数“用户提问、模型流式回答”的场景，SSE 是更轻量、更兼容、更省心的选择——这也是 OpenAI 和 EnlyAI 官方 API 采用的方案。</p>
+
+            <p>实现层面，FastAPI + OpenAI SDK（指向 EnlyAI）+ 前端 fetch/ReadableStream，是一套经过验证的成熟组合。把 Nginx 缓冲关掉、超时调大、断开处理好，你的流式聊天接口就能稳定上线了。</p>
+
+            <div class="cta">
+                <h3>想用一套 API 实现多模型流式输出？</h3>
+                <p>EnlyAI 提供 OpenAI 兼容的统一流式接口，支持 GPT、Claude、Gemini 等数十种模型，注册即送免费额度，只需改 base_url 即可接入。</p>
+                <a href="https://enlyai.com" class="cta-btn">立即注册 EnlyAI →</a>
+            </div>
+        </div>
+    <section class="related-posts">
+      <h2>相关文章推荐</h2>
+      <div class="related-grid">
+        <a href="/blog/python-llm-api-tutorial.html" class="related-card"><span class="related-title">用Python调用LLM API的5种方式</span><span class="related-arrow">→</span></a><a href="/blog/langchain-tutorial.html" class="related-card"><span class="related-title">LangChain入门：用Python构建LLM应用</span><span class="related-arrow">→</span></a><a href="/blog/api-rate-limiting-best-practices.html" class="related-card"><span class="related-title">大模型API限流与重试最佳实践</span><span class="related-arrow">→</span></a><a href="/blog/build-ai-chatbot-guide.html" class="related-card"><span class="related-title">如何搭建自己的AI聊天机器人</span><span class="related-arrow">→</span></a>
+      </div>
+    </section>
+
+    </article>
+
+    <footer>
+        <div class="container">
+            <p>© 2026 EnlyAI · <a href="https://enlyai.com">enlyai.com</a></p>
+            <p class="icp"><a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener">粤ICP备2026055772号-1</a></p>
+        </div>
+    </footer>
+</body>
+</html>

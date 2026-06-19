@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LangChain入门：用Python构建LLM应用 | EnlyAI 博客</title>
+    <meta name="description" content="介绍 LangChain 框架的使用方法，教你用 Python 构建 LLM 应用，涵盖核心概念、提示词模板、链、记忆、RAG 与 Agent，附带完整代码示例。">
+    <meta name="keywords" content="LangChain 教程, LangChain Python, LLM 应用开发, LangChain OpenAI">
+    <meta name="author" content="EnlyAI">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://enlyai.com/blog/langchain-tutorial.html">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="LangChain入门：用Python构建LLM应用">
+    <meta property="og:description" content="介绍 LangChain 框架的使用方法，教你用 Python 构建 LLM 应用，涵盖核心概念、提示词模板、链、记忆、RAG 与 Agent。">
+    <meta property="og:url" content="https://enlyai.com/blog/langchain-tutorial.html">
+    <meta property="og:site_name" content="EnlyAI">
+    <meta property="og:locale" content="zh_CN">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="LangChain入门：用Python构建LLM应用">
+    <meta name="twitter:description" content="介绍 LangChain 框架的使用方法，教你用 Python 构建 LLM 应用，附带完整代码示例。">
+
+    <!-- Schema.org 结构化数据 -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "headline": "LangChain入门：用Python构建LLM应用",
+        "description": "介绍 LangChain 框架的使用方法，教你用 Python 构建 LLM 应用，涵盖核心概念、提示词模板、链、记忆、RAG 与 Agent，附带完整代码示例。",
+        "keywords": "LangChain 教程, LangChain Python, LLM 应用开发, LangChain OpenAI",
+        "author": {
+            "@type": "Organization",
+            "name": "EnlyAI",
+            "url": "https://enlyai.com"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "EnlyAI",
+            "url": "https://enlyai.com"
+        },
+        "datePublished": "2026-06-18",
+        "dateModified": "2026-06-18",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https://enlyai.com/blog/langchain-tutorial.html"
+        }
+    }
+    </script>
+
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #dbeafe;
+            --text: #1f2937;
+            --text-light: #6b7280;
+            --bg: #ffffff;
+            --bg-soft: #f9fafb;
+            --border: #e5e7eb;
+            --code-bg: #1e293b;
+            --code-text: #e2e8f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            color: var(--text);
+            background: var(--bg);
+            line-height: 1.8;
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .top-nav {
+            background: #fff;
+            border-bottom: 1px solid var(--border);
+            padding: 14px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: saturate(180%) blur(8px);
+            background: rgba(255, 255, 255, 0.92);
+        }
+
+        .top-nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .back-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 15px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .back-link:hover {
+            color: var(--primary-dark);
+        }
+
+        .brand {
+            font-weight: 700;
+            font-size: 18px;
+            color: var(--text);
+            text-decoration: none;
+            letter-spacing: -0.3px;
+        }
+
+        .brand span {
+            color: var(--primary);
+        }
+
+        article {
+            padding: 40px 0 60px;
+        }
+
+        .article-meta {
+            color: var(--text-light);
+            font-size: 14px;
+            margin-bottom: 16px;
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .tag {
+            background: var(--primary-light);
+            color: var(--primary-dark);
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        h1 {
+            font-size: 34px;
+            line-height: 1.3;
+            font-weight: 800;
+            margin-bottom: 20px;
+            letter-spacing: -0.5px;
+            color: #111827;
+        }
+
+        h2 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 40px 0 16px;
+            color: #111827;
+            padding-top: 8px;
+            border-top: 1px solid var(--border);
+        }
+
+        h3 {
+            font-size: 19px;
+            font-weight: 600;
+            margin: 24px 0 12px;
+            color: #1f2937;
+        }
+
+        p {
+            margin-bottom: 18px;
+            color: var(--text);
+        }
+
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        ul, ol {
+            margin: 0 0 18px 22px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        strong {
+            color: #111827;
+            font-weight: 600;
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary);
+            background: var(--bg-soft);
+            padding: 14px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+            color: var(--text-light);
+        }
+
+        blockquote p {
+            margin-bottom: 0;
+        }
+
+        pre {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 20px 22px;
+            border-radius: 10px;
+            overflow-x: auto;
+            margin: 18px 0;
+            font-size: 14px;
+            line-height: 1.65;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+        }
+
+        code {
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+        }
+
+        p code, li code {
+            background: #f1f5f9;
+            color: #be185d;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        /* 语法高亮 */
+        .k { color: #c084fc; }   /* keyword */
+        .s { color: #86efac; }   /* string */
+        .c { color: #64748b; font-style: italic; }  /* comment */
+        .n { color: #fbbf24; }   /* number */
+        .f { color: #60a5fa; }   /* function */
+        .o { color: #f472b6; }   /* operator */
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 15px;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 10px 14px;
+            text-align: left;
+        }
+
+        th {
+            background: var(--bg-soft);
+            font-weight: 600;
+        }
+
+        .cta {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: #fff;
+            padding: 36px 30px;
+            border-radius: 14px;
+            margin: 40px 0 20px;
+            text-align: center;
+        }
+
+        .cta h3 {
+            color: #fff;
+            margin-top: 0;
+            font-size: 22px;
+        }
+
+        .cta p {
+            color: rgba(255, 255, 255, 0.92);
+            margin-bottom: 22px;
+        }
+
+        .cta-btn {
+            display: inline-block;
+            background: #fff;
+            color: var(--primary);
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            text-decoration: none;
+            transition: transform 0.15s ease;
+        }
+
+        .cta-btn:hover {
+            text-decoration: none;
+            transform: translateY(-2px);
+        }
+
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 24px 0;
+            text-align: center;
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        footer a {
+            color: var(--text-light);
+        }
+
+        footer a:hover {
+            color: var(--primary);
+        }
+
+        .icp {
+            margin-top: 6px;
+            font-size: 13px;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 26px; }
+            h2 { font-size: 21px; }
+            pre { font-size: 13px; padding: 16px; }
+            .container { padding: 0 16px; }
+        }
+    
+    .related-posts {
+      margin-top: 48px;
+      padding-top: 32px;
+      border-top: 2px solid #e5e7eb;
+    }
+    .related-posts h2 {
+      font-size: 1.4rem;
+      margin-bottom: 20px;
+      color: #111827;
+    }
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .related-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      text-decoration: none;
+      color: #374151;
+      transition: all 0.2s;
+      font-size: 0.95rem;
+      line-height: 1.4;
+    }
+    .related-card:hover {
+      background: #eff6ff;
+      border-color: #2563eb;
+      color: #2563eb;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+    }
+    .related-title {
+      flex: 1;
+      padding-right: 12px;
+    }
+    .related-arrow {
+      color: #9ca3af;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .related-card:hover .related-arrow {
+      color: #2563eb;
+    }
+
+  </style>
+</head>
+<body>
+    <nav class="top-nav">
+        <div class="container">
+            <a href="https://enlyai.com" class="brand">Enly<span>AI</span></a>
+            <a href="https://enlyai.com" class="back-link">← 返回首页</a>
+        </div>
+    </nav>
+
+    <article>
+        <div class="container">
+            <div class="article-meta">
+                <span class="tag">LangChain</span>
+                <span class="tag">Python</span>
+                <span>2026-06-18</span>
+                <span>阅读约 15 分钟</span>
+            </div>
+
+            <h1>LangChain入门：用Python构建LLM应用</h1>
+
+            <p>当你第一次用 OpenAI SDK 调通一个大模型，那种“AI 真的能听懂我说话”的兴奋感会持续好几天。但兴奋过后，真正的工程问题随之而来：如何复用提示词？如何让模型记住上下文？如何让模型调用外部工具？如何把私有文档喂给模型？这些问题单靠一个 <code>chat.completions.create</code> 是解决不了的。</p>
+
+            <p>这就是 <strong>LangChain</strong> 出现的原因。它是目前最流行的 LLM 应用开发框架，把“模型调用、提示词管理、记忆、工具、检索”抽象成可组合的组件，让你像搭积木一样构建复杂的 AI 应用。本文将从零开始，带你用 Python 跑通 LangChain 的核心能力，并在最后展示如何通过 EnlyAI 统一 API 接入多种模型。</p>
+
+            <h2>一、LangChain 是什么</h2>
+
+            <p>LangChain 最初由 Harrison Chase 在 2022 年底开源，定位是“面向大语言模型的应用开发框架”。它的核心理念是：<strong>把 LLM 应用拆解成可组合的模块</strong>，而不是把所有逻辑塞进一个巨大的 prompt 字符串里。</p>
+
+            <p>LangChain 的核心模块包括：</p>
+            <ul>
+                <li><strong>Models</strong>：统一封装各类模型的调用接口（聊天模型、文本模型、嵌入模型）。</li>
+                <li><strong>Prompts</strong>：提示词模板，支持变量插值和 Few-shot 示例。</li>
+                <li><strong>Chains</strong>：把多个组件串联成一条处理流水线。</li>
+                <li><strong>Memory</strong>：跨轮次的对话记忆。</li>
+                <li><strong>Retrievers</strong>：从向量数据库检索相关文档，支撑 RAG。</li>
+                <li><strong>Agents</strong>：让模型自主决定调用哪些工具来完成任务。</li>
+            </ul>
+
+            <p>理解这六个模块，就理解了 LangChain 的全部骨架。下面我们逐一上手。</p>
+
+            <h2>二、环境搭建与安装</h2>
+
+            <p>LangChain 在 0.2 版本之后做了模块化拆分，主包只包含核心抽象，具体模型的集成需要单独安装。对于大多数开发者，推荐直接安装 <code>langchain</code> 和 <code>langchain-openai</code>。</p>
+
+            <pre><code><span class="c"># 安装 LangChain 核心包与 OpenAI 集成</span>
+pip install langchain langchain-openai
+
+<span class="c"># 如果需要 RAG，再装向量库和文本分割器</span>
+pip install langchain-community faiss-cpu</code></pre>
+
+            <p>安装完成后，建议把 API 密钥放到环境变量里，而不是硬编码在脚本中：</p>
+
+            <pre><code><span class="c"># Linux / macOS</span>
+<span class="k">export</span> OPENAI_API_KEY=<span class="s">"sk-your-api-key"</span>
+<span class="k">export</span> OPENAI_BASE_URL=<span class="s">"https://enlyai.com/v1"</span>
+
+<span class="c"># Windows PowerShell</span>
+<span class="c"># $env:OPENAI_API_KEY="sk-your-api-key"</span>
+<span class="c"># $env:OPENAI_BASE_URL="https://enlyai.com/v1"</span></code></pre>
+
+            <blockquote>
+                <p>提示：把 <code>OPENAI_BASE_URL</code> 指向 <code>https://enlyai.com/v1</code>，LangChain 就会通过 EnlyAI 聚合平台调用模型，一套密钥即可访问 GPT、Claude、Gemini 等数十种模型。</p>
+            </blockquote>
+
+            <h2>三、第一次调用：ChatOpenAI</h2>
+
+            <p>LangChain 中最常用的模型类是 <code>ChatOpenAI</code>，它封装了 OpenAI 兼容的聊天接口。由于 EnlyAI 完全兼容 OpenAI API 格式，所以可以直接用这个类接入。</p>
+
+            <pre><code><span class="k">from</span> langchain_openai <span class="k">import</span> ChatOpenAI
+
+<span class="c"># 通过 EnlyAI 统一接入，可随时切换底层模型</span>
+llm = ChatOpenAI(
+    model=<span class="s">"gpt-5.4-mini"</span>,
+    api_key=<span class="s">"sk-your-api-key"</span>,
+    base_url=<span class="s">"https://enlyai.com/v1"</span>,
+    temperature=<span class="n">0.3</span>
+)
+
+<span class="c"># 直接传入字符串即可调用</span>
+response = llm.invoke(<span class="s">"用一句话解释什么是向量数据库"</span>)
+<span class="f">print</span>(response.content)</code></pre>
+
+            <p>这里有几个关键参数需要理解：</p>
+            <ul>
+                <li><code>model</code>：模型名称。通过 EnlyAI 接入时，可以填 <code>gpt-5.4-mini</code>、<code>claude-sonnet-4-6</code>、<code>gemini-3.5-flash</code> 等。</li>
+                <li><code>temperature</code>：取值 0 到 1，越低越确定，越高越有创造力。技术问答建议 0.2-0.3，创意写作建议 0.7-0.9。</li>
+                <li><code>base_url</code>：API 地址。指向 EnlyAI 后，所有调用都走聚合通道。</li>
+            </ul>
+
+            <h2>四、提示词模板：PromptTemplate</h2>
+
+            <p>真实应用中，提示词往往很长，而且包含动态变量。直接用 f-string 拼接会让代码很难维护。LangChain 提供了 <code>ChatPromptTemplate</code> 来管理提示词结构。</p>
+
+            <pre><code><span class="k">from</span> langchain_core.prompts <span class="k">import</span> ChatPromptTemplate
+
+prompt = ChatPromptTemplate.from_messages([
+    (<span class="s">"system"</span>, <span class="s">"你是一位资深 {role}，请用专业但易懂的语言回答。"</span>),
+    (<span class="s">"user"</span>, <span class="s">"{question}"</span>)
+])
+
+<span class="c"># 渲染模板</span>
+messages = prompt.invoke({
+    <span class="s">"role"</span>: <span class="s">"数据库工程师"</span>,
+    <span class="s">"question"</span>: <span class="s">"为什么 PostgreSQL 比 MySQL 更适合复杂查询？"</span>
+})
+<span class="f">print</span>(messages)</code></pre>
+
+            <p><code>from_messages</code> 接收一个消息列表，每条消息是 <code>(角色, 内容)</code> 元组。花括号里的 <code>{role}</code> 和 <code>{question}</code> 是变量，调用 <code>invoke</code> 时传入字典即可填充。</p>
+
+            <h2>五、链（Chains）：LCEL 表达式</h2>
+
+            <p>LangChain 0.2 之后推荐使用 <strong>LCEL（LangChain Expression Language）</strong> 来构建链。它的语法非常优雅：用管道符 <code>|</code> 把组件串联起来，就像 Unix 管道一样。</p>
+
+            <pre><code><span class="k">from</span> langchain_openai <span class="k">import</span> ChatOpenAI
+<span class="k">from</span> langchain_core.prompts <span class="k">import</span> ChatPromptTemplate
+<span class="k">from</span> langchain_core.output_parsers <span class="k">import</span> StrOutputParser
+
+llm = ChatOpenAI(
+    model=<span class="s">"gpt-5.4-mini"</span>,
+    api_key=<span class="s">"sk-your-api-key"</span>,
+    base_url=<span class="s">"https://enlyai.com/v1"</span>
+)
+
+prompt = ChatPromptTemplate.from_template(<span class="s">"请把以下文本翻译成{language}：\n{text}"</span>)
+
+<span class="c"># 用管道符串联：prompt -> llm -> 输出解析器</span>
+chain = prompt | llm | StrOutputParser()
+
+result = chain.invoke({
+    <span class="s">"language"</span>: <span class="s">"英文"</span>,
+    <span class="s">"text"</span>: <span class="s">"大模型让软件开发变得更有趣了"</span>
+})
+<span class="f">print</span>(result)</code></pre>
+
+            <p>这条链的执行流程是：<code>prompt</code> 把输入字典渲染成消息 → <code>llm</code> 调用模型生成回复 → <code>StrOutputParser</code> 把回复对象转成纯字符串。LCEL 的好处是<strong>每个组件都支持 invoke / stream / batch</strong>，切换流式输出只需把 <code>invoke</code> 换成 <code>stream</code>：</p>
+
+            <pre><code><span class="c"># 流式输出</span>
+<span class="k">for</span> chunk <span class="k">in</span> chain.stream({
+    <span class="s">"language"</span>: <span class="s">"日文"</span>,
+    <span class="s">"text"</span>: <span class="s">"今天天气真好"</span>
+}):
+    <span class="f">print</span>(chunk, end=<span class="s">""</span>, flush=<span class="k">True</span>)</code></pre>
+
+            <h2>六、记忆（Memory）：多轮对话</h2>
+
+            <p>LLM 本身是无状态的，每次调用都是独立的。要实现“记得上一轮说了什么”的多轮对话，需要把历史消息拼到当前请求里。LangChain 提供了 <code>ChatMessageHistory</code> 来管理对话历史。</p>
+
+            <pre><code><span class="k">from</span> langchain_core.chat_history <span class="k">import</span> InMemoryChatMessageHistory
+<span class="k">from</span> langchain_core.runnables.history <span class="k">import</span> RunnableWithMessageHistory
+
+llm = ChatOpenAI(
+    model=<span class="s">"gpt-5.4-mini"</span>,
+    api_key=<span class="s">"sk-your-api-key"</span>,
+    base_url=<span class="s">"https://enlyai.com/v1"</span>
+)
+
+prompt = ChatPromptTemplate.from_messages([
+    (<span class="s">"system"</span>, <span class="s">"你是一个友好的助手，记住之前的对话内容。"</span>),
+    <span class="s">"placeholder"</span>,   <span class="c"># 这里会自动插入历史消息</span>
+    (<span class="s">"user"</span>, <span class="s">"{input}"</span>)
+])
+
+chain = prompt | llm
+
+<span class="c"># 用 session_id 区分不同用户的会话</span>
+store = {}
+<span class="k">def</span> <span class="f">get_history</span>(session_id):
+    <span class="k">if</span> session_id <span class="k">not in</span> store:
+        store[session_id] = InMemoryChatMessageHistory()
+    <span class="k">return</span> store[session_id]
+
+chain_with_history = RunnableWithMessageHistory(
+    chain, get_history,
+    input_messages_key=<span class="s">"input"</span>,
+    history_factory_config=[]
+)
+
+<span class="c"># 第一轮</span>
+r1 = chain_with_history.invoke(
+    {<span class="s">"input"</span>: <span class="s">"我叫小明，今年 28 岁"</span>},
+    config={<span class="s">"configurable"</span>: {<span class="s">"session_id"</span>: <span class="s">"user-1"</span>}}
+)
+<span class="f">print</span>(r1.content)
+
+<span class="c"># 第二轮，模型能记住上一轮的信息</span>
+r2 = chain_with_history.invoke(
+    {<span class="s">"input"</span>: <span class="s">"我刚才告诉你我叫什么？"</span>},
+    config={<span class="s">"configurable"</span>: {<span class="s">"session_id"</span>: <span class="s">"user-1"</span>}}
+)
+<span class="f">print</span>(r2.content)  <span class="c"># 会回答"小明"</span></code></pre>
+
+            <p>生产环境中，建议把 <code>InMemoryChatMessageHistory</code> 换成 Redis 或数据库实现，避免服务重启后丢失历史。</p>
+
+            <h2>七、RAG：让模型读懂你的私有文档</h2>
+
+            <p>RAG（Retrieval-Augmented Generation，检索增强生成）是 LangChain 最热门的应用场景。它的思路是：先从知识库中检索出与问题相关的文档片段，再把这些片段塞进 prompt，让模型基于文档回答。这样既能让模型“知道”私有知识，又能避免幻觉。</p>
+
+            <p>一个最小可用的 RAG 流程如下：</p>
+
+            <pre><code><span class="k">from</span> langchain_community.vectorstores <span class="k">import</span> FAISS
+<span class="k">from</span> langchain_openai <span class="k">import</span> OpenAIEmbeddings, ChatOpenAI
+<span class="k">from</span> langchain_text_splitters <span class="k">import</span> RecursiveCharacterTextSplitter
+
+<span class="c"># 1. 准备文档</span>
+docs_text = <span class="s">"""
+EnlyAI 是一个 LLM API 聚合平台，支持 OpenAI、Claude、Gemini 等多种模型。
+API base URL 是 https://enlyai.com/v1，完全兼容 OpenAI API 格式。
+新用户注册即送免费额度，可以在控制台查看用量和账单。
+"""</span>
+
+<span class="c"># 2. 切分文档</span>
+splitter = RecursiveCharacterTextSplitter(chunk_size=<span class="n">100</span>, chunk_overlap=<span class="n">20</span>)
+chunks = splitter.create_documents([docs_text])
+
+<span class="c"># 3. 生成嵌入并存入向量库</span>
+embeddings = OpenAIEmbeddings(
+    api_key=<span class="s">"sk-your-api-key"</span>,
+    base_url=<span class="s">"https://enlyai.com/v1"</span>
+)
+vectorstore = FAISS.from_documents(chunks, embeddings)
+
+<span class="c"># 4. 构建检索器</span>
+retriever = vectorstore.as_retriever(search_kwargs={<span class="s">"k"</span>: <span class="n">2</span>})
+
+<span class="c"># 5. 检索 + 生成</span>
+llm = ChatOpenAI(
+    model=<span class="s">"gpt-5.4-mini"</span>,
+    api_key=<span class="s">"sk-your-api-key"</span>,
+    base_url=<span class="s">"https://enlyai.com/v1"</span>
+)
+
+prompt = ChatPromptTemplate.from_template(<span class="s">"""
+根据以下资料回答问题。如果资料里没有答案，请说"我不知道"。
+
+资料：
+{context}
+
+问题：{question}
+"""</span>)
+
+<span class="k">from</span> langchain_core.runnables <span class="k">import</span> RunnablePassthrough
+
+rag_chain = (
+    {<span class="s">"context"</span>: retriever, <span class="s">"question"</span>: RunnablePassthrough()}
+    | prompt | llm | StrOutputParser()
+)
+
+answer = rag_chain.invoke(<span class="s">"EnlyAI 的 API 地址是什么？"</span>)
+<span class="f">print</span>(answer)  <span class="c"># 会回答 https://enlyai.com/v1</span></code></pre>
+
+            <p>这段代码完成了“切分 → 嵌入 → 存储 → 检索 → 生成”的完整闭环。实际项目中，你只需要把 <code>docs_text</code> 换成从 PDF、网页或数据库加载的真实文档即可。</p>
+
+            <h2>八、Agent：让模型自主调用工具</h2>
+
+            <p>前面所有例子都是“固定流程”：输入 → 处理 → 输出。但有些任务需要模型<strong>自主决策</strong>——比如“查一下北京明天天气，然后写一首诗”，模型需要先调用天气工具，拿到结果后再写诗。这就是 Agent 的用武之地。</p>
+
+            <pre><code><span class="k">from</span> langchain_openai <span class="k">import</span> ChatOpenAI
+<span class="k">from</span> langchain_core.tools <span class="k">import</span> tool
+<span class="k">from</span> langchain.agents <span class="k">import</span> create_tool_calling_agent, AgentExecutor
+<span class="k">from</span> langchain_core.prompts <span class="k">import</span> ChatPromptTemplate
+
+<span class="c"># 定义一个工具：计算器</span>
+@tool
+<span class="k">def</span> <span class="f">calculate</span>(expression: <span class="k">str</span>) -> <span class="k">str</span>:
+    <span class="s">"""计算一个数学表达式并返回结果。输入应为合法的 Python 表达式，例如 '12 * 8 + 5'。"""</span>
+    <span class="k">return</span> <span class="k">str</span>(<span class="f">eval</span>(expression))
+
+llm = ChatOpenAI(
+    model=<span class="s">"gpt-5.4-mini"</span>,
+    api_key=<span class="s">"sk-your-api-key"</span>,
+    base_url=<span class="s">"https://enlyai.com/v1"</span>
+)
+
+prompt = ChatPromptTemplate.from_messages([
+    (<span class="s">"system"</span>, <span class="s">"你是一个能调用工具的助手。"</span>),
+    (<span class="s">"user"</span>, <span class="s">"{input}"</span>),
+    (<span class="s">"placeholder"</span>, <span class="s">"{agent_scratchpad}"</span>)
+])
+
+tools = [calculate]
+agent = create_tool_calling_agent(llm, tools, prompt)
+executor = AgentExecutor(agent=agent, tools=tools, verbose=<span class="k">True</span>)
+
+result = executor.invoke({<span class="s">"input"</span>: <span class="s">"帮我算一下 (123 + 456) * 2 等于多少"</span>})
+<span class="f">print</span>(result[<span class="s">"output"</span>])</code></pre>
+
+            <p>运行后你会看到模型先调用 <code>calculate</code> 工具，拿到 <code>1158</code>，再组织成自然语言回复。Agent 的强大之处在于：你只需要定义工具，模型会自己决定什么时候用、怎么用。</p>
+
+            <h2>九、用 EnlyAI 统一接入多模型</h2>
+
+            <p>前面所有代码都用了 <code>gpt-5.4-mini</code>。但真实业务中，你可能需要在不同模型间切换：用 GPT-5.5 做复杂推理，用 Claude 写文案，用 Gemini 处理长文档。如果每个模型都单独对接，密钥管理、计费、SDK 切换会非常麻烦。</p>
+
+            <p>EnlyAI 提供了<strong>统一 API 接口</strong>，完全兼容 OpenAI 格式。你只需要把 <code>base_url</code> 指向 <code>https://enlyai.com/v1</code>，就能用同一套 LangChain 代码调用几十种模型：</p>
+
+            <pre><code><span class="k">from</span> langchain_openai <span class="k">import</span> ChatOpenAI
+
+<span class="c"># 同一套代码，只改 model 名称即可切换</span>
+configs = [
+    {<span class="s">"model"</span>: <span class="s">"gpt-5.4-mini"</span>, <span class="s">"desc"</span>: <span class="s">"GPT-5.4-mini"</span>},
+    {<span class="s">"model"</span>: <span class="s">"claude-sonnet-4-6"</span>, <span class="s">"desc"</span>: <span class="s">"Claude Sonnet 4.6"</span>},
+    {<span class="s">"model"</span>: <span class="s">"gemini-3.5-flash"</span>, <span class="s">"desc"</span>: <span class="s">"Gemini 3.5 Flash"</span>},
+]
+
+question = <span class="s">"用一句话解释什么是 RAG"</span>
+
+<span class="k">for</span> cfg <span class="k">in</span> configs:
+    llm = ChatOpenAI(
+        model=cfg[<span class="s">"model"</span>],
+        api_key=<span class="s">"sk-your-enlyai-key"</span>,
+        base_url=<span class="s">"https://enlyai.com/v1"</span>
+    )
+    answer = llm.invoke(question)
+    <span class="f">print</span>(<span class="s">f"[{cfg['desc']}] -> {answer.content}"</span>)</code></pre>
+
+            <p>对应的 cURL 测试命令，方便你在终端快速验证：</p>
+
+            <pre><code>curl https://enlyai.com/v1/chat/completions \
+  -H <span class="s">"Authorization: Bearer sk-your-enlyai-key"</span> \
+  -H <span class="s">"Content-Type: application/json"</span> \
+  -d <span class="s">'{
+    "model": "claude-sonnet-4-6",
+    "messages": [{"role": "user", "content": "用一句话解释什么是 RAG"}]
+  }'</span></code></pre>
+
+            <p>统一 API 的价值在于：</p>
+            <ul>
+                <li><strong>一套密钥</strong>：不用在每个平台分别注册、充值、管理 key。</li>
+                <li><strong>统一计费</strong>：所有模型调用汇总在一个账单，方便成本分析。</li>
+                <li><strong>故障转移</strong>：某个模型服务波动时，改一个字符串就能切换备用模型。</li>
+                <li><strong>零迁移成本</strong>：原本基于 OpenAI SDK 的 LangChain 代码几乎不用改。</li>
+            </ul>
+
+            <h2>十、生产环境最佳实践</h2>
+
+            <p>把 LangChain 应用从 Demo 推向生产，有几点经验值得分享：</p>
+
+            <ol>
+                <li><strong>用 LCEL 而不是旧的 LLMChain</strong>：LCEL 原生支持流式、异步、批量，性能更好，且是官方主推方向。</li>
+                <li><strong>把记忆持久化</strong>：生产环境不要用 <code>InMemoryChatMessageHistory</code>，改用 Redis 或数据库，否则服务重启历史就丢了。</li>
+                <li><strong>限制 Agent 的迭代次数</strong>：用 <code>max_iterations</code> 防止 Agent 陷入死循环烧 token。</li>
+                <li><strong>监控 token 消耗</strong>：每次调用都记录 <code>usage_metadata</code>，否则账单会悄悄失控。</li>
+                <li><strong>密钥走环境变量</strong>：永远不要把 API key 写死在代码里，用 <code>os.getenv("OPENAI_API_KEY")</code> 读取。</li>
+                <li><strong>给 RAG 加引用来源</strong>：让模型在回答中标注引用了哪些文档片段，方便用户核实，也能降低幻觉风险。</li>
+            </ol>
+
+            <h2>总结</h2>
+
+            <p>LangChain 的学习曲线确实比直接调 OpenAI SDK 陡峭，但它解决的问题也是真实的：当你的应用从“单次问答”进化到“多轮对话 + 文档检索 + 工具调用”时，没有一个框架会非常痛苦。掌握本文讲的六个核心模块——Models、Prompts、Chains、Memory、Retrievers、Agents——你就能应对绝大多数 LLM 应用场景。</p>
+
+            <p>而把 LangChain 和 EnlyAI 统一 API 结合起来，你既能享受框架的工程能力，又能用一套密钥、一个地址访问所有主流大模型，把精力集中在业务逻辑而不是基础设施上。</p>
+
+            <div class="cta">
+                <h3>想用 LangChain 调用所有主流大模型？</h3>
+                <p>EnlyAI 提供 OpenAI 兼容的统一接口，支持 GPT、Claude、Gemini 等数十种模型，注册即送免费额度，LangChain 代码只需改一个 base_url 即可接入。</p>
+                <a href="https://enlyai.com" class="cta-btn">立即注册 EnlyAI →</a>
+            </div>
+        </div>
+    <section class="related-posts">
+      <h2>相关文章推荐</h2>
+      <div class="related-grid">
+        <a href="/blog/python-llm-api-tutorial.html" class="related-card"><span class="related-title">用Python调用LLM API的5种方式</span><span class="related-arrow">→</span></a><a href="/blog/build-ai-chatbot-guide.html" class="related-card"><span class="related-title">如何搭建自己的AI聊天机器人</span><span class="related-arrow">→</span></a><a href="/blog/api-streaming-guide.html" class="related-card"><span class="related-title">API流式输出实现：SSE与WebSocket详解</span><span class="related-arrow">→</span></a><a href="/blog/api-rate-limiting-best-practices.html" class="related-card"><span class="related-title">大模型API限流与重试最佳实践</span><span class="related-arrow">→</span></a>
+      </div>
+    </section>
+
+    </article>
+
+    <footer>
+        <div class="container">
+            <p>© 2026 EnlyAI · <a href="https://enlyai.com">enlyai.com</a></p>
+            <p class="icp"><a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener">粤ICP备2026055772号-1</a></p>
+        </div>
+    </footer>
+</body>
+</html>

@@ -337,7 +337,57 @@
             table { font-size: 13px; }
             th, td { padding: 8px 10px; }
         }
-    </style>
+    
+    .related-posts {
+      margin-top: 48px;
+      padding-top: 32px;
+      border-top: 2px solid #e5e7eb;
+    }
+    .related-posts h2 {
+      font-size: 1.4rem;
+      margin-bottom: 20px;
+      color: #111827;
+    }
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .related-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      text-decoration: none;
+      color: #374151;
+      transition: all 0.2s;
+      font-size: 0.95rem;
+      line-height: 1.4;
+    }
+    .related-card:hover {
+      background: #eff6ff;
+      border-color: #2563eb;
+      color: #2563eb;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+    }
+    .related-title {
+      flex: 1;
+      padding-right: 12px;
+    }
+    .related-arrow {
+      color: #9ca3af;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .related-card:hover .related-arrow {
+      color: #2563eb;
+    }
+
+  </style>
 </head>
 <body>
     <nav class="top-nav">
@@ -370,7 +420,7 @@
                 <li><strong>核心任务是什么？</strong>是代码生成、文本创作、信息抽取、多轮对话，还是复杂推理？不同模型擅长的领域差异很大。</li>
                 <li><strong>对延迟敏感吗？</strong>实时聊天要求首 token 在 1 秒内，而批量处理可以接受 10 秒以上。延迟敏感场景要优先考虑小模型。</li>
                 <li><strong>预算上限多少？</strong>按 100 万 token 计，最贵和最便宜的模型能差 20 倍以上。先算清单位经济模型再选型。</li>
-                <li><strong>需要多模态吗？</strong>如果涉及图片、音频、视频理解，可选范围会大幅收窄到 GPT-4o、Gemini 等少数模型。</li>
+                <li><strong>需要多模态吗？</strong>如果涉及图片、音频、视频理解，可选范围会大幅收窄到 GPT-5.5、Gemini 等少数模型。</li>
             </ol>
 
             <p>把这四个问题的答案写下来，你会发现候选名单已经缩短到 3-5 个，接下来再做精细对比。</p>
@@ -390,45 +440,45 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td>GPT-4o</td>
+                        <td>GPT-5.5</td>
                         <td>通用、多模态、代码</td>
-                        <td>128K</td>
+                        <td>270K</td>
                         <td>综合能力均衡，生态最成熟</td>
                     </tr>
                     <tr>
-                        <td>GPT-4o-mini</td>
+                        <td>GPT-5.4-mini</td>
                         <td>轻量任务、高并发</td>
                         <td>128K</td>
                         <td>性价比高，速度快</td>
                     </tr>
                     <tr>
-                        <td>Claude 3.5 Sonnet</td>
+                        <td>Claude Sonnet 4.6</td>
                         <td>长文写作、代码、推理</td>
-                        <td>200K</td>
+                        <td>300K</td>
                         <td>文笔细腻，长上下文表现稳定</td>
                     </tr>
                     <tr>
-                        <td>Claude 3 Haiku</td>
+                        <td>Claude Haiku 4.5</td>
                         <td>快速对话、分类</td>
                         <td>200K</td>
                         <td>响应快，成本极低</td>
                     </tr>
                     <tr>
-                        <td>Gemini 1.5 Pro</td>
+                        <td>Gemini 3.5 Pro</td>
                         <td>超长上下文、多模态</td>
-                        <td>1M+</td>
+                        <td>2M</td>
                         <td>上下文最长，视频理解强</td>
                     </tr>
                     <tr>
-                        <td>Gemini 1.5 Flash</td>
+                        <td>Gemini 3.5 Flash</td>
                         <td>实时场景、轻量任务</td>
                         <td>1M</td>
                         <td>速度极快，价格低</td>
                     </tr>
                     <tr>
-                        <td>DeepSeek-V3</td>
+                        <td>DeepSeek V4-Pro</td>
                         <td>代码、数学推理</td>
-                        <td>64K</td>
+                        <td>1M</td>
                         <td>开源，推理能力强，价格极低</td>
                     </tr>
                 </tbody>
@@ -440,13 +490,13 @@
 
             <h2>三、场景一：代码生成与编程辅助</h2>
 
-            <p>代码场景对模型的逻辑能力、上下文理解、错误修复能力要求很高。综合各大基准测试和实际开发反馈，<strong>Claude 3.5 Sonnet 和 GPT-4o 是当前代码能力的第一梯队</strong>，DeepSeek-V3 在开源模型里表现突出。</p>
+            <p>代码场景对模型的逻辑能力、上下文理解、错误修复能力要求很高。综合各大基准测试和实际开发反馈，<strong>Claude Sonnet 4.6 和 GPT-5.5 是当前代码能力的第一梯队</strong>，DeepSeek V4-Pro 在开源模型里表现突出。</p>
 
             <p>选型建议：</p>
             <ul>
-                <li><strong>复杂工程级代码</strong>（重构、调试、多文件理解）：优先 Claude 3.5 Sonnet，它在长上下文代码理解上更稳。</li>
-                <li><strong>通用代码补全、脚本生成</strong>：GPT-4o 综合体验好，工具链支持最全。</li>
-                <li><strong>成本敏感的批量代码任务</strong>：DeepSeek-V3 或 GPT-4o-mini，价格只有旗舰模型的十分之一。</li>
+                <li><strong>复杂工程级代码</strong>（重构、调试、多文件理解）：优先 Claude Sonnet 4.6，它在长上下文代码理解上更稳。</li>
+                <li><strong>通用代码补全、脚本生成</strong>：GPT-5.5 综合体验好，工具链支持最全。</li>
+                <li><strong>成本敏感的批量代码任务</strong>：DeepSeek V4-Pro 或 GPT-5.4-mini，价格只有旗舰模型的十几分之一到几十分之一。</li>
             </ul>
 
             <p>下面是用 EnlyAI 统一接口调用 Claude 生成代码的示例：</p>
@@ -459,7 +509,7 @@ client = OpenAI(
 )
 
 response = client.chat.completions.create(
-    model=<span class="s">"claude-3-5-sonnet"</span>,  <span class="c"># 想换 GPT-4o 只需改这里</span>
+    model=<span class="s">"claude-sonnet-4-6"</span>,  <span class="c"># 想换 GPT-5.5 只需改这里</span>
     messages=[
         {<span class="s">"role"</span>: <span class="s">"system"</span>, <span class="s">"content"</span>: <span class="s">"你是一位资深 Python 工程师"</span>},
         {<span class="s">"role"</span>: <span class="s">"user"</span>, <span class="s">"content"</span>: <span class="s">"写一个带重试和超时的 HTTP 请求函数"</span>}
@@ -474,7 +524,7 @@ response = client.chat.completions.create(
   -H <span class="s">"Authorization: Bearer sk-your-api-key"</span> \
   -H <span class="s">"Content-Type: application/json"</span> \
   -d <span class="s">'{
-    "model": "claude-3-5-sonnet",
+    "model": "claude-sonnet-4-6",
     "messages": [
       {"role": "system", "content": "你是一位资深 Python 工程师"},
       {"role": "user", "content": "写一个带重试和超时的 HTTP 请求函数"}
@@ -483,12 +533,12 @@ response = client.chat.completions.create(
 
             <h2>四、场景二：长文本处理与文档分析</h2>
 
-            <p>当输入超过几万字（比如分析整本财报、总结长篇论文、处理法律合同），上下文窗口长度就成了硬门槛。这个场景下 <strong>Gemini 1.5 Pro 凭借 100 万 token 的超长上下文优势明显</strong>，Claude 3.5 Sonnet 的 20 万 token 也足够应付大多数长文档。</p>
+            <p>当输入超过几万字（比如分析整本财报、总结长篇论文、处理法律合同），上下文窗口长度就成了硬门槛。这个场景下 <strong>Gemini 3.5 Pro 凭借 200 万 token 的超长上下文优势明显</strong>，Claude Sonnet 4.6 的 30 万 token 也足够应付大多数长文档。</p>
 
             <p>选型建议：</p>
             <ul>
-                <li><strong>超长文档（50 万 token 以上）</strong>：Gemini 1.5 Pro，目前唯一能一次性吃下整本书的模型。</li>
-                <li><strong>中等长文（5-20 万 token）</strong>：Claude 3.5 Sonnet，长文理解精度高，且不易“遗忘”中间内容。</li>
+                <li><strong>超长文档（50 万 token 以上）</strong>：Gemini 3.5 Pro，目前唯一能一次性吃下整本书的模型。</li>
+                <li><strong>中等长文（5-20 万 token）</strong>：Claude Sonnet 4.6，长文理解精度高，且不易“遗忘”中间内容。</li>
                 <li><strong>长文 + 高频调用</strong>：先用小模型做摘要，再用大模型做精读，分摊成本。</li>
             </ul>
 
@@ -496,24 +546,24 @@ response = client.chat.completions.create(
 
             <h2>五、场景三：多语言与跨文化内容</h2>
 
-            <p>如果你的应用面向多语种用户，模型的翻译质量、小语种支持、文化适配能力就很关键。<strong>GPT-4o 和 Gemini 在多语言覆盖面上更广</strong>，Claude 在中英双语的长文写作上文笔更自然。</p>
+            <p>如果你的应用面向多语种用户，模型的翻译质量、小语种支持、文化适配能力就很关键。<strong>GPT-5.5 和 Gemini 在多语言覆盖面上更广</strong>，Claude 在中英双语的长文写作上文笔更自然。</p>
 
             <p>选型建议：</p>
             <ul>
-                <li><strong>小语种翻译</strong>（日、韩、阿拉伯语等）：GPT-4o 或 Gemini 1.5 Pro，语种覆盖最全。</li>
-                <li><strong>中文创作</strong>（公众号、营销文案）：Claude 3.5 Sonnet 的中文表达更地道，少“翻译腔”。</li>
-                <li><strong>多语言客服</strong>：GPT-4o-mini，速度快、成本低，足以应对常规问答。</li>
+                <li><strong>小语种翻译</strong>（日、韩、阿拉伯语等）：GPT-5.5 或 Gemini 3.5 Pro，语种覆盖最全。</li>
+                <li><strong>中文创作</strong>（公众号、营销文案）：Claude Sonnet 4.6 的中文表达更地道，少“翻译腔”。</li>
+                <li><strong>多语言客服</strong>：GPT-5.4-mini，速度快、成本低，足以应对常规问答。</li>
             </ul>
 
             <h2>六、场景四：复杂推理与数学</h2>
 
-            <p>涉及数学证明、逻辑推理、数据分析的任务，对模型的“思考深度”要求高。这个领域 <strong>GPT-4o、Claude 3.5 Sonnet、DeepSeek-V3 是公认的第一梯队</strong>，尤其是 DeepSeek 在数学竞赛题上的表现甚至超过部分闭源旗舰。</p>
+            <p>涉及数学证明、逻辑推理、数据分析的任务，对模型的“思考深度”要求高。这个领域 <strong>GPT-5.5、Claude Sonnet 4.6、DeepSeek V4-Pro 是公认的第一梯队</strong>，尤其是 DeepSeek 在数学竞赛题上的表现甚至超过部分闭源旗舰。</p>
 
             <p>选型建议：</p>
             <ul>
-                <li><strong>高难度数学/逻辑题</strong>：GPT-4o 或 DeepSeek-V3，推理链更严谨。</li>
-                <li><strong>数据分析、报表解读</strong>：Claude 3.5 Sonnet，结构化输出更规范。</li>
-                <li><strong>预算有限的推理任务</strong>：DeepSeek-V3，开源且价格极低，性价比突出。</li>
+                <li><strong>高难度数学/逻辑题</strong>：GPT-5.5 或 DeepSeek V4-Pro，推理链更严谨。</li>
+                <li><strong>数据分析、报表解读</strong>：Claude Sonnet 4.6，结构化输出更规范。</li>
+                <li><strong>预算有限的推理任务</strong>：DeepSeek V4-Pro，开源且价格极低，性价比突出。</li>
             </ul>
 
             <h2>七、场景五：实时对话与高并发</h2>
@@ -522,8 +572,8 @@ response = client.chat.completions.create(
 
             <p>选型建议：</p>
             <ul>
-                <li><strong>实时聊天</strong>：GPT-4o-mini、Claude 3 Haiku、Gemini 1.5 Flash，三者延迟都在 1 秒内。</li>
-                <li><strong>高并发客服</strong>：Gemini 1.5 Flash，吞吐量高、价格低，适合海量短对话。</li>
+                <li><strong>实时聊天</strong>：GPT-5.4-mini、Claude Haiku 4.5、Gemini 3.5 Flash，三者延迟都在 1 秒内。</li>
+                <li><strong>高并发客服</strong>：Gemini 3.5 Flash，吞吐量高、价格低，适合海量短对话。</li>
                 <li><strong>对话 + 复杂任务</strong>：用小模型做意图识别和简单问答，复杂问题再路由到旗舰模型。</li>
             </ul>
 
@@ -537,7 +587,7 @@ client = OpenAI(
 )
 
 stream = client.chat.completions.create(
-    model=<span class="s">"gpt-4o-mini"</span>,  <span class="c"># 实时场景用小模型</span>
+    model=<span class="s">"gpt-5.4-mini"</span>,  <span class="c"># 实时场景用小模型</span>
     messages=[{<span class="s">"role"</span>: <span class="s">"user"</span>, <span class="s">"content"</span>: <span class="s">"讲个程序员笑话"</span>}],
     stream=<span class="k">True</span>  <span class="c"># 开启流式</span>
 )
@@ -549,13 +599,13 @@ stream = client.chat.completions.create(
 
             <h2>八、场景六：多模态（图像/视频理解）</h2>
 
-            <p>需要识别图片、分析视频、读取图表时，只能选多模态模型。<strong>GPT-4o 和 Gemini 1.5 Pro 是目前多模态能力最强的两个</strong>，Gemini 在视频理解上尤其突出。</p>
+            <p>需要识别图片、分析视频、读取图表时，只能选多模态模型。<strong>GPT-5.5 和 Gemini 3.5 Pro 是目前多模态能力最强的两个</strong>，Gemini 在视频理解上尤其突出。</p>
 
             <p>选型建议：</p>
             <ul>
-                <li><strong>图片识别、OCR、图表解读</strong>：GPT-4o，识别精度高，细节描述准确。</li>
-                <li><strong>视频内容理解</strong>：Gemini 1.5 Pro，原生支持长视频输入。</li>
-                <li><strong>成本敏感的图像分类</strong>：GPT-4o-mini 也支持视觉，价格更低。</li>
+                <li><strong>图片识别、OCR、图表解读</strong>：GPT-5.5，识别精度高，细节描述准确。</li>
+                <li><strong>视频内容理解</strong>：Gemini 3.5 Pro，原生支持长视频输入。</li>
+                <li><strong>成本敏感的图像分类</strong>：GPT-5.4-mini 也支持视觉，价格更低。</li>
             </ul>
 
             <h2>九、成本视角：别为用不上的能力买单</h2>
@@ -573,17 +623,17 @@ stream = client.chat.completions.create(
                 <tbody>
                     <tr>
                         <td>意图识别、分类、简单问答</td>
-                        <td>GPT-4o-mini / Haiku / Flash</td>
+                        <td>GPT-5.4-mini / Haiku / Flash</td>
                         <td>~70%</td>
                     </tr>
                     <tr>
                         <td>常规生成、翻译、摘要</td>
-                        <td>GPT-4o / Claude 3.5 Sonnet</td>
+                        <td>GPT-5.5 / Claude Sonnet 4.6</td>
                         <td>~25%</td>
                     </tr>
                     <tr>
                         <td>复杂推理、长文、多模态</td>
-                        <td>GPT-4o / Gemini 1.5 Pro</td>
+                        <td>GPT-5.5 / Gemini 3.5 Pro</td>
                         <td>~5%</td>
                     </tr>
                 </tbody>
@@ -620,6 +670,13 @@ stream = client.chat.completions.create(
                 <a href="https://enlyai.com" class="cta-btn">立即注册 EnlyAI →</a>
             </div>
         </div>
+    <section class="related-posts">
+      <h2>相关文章推荐</h2>
+      <div class="related-grid">
+        <a href="/blog/llm-api-comparison.html" class="related-card"><span class="related-title">OpenAI vs Claude vs Gemini API对比</span><span class="related-arrow">→</span></a><a href="/blog/llm-api-cost-optimization.html" class="related-card"><span class="related-title">LLM API成本对比与省钱技巧</span><span class="related-arrow">→</span></a><a href="/blog/best-llm-api-platforms-2026.html" class="related-card"><span class="related-title">2026年最佳LLM API聚合平台推荐</span><span class="related-arrow">→</span></a><a href="/blog/openai-api-alternatives.html" class="related-card"><span class="related-title">OpenAI API替代方案：更便宜的选择</span><span class="related-arrow">→</span></a>
+      </div>
+    </section>
+
     </article>
 
     <footer>
