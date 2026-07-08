@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EnlyAI - 统一大模型API网关 | 一个Key调用所有AI模型</title>
+<meta name="description" content="EnlyAI是统一的AI大模型API网关，一个API Key即可调用Claude Sonnet 5、GPT-5.6、Gemini 3.5 Pro、GLM 5.2、DeepSeek V4、Qwen3-Max等2026年最新顶级大模型。支持OpenAI兼容格式，免费额度，无需信用卡，国内快速访问。">
+<meta name="keywords" content="AI API,大模型API,Claude Sonnet 5 API,GPT-5.6 API,Gemini 3.5 Pro API,GLM 5.2 API,DeepSeek V4 API,Qwen3-Max API,Kimi K3 API,免费API,OpenAI兼容,API网关,聚合API,EnlyAI,2026最新大模型,国内可用API">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://enlyai.com/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://enlyai.com/">
+<meta property="og:title" content="EnlyAI - 统一大模型API网关">
+<meta property="og:description" content="一个API Key调用Claude Sonnet 5、GPT-5.6、Gemini 3.5 Pro、GLM 5.2、DeepSeek V4等2026年最新顶级大模型。OpenAI兼容格式，免费额度，国内快速访问。">
+<meta property="og:image" content="https://enlyai.com/logo.png">
+<meta property="og:image:width" content="730">
+<meta property="og:image:height" content="635">
+<meta property="og:image:alt" content="EnlyAI Logo">
+<link rel="icon" type="image/png" href="https://enlyai.com/logo.png">
+<link rel="apple-touch-icon" href="https://enlyai.com/logo.png">
+<meta property="og:site_name" content="EnlyAI">
+<meta property="og:locale" content="zh_CN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="EnlyAI - 统一大模型API网关">
+<meta name="twitter:description" content="一个API Key调用2026年所有最新顶级大模型，OpenAI兼容，国内快速访问。">
+<meta name="twitter:image" content="https://enlyai.com/logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"EnlyAI","url":"https://enlyai.com","description":"统一的大模型API网关，一个API Key调用Claude Sonnet 5、GPT-5.6、Gemini 3.5 Pro、GLM 5.2、DeepSeek V4等2026年最新顶级大模型。","applicationCategory":"DeveloperApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"CNY"},"featureList":["免费大模型API","OpenAI兼容API","多模型支持","国内无需VPN"]}</script>
+</head>
+<body>
+<h1>EnlyAI - 统一大模型API网关</h1>
+<p>EnlyAI 是一个统一的大模型 API 聚合平台，通过一个 API Key 即可访问 2026 年国内外所有顶级大模型。兼容 OpenAI API 格式，国内无需 VPN 即可快速访问。</p>
+
+<h2>支持的模型（2026年7月最新�><strong>Direct China Access</strong> - Server optimized for direct access from mainland China, no proxy or VPN required</li>
+<li><strong>Developer Friendly</strong> - Online Playground testing, real-time usage dashboard, and multi-language code examples (Python/cURL etc.)</li>
+</ul>
+
+<h2>Quick Start</h2>
+<p>Get started with EnlyAI in 3 simple steps:</p>
+<ol>
+<li>Register for free at <a href="https://enlyai.com/register">enlyai.com/register</a></li>
+<li>Get your API key from the dashboard</li>
+<li>Start making API calls using OpenAI-compatible format</li>
+</ol>
+
+<h3>API Example (Python)</h3>
+<pre><code>from openai import OpenAI
+
+client = OpenAI(
+    api_key="your-enlyai-api-key",
+    base_url="https://enlyai.com/v1"
+)
+
+response = client.chat.completions.create(
+    model="enlyai-chat",
+    messages=[{"role": "user", "content": "Hello!"}]
+)
+print(response.choices[0].message.content)</code></pre>
+
+<h3>API Example (cURL)</h3>
+<pre><code>curl https://api.enlyai.com/v1/chat/completions \
+  -H "Authorization: Bearer your-enlyai-api-key" \
+  -H "Content-Type: application/json" \
+  -d '{"model":"enlyai-chat","messages":[{"role":"user","content":"Hello!"}]}'</code></pre>
+
+<h2>Pricing</h2>
+<p>EnlyAI offers free credits for new users. Pay-as-you-go pricing with no monthly fees. Check our <a href="https://enlyai.com/pricing">pricing page</a> for details.</p>
+
+<h2>About EnlyAI</h2>
+<p>EnlyAI is dedicated to making AI accessible to everyone. We aggregate multiple LLM providers into a single, easy-to-use API gateway, removing the complexity of managing multiple API keys and endpoints. Whether you are a developer building AI applications, a researcher experimenting with different models, or a student learning about AI, EnlyAI provides the tools you need.</p>
+
+<h2>Contact</h2>
+<p>Website: <a href="https://enlyai.com">enlyai.com</a></p>
+<p>Technical Support: Visit our About page for WeChat QR code</p>
+</body>
+</html>

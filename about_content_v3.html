@@ -1,0 +1,144 @@
+<style>
+#enlyai-about { max-width:860px; margin:0 auto; padding:24px 20px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,'Noto Sans SC','PingFang SC',sans-serif; color:var(--semi-color-text-0,#333); line-height:1.6; }
+#enlyai-about .ea-card { background:var(--semi-color-bg-1,#f8f9fa); border-radius:16px; padding:28px 32px; margin-bottom:24px; border:1px solid var(--semi-color-border,#eee); }
+#enlyai-about .ea-title { font-size:18px; font-weight:600; margin:0 0 16px; color:var(--semi-color-primary,#3b82f6); display:flex; align-items:center; gap:8px; }
+#enlyai-about .ea-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+#enlyai-about .ea-item { padding:14px 16px; background:var(--semi-color-bg-0,#fff); border-radius:10px; border:1px solid var(--semi-color-border,#eee); }
+#enlyai-about .ea-item-title { font-weight:600; font-size:14px; margin-bottom:4px; color:var(--semi-color-text-0,#333); }
+#enlyai-about .ea-item-desc { font-size:13px; color:var(--semi-color-text-2,#888); }
+#enlyai-about .ea-stat { display:flex; align-items:center; gap:10px; padding:10px 14px; background:var(--semi-color-bg-0,#fff); border-radius:8px; }
+#enlyai-about .ea-stat-num { font-size:22px; font-weight:700; color:var(--semi-color-primary,#3b82f6); }
+#enlyai-about .ea-stat-label { font-size:13px; color:var(--semi-color-text-2,#888); }
+#enlyai-about .ea-footer { text-align:center; padding:16px 0; color:var(--semi-color-text-2,#aaa); font-size:12px; border-top:1px solid var(--semi-color-border,#eee); margin-top:16px; }
+
+/* 中英文切换：默认英文，中文时隐藏 */
+#enlyai-about .zh { display:none; }
+#enlyai-about .en { display:inline; }
+
+/* 当 html lang 以 zh 开头时，显示中文隐藏英文 */
+:lang(zh) #enlyai-about .zh { display:inline; }
+:lang(zh) #enlyai-about .en { display:none; }
+:lang(zh-CN) #enlyai-about .zh { display:inline; }
+:lang(zh-CN) #enlyai-about .en { display:none; }
+:lang(zh-TW) #enlyai-about .zh { display:inline; }
+:lang(zh-TW) #enlyai-about .en { display:none; }
+:lang(zh-HK) #enlyai-about .zh { display:inline; }
+:lang(zh-HK) #enlyai-about .en { display:none; }
+
+/* block 级别的中英文切换 */
+#enlyai-about .zh-block { display:none; }
+#enlyai-about .en-block { display:block; }
+:lang(zh) #enlyai-about .zh-block { display:block; }
+:lang(zh) #enlyai-about .en-block { display:none; }
+:lang(zh-CN) #enlyai-about .zh-block { display:block; }
+:lang(zh-CN) #enlyai-about .en-block { display:none; }
+</style>
+
+<div id="enlyai-about">
+
+<!-- Hero -->
+<div style="text-align:center;margin-bottom:48px;padding:40px 0;">
+  <div style="display:inline-block;width:80px;height:80px;border-radius:20px;overflow:hidden;margin-bottom:20px;box-shadow:0 4px 24px rgba(59,130,246,0.2);">
+    <img src="/team.jpg" style="width:100%;height:100%;object-fit:cover;">
+  </div>
+  <h1 style="font-size:28px;font-weight:700;margin:0 0 8px;color:var(--semi-color-text-0,#1a1a2e);letter-spacing:-0.5px;">
+    <span class="zh">关于 EnlyAI</span><span class="en">About EnlyAI</span>
+  </h1>
+  <p style="font-size:16px;color:var(--semi-color-text-2,#888);margin:0;font-weight:400;">
+    <span class="zh">统一大语言模型 API 网关</span><span class="en">The Unified LLM API Gateway</span>
+  </p>
+</div>
+
+<!-- Mission -->
+<div class="ea-card">
+  <h2 class="ea-title">&#x1F680; <span class="zh">我们的使命</span><span class="en">Our Mission</span></h2>
+  <p style="margin:0;font-size:15px;line-height:1.8;color:var(--semi-color-text-1,#555);">
+    <span class="zh">EnlyAI 致力于为开发者和企业提供统一、稳定、高效的大语言模型 API 接入服务。我们聚合了 OpenAI、Claude、Gemini、DeepSeek、Qwen 等全球顶尖 AI 模型供应商，通过统一的 API 格式，让您无需对接多个供应商，即可灵活使用最先进的 AI 能力。</span>
+    <span class="en">EnlyAI is dedicated to providing developers and enterprises with a unified, stable, and efficient LLM API access service. We aggregate the world&#39;s leading AI model providers including OpenAI, Claude, Gemini, DeepSeek, Qwen, and more. Through a unified API format, you can flexibly use the most advanced AI capabilities without integrating with multiple providers.</span>
+  </p>
+</div>
+
+<!-- Core Advantages -->
+<div class="ea-card">
+  <h2 class="ea-title">&#x2728; <span class="zh">核心优势</span><span class="en">Core Advantages</span></h2>
+  <div class="ea-grid">
+    <div class="ea-item">
+      <div class="ea-item-title"><span class="zh">统一接口</span><span class="en">Unified Interface</span></div>
+      <div class="ea-item-desc"><span class="zh">兼容 OpenAI API 格式，无缝切换供应商</span><span class="en">OpenAI-compatible, seamless provider switching</span></div>
+    </div>
+    <div class="ea-item">
+      <div class="ea-item-title"><span class="zh">智能路由</span><span class="en">Smart Routing</span></div>
+      <div class="ea-item-desc"><span class="zh">自动选择最优渠道，确保高可用</span><span class="en">Auto-selects optimal channel for high availability</span></div>
+    </div>
+    <div class="ea-item">
+      <div class="ea-item-title"><span class="zh">负载均衡</span><span class="en">Load Balancing</span></div>
+      <div class="ea-item-desc"><span class="zh">多渠道并行，提升响应速度</span><span class="en">Multi-channel parallel for faster response</span></div>
+    </div>
+    <div class="ea-item">
+      <div class="ea-item-title"><span class="zh">成本优化</span><span class="en">Cost Optimization</span></div>
+      <div class="ea-item-desc"><span class="zh">灵活计费策略，降低 AI 调用成本</span><span class="en">Flexible billing to reduce AI costs</span></div>
+    </div>
+    <div class="ea-item">
+      <div class="ea-item-title"><span class="zh">全模型覆盖</span><span class="en">Full Model Coverage</span></div>
+      <div class="ea-item-desc"><span class="zh">文本、图像、音频、视频多模态能力</span><span class="en">Text, image, audio, video &amp; multimodal</span></div>
+    </div>
+    <div class="ea-item">
+      <div class="ea-item-title"><span class="zh">企业级安全</span><span class="en">Enterprise Security</span></div>
+      <div class="ea-item-desc"><span class="zh">数据加密与隐私保护</span><span class="en">Data encryption &amp; privacy protection</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- Technical Support -->
+<div class="ea-card" style="text-align:center;">
+  <h2 class="ea-title" style="justify-content:center;">&#x1F465; <span class="zh">技术支持</span><span class="en">Technical Support</span></h2>
+  <div style="display:flex;justify-content:center;gap:32px;flex-wrap:wrap;align-items:flex-start;text-align:left;">
+    <div style="text-align:center;">
+      <img src="/team.jpg" alt="WeChat" style="width:200px;height:auto;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.08);display:block;">
+      <p style="margin:12px 0 0;font-size:13px;color:var(--semi-color-text-2,#888);">
+        <span class="zh">扫码添加技术支持微信</span><span class="en">Scan to add WeChat support</span>
+      </p>
+    </div>
+    <div style="max-width:280px;padding-top:8px;">
+      <p style="font-size:14px;color:var(--semi-color-text-1,#555);margin:0 0 12px;">
+        <span class="zh">EnlyAI 技术团队提供专业支持：</span><span class="en">EnlyAI tech team provides professional support:</span>
+      </p>
+      <ul style="margin:0;padding-left:18px;font-size:13px;color:var(--semi-color-text-2,#888);line-height:2.2;">
+        <li><span class="zh">API 接入指导</span><span class="en">API integration guidance</span></li>
+        <li><span class="zh">模型选型建议</span><span class="en">Model selection advice</span></li>
+        <li><span class="zh">渠道配置优化</span><span class="en">Channel configuration optimization</span></li>
+        <li><span class="zh">故障排查响应</span><span class="en">Troubleshooting &amp; incident response</span></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Service Guarantee -->
+<div class="ea-card" style="background:linear-gradient(135deg,#eff6ff,#f0f0ff);">
+  <h2 class="ea-title">&#x1F6E1;&#xFE0F; <span class="zh">服务保障</span><span class="en">Service Guarantee</span></h2>
+  <div class="ea-grid">
+    <div class="ea-stat">
+      <span class="ea-stat-num">99.9%</span>
+      <span class="ea-stat-label"><span class="zh">服务可用性</span><span class="en">Availability</span></span>
+    </div>
+    <div class="ea-stat">
+      <span class="ea-stat-num">24/7</span>
+      <span class="ea-stat-label"><span class="zh">实时监控告警</span><span class="en">Monitoring &amp; Alerting</span></span>
+    </div>
+    <div class="ea-stat">
+      <span class="ea-stat-num">&lt;5min</span>
+      <span class="ea-stat-label"><span class="zh">故障响应时间</span><span class="en">Incident Response</span></span>
+    </div>
+    <div class="ea-stat">
+      <span class="ea-stat-num">AES-256</span>
+      <span class="ea-stat-label"><span class="zh">数据加密</span><span class="en">Data Encryption</span></span>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<div class="ea-footer">
+  <p style="margin:0;">2024-2026 EnlyAI &middot; <span class="zh">粤ICP备2026055772号-1</span><span class="en">ICP License: Yue ICP No.202605772-1</span></p>
+</div>
+
+</div>

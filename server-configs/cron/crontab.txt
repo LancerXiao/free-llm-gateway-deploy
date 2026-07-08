@@ -1,0 +1,4 @@
+0 3 * * * certbot renew --quiet --post-hook 'nginx -s reload'
+*/10 * * * * python3 /root/sync-free-keys.py >> /var/log/sync-free-keys.log 2>&1
+30 0 * * * /usr/bin/python3 /opt/enlyai/daily_report.py >> /var/log/enlyai/report_generator.log 2>&1
+0 3 * * * /opt/enlyai/auto_submit_urls.sh >> /var/log/url-submit.log 2>&1
